@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
+using System.Windows.Forms
 using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,6 +42,7 @@ namespace Scanda.Service
         protected override void OnStart(string[] args)
         {
             evnLogger.WriteEntry("Configuring onStart", EventLogEntryType.Information);
+            MessageBox.Show("Service Start papu");
         }
 
         protected override void OnStop()
