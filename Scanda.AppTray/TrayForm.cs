@@ -12,6 +12,7 @@ namespace Scanda.AppTray
 {
     public partial class FormTray : Form
     {
+        private LoginForm loginForm;
         public FormTray()
         {
             InitializeComponent();
@@ -33,12 +34,14 @@ namespace Scanda.AppTray
 
         private void folderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Folder");
+            
         }
 
         private void autenticarToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Activate();
+            Activate();
+            loginForm = new LoginForm();
+            loginForm.ShowDialog();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
