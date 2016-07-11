@@ -5,7 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
-using System.Windows.Forms
+using System.Windows.Forms;
 using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
