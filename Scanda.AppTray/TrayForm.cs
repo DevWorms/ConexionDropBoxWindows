@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using System.Net.Http;
 
 namespace Scanda.AppTray
 {
@@ -69,13 +70,6 @@ namespace Scanda.AppTray
             }
         }
 
-        private void autenticarToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Activate();
-            loginForm = new LoginForm();
-            loginForm.ShowDialog();
-        }
-
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -89,6 +83,38 @@ namespace Scanda.AppTray
             configuracionForm.ShowDialog();
             // recoverForm = new RecuperarForm();
             // recoverForm.ShowDialog();
+        }
+
+        private void descargarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            List<Control> selectedDownload = new List<Control>() { };
+            recoverForm = new RecuperarForm();
+            recoverForm.FormClosed += RecuperarForm_Close;
+            recoverForm.ShowDialog();
+        }
+
+        void RecuperarForm_Close(object sender, EventArgs e)
+        {
+            var form = (RecuperarForm)sender;
+            foreach(Control ctrl in form.controls)
+            {
+                
+            }
+            notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo", ToolTipIcon.Info);
+            // combinar co codigo de chemas
+            //using (var httpClient = new HttpClient())
+            //{
+            //    using (var request = new HttpRequestMessage(HttpMethod.Get, "ftp://speedtest:speedtest@ftp.otenet.gr/test10Mb.db"))
+            //    {
+            //        using (
+            //            Stream contentStream = await (await httpClient.SendAsync(request)).Content.ReadAsStreamAsync(),
+            //            stream = new FileStream(@"C:\Scanda\test.db", FileMode.Create, FileAccess.Write, FileShare.None, 1024 * 100, true))
+            //        {
+            //            await contentStream.CopyToAsync(stream);
+            //        }
+            //    }
+            //}
         }
     }
 }

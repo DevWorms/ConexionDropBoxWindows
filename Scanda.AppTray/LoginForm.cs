@@ -13,6 +13,8 @@ using System.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using MetroFramework.Forms;
+using MetroFramework.Controls;
 
 namespace Scanda.AppTray
 {
@@ -22,7 +24,7 @@ namespace Scanda.AppTray
         public int Status;
         public int IdCustomer;
     }
-    public partial class LoginForm : Form
+    public partial class LoginForm : MetroForm
     {
         private string json;
         private Config config;
@@ -45,20 +47,26 @@ namespace Scanda.AppTray
 
                 // Validamos que no esten vacios los campos
                 if (string.IsNullOrWhiteSpace(username))
+                {
                     lblMessages.Text = "El campo usuario es obligatorio";
+                    return;
+                }
 
                 if (string.IsNullOrWhiteSpace(password))
+                {
                     lblMessages.Text = "El campo password es obligatorio";
+                    return;
+                }
 
                 using (var client = new HttpClient())
                 {
                     // TODO - Send HTTP requests
-                    var service_url = string.Format("{0}{1}", url, "Login_GET?User=Jguerrero&Password=Jguerrero");
+                    // var query = HttpUtility.ParseQueryString(string.Empty);
                     client.BaseAddress = new Uri(url);
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    HttpResponseMessage response = await client.GetAsync("Login_GET?User=Jguerrero&Password=Jguerrero");
+                    HttpResponseMessage response = await client.GetAsync(string.Format("Login_GET?User={0}&Password={0}", username, password));
                     if (response.IsSuccessStatusCode)
                     {
                         var resp = await response.Content.ReadAsStringAsync();

@@ -40,6 +40,7 @@
             this.configuracionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblInfo = new System.Windows.Forms.Label();
+            this.ScandaServiceController = new System.ServiceProcess.ServiceController();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,7 +61,7 @@
             this.configuracionToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(153, 114);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(151, 92);
             // 
             // servicioToolStripMenuItem
             // 
@@ -69,7 +70,7 @@
             this.pauseToolStripMenuItem,
             this.stopToolStripMenuItem});
             this.servicioToolStripMenuItem.Name = "servicioToolStripMenuItem";
-            this.servicioToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.servicioToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.servicioToolStripMenuItem.Text = "Servicio";
             // 
             // startToolStripMenuItem
@@ -93,21 +94,21 @@
             // descargarToolStripMenuItem
             // 
             this.descargarToolStripMenuItem.Name = "descargarToolStripMenuItem";
-            this.descargarToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.descargarToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.descargarToolStripMenuItem.Text = "Descargar";
-            this.descargarToolStripMenuItem.Click += new System.EventHandler(this.autenticarToolStripMenuItem_Click);
+            this.descargarToolStripMenuItem.Click += new System.EventHandler(this.descargarToolStripMenuItem_Click);
             // 
             // configuracionToolStripMenuItem
             // 
             this.configuracionToolStripMenuItem.Name = "configuracionToolStripMenuItem";
-            this.configuracionToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.configuracionToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.configuracionToolStripMenuItem.Text = "Configuracion";
             this.configuracionToolStripMenuItem.Click += new System.EventHandler(this.configuracionToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.exitToolStripMenuItem.Text = "Salir";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -120,6 +121,10 @@
             this.lblInfo.TabIndex = 0;
             this.lblInfo.Text = "Scanda Tray Application";
             this.lblInfo.Click += new System.EventHandler(this.lblInfo_Click);
+            // 
+            // ScandaServiceController
+            // 
+            this.ScandaServiceController.ServiceName = "Scanda";
             // 
             // FormTray
             // 
@@ -151,6 +156,7 @@
         private System.Windows.Forms.ToolStripMenuItem descargarToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem configuracionToolStripMenuItem;
+        private System.ServiceProcess.ServiceController ScandaServiceController;
     }
 }
 
