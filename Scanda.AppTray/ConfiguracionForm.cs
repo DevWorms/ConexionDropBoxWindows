@@ -96,7 +96,7 @@ namespace Scanda.AppTray
                 {
                     selectedPath = fbd.SelectedPath;
                     // txtRuta.Text = selectedPath;
-                    mtxt_folder.Text = config.path;
+                    mtxt_folder.Text = selectedPath;
                     config.path = selectedPath;
                     // Guardamos la ruta
                     File.WriteAllText(@"C:\Scanda\configuration.json", JsonConvert.SerializeObject(config));

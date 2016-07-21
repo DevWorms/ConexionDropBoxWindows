@@ -242,6 +242,7 @@
             this.btnElegir.TabIndex = 1;
             this.btnElegir.Text = "Elegir Carpeta";
             this.btnElegir.UseVisualStyleBackColor = true;
+            this.btnElegir.Click += new System.EventHandler(this.btnElegir_Click);
             // 
             // metroTabPageAccount
             // 
