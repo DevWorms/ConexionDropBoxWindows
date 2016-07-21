@@ -42,17 +42,17 @@ namespace Scanda.AppTray
             try
             {
                 // Obtenemos los datos de los inputs
-                string username = txtUsername.Text;
-                string password = txtPassword.Text;
+                string username = txtUsername.Text.Trim();
+                string password = txtPassword.Text.Trim();
 
                 // Validamos que no esten vacios los campos
-                if (string.IsNullOrWhiteSpace(username))
+                if (string.IsNullOrEmpty(username) || username == "alguien@example.com")
                 {
                     lblMessages.Text = "El campo usuario es obligatorio";
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(password))
+                if (string.IsNullOrEmpty(password) || password == "contraseña")
                 {
                     lblMessages.Text = "El campo password es obligatorio";
                     return;
@@ -76,8 +76,9 @@ namespace Scanda.AppTray
                         config.id_customer = r.IdCustomer.ToString();
                         File.WriteAllText(@"C:\Scanda\configuration.json", JsonConvert.SerializeObject(config));
                         Close();
-                        // Product product = await response.Content.ReadAsAsync > Product > ();
-                        // Console.WriteLine("{0}\t${1}\t{2}", product.Name, product.Price, product.Category);
+                    } else
+                    {
+                        lblMessages.Text = "Contraseña/Usuario incorrectos";
                     }
                 }
 
@@ -85,6 +86,11 @@ namespace Scanda.AppTray
             catch(Exception ex)
             {
                 // Para los logs
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
             }
             // Revisamos si existe el directorio para almacenar nuestros archivos.
 

@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
+using System.ServiceProcess;
 
 namespace Scanda.AppTray
 {
@@ -17,8 +18,8 @@ namespace Scanda.AppTray
     {
         private RecuperarForm recoverForm;
         private ConfiguracionForm configuracionForm;
-        private LoginForm loginForm;
         private string selectedPath = "";
+        // private ProcessInfo notePad;
         public FormTray()
         {
             InitializeComponent();
@@ -30,8 +31,6 @@ namespace Scanda.AppTray
             if (!File.Exists(@"C:\Scanda\configuration.json"))
             {
                 // Si no existe lo creamos
-                // File.Create(@"C:\Scanda\configuration.json", 2048, FileOptions.Asynchronous);
-
                 // Creamos el archivo de configuracion
                 JObject configSettings = new JObject(
                     new JProperty("path", ""),
@@ -45,6 +44,7 @@ namespace Scanda.AppTray
                 // escribimos el archivo
                 File.WriteAllText(@"C:\Scanda\configuration.json", configSettings.ToString());
             }
+            
         }
 
         private void lblInfo_Click(object sender, EventArgs e)
@@ -115,6 +115,78 @@ namespace Scanda.AppTray
             //        }
             //    }
             //}
+        }
+
+        private void FormTray_Load(object sender, EventArgs e)
+        {
+            // ServiceBase service = new ServiceBase();
+            // Scanda.Service.ScandaService.Run(service);
+            if (DoesServiceExist("ServiceScanda", "."))
+            {
+                ServiceController sc = new ServiceController("ServiceScanda");
+
+                switch (sc.Status)
+                {
+                    case ServiceControllerStatus.Running:
+                        startToolStripMenuItem.Checked = true;
+                        pauseToolStripMenuItem.Checked = false;
+                        stopToolStripMenuItem.Checked = false;
+                        break;
+                    case ServiceControllerStatus.Stopped:
+                        startToolStripMenuItem.Checked = false;
+                        pauseToolStripMenuItem.Checked = false;
+                        stopToolStripMenuItem.Checked = true;
+                        break;
+                    case ServiceControllerStatus.Paused:
+                        startToolStripMenuItem.Checked = false;
+                        pauseToolStripMenuItem.Checked = true;
+                        stopToolStripMenuItem.Checked = false;
+                        break;
+                    case ServiceControllerStatus.StopPending:
+                        servicioToolStripMenuItem.Enabled = true;
+                        break;
+                    case ServiceControllerStatus.StartPending:
+                        servicioToolStripMenuItem.Enabled = true;
+                        break;
+                    default:
+                        servicioToolStripMenuItem.Enabled = false;
+                        break;
+                }
+            }else
+            {
+                servicioToolStripMenuItem.Visible = false;
+            }
+        }
+
+        bool DoesServiceExist(string serviceName, string machineName)
+        {
+            ServiceController[] services = ServiceController.GetServices(machineName);
+            var service = services.FirstOrDefault(s => s.ServiceName == serviceName);
+            return service != null;
+        }
+
+        private void startToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ScandaServiceController.Start();
+            startToolStripMenuItem.Checked = true;
+            pauseToolStripMenuItem.Checked = false;
+            stopToolStripMenuItem.Checked = false;
+        }
+
+        private void stopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ScandaServiceController.Stop();
+            startToolStripMenuItem.Checked = false;
+            pauseToolStripMenuItem.Checked = false;
+            stopToolStripMenuItem.Checked = true;
+        }
+
+        private void pauseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ScandaServiceController.Pause();
+            startToolStripMenuItem.Checked = false;
+            pauseToolStripMenuItem.Checked = true;
+            stopToolStripMenuItem.Checked = false;
         }
     }
 }
