@@ -105,9 +105,9 @@
             this.lblCompany.ForeColor = System.Drawing.Color.Gray;
             this.lblCompany.Location = new System.Drawing.Point(114, 349);
             this.lblCompany.Name = "lblCompany";
-            this.lblCompany.Size = new System.Drawing.Size(91, 13);
+            this.lblCompany.Size = new System.Drawing.Size(75, 13);
             this.lblCompany.TabIndex = 7;
-            this.lblCompany.Text = "@ 2016 DevWorms";
+            this.lblCompany.Text = "@ 2016 Scanda";
             // 
             // pictureBox1
             // 
@@ -118,6 +118,7 @@
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 8;
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.Visible = false;
             // 
             // lblMessages
             // 
