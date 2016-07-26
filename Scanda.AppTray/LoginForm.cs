@@ -27,14 +27,19 @@ namespace Scanda.AppTray
     public partial class LoginForm : MetroForm
     {
         private string json;
-        private Config config;
         private string url;
-        public LoginForm()
+        private bool flag;
+        private string configuration_path;
+        private ConfiguracionForm configuracionForm;
+        private Config config;
+        public LoginForm(bool isNuevaInstancia, string configPath)
         {
             InitializeComponent();
-            json = File.ReadAllText(@"C:\Scanda\configuration.json");
+            json = File.ReadAllText(configPath);
             config = JsonConvert.DeserializeObject<Config>(json);
             url = ConfigurationManager.AppSettings["api_url"];
+            flag = isNuevaInstancia;
+            configuration_path = configPath;
         }
 
         private async void btnLogin_Click(object sender, EventArgs e)
@@ -92,23 +97,6 @@ namespace Scanda.AppTray
                     + "\n" + ex.StackTrace
                     + "\n");
             }
-            // Revisamos si existe el directorio para almacenar nuestros archivos.
-
-            //if (!Directory.Exists("C:\\Scanda") )
-            //{
-            //    // Creamos el Directorio
-            //    Directory.CreateDirectory("C:\\Scanda");
-            //}
-            //// Revisamos si existe el archivo credentials.txt
-            //if (!File.Exists("C:\\Scanda\\credentials.txt"))
-            //{
-            //    // Si no existe lo creamos
-            //    File.Create("C:\\Scanda\\credentials.txt", 2048, FileOptions.Asynchronous);
-            //}
-            //// abrimos el archivo
-            //File.WriteAllText("C:\\Scanda\\credentials.txt", string.Format("{0}|{1}", username, password));
-            //// Servicio de Chemas
-            //this.Close();
         }
 
         private void LoginForm_Load(object sender, EventArgs e)
@@ -121,6 +109,18 @@ namespace Scanda.AppTray
             txtPassword.ForeColor = Color.Gray;
             txtPassword.GotFocus += RemoveText;
             txtPassword.LostFocus += AddText;
+
+            if (flag)
+            {
+                // abrimos la ventana de configuraciones 
+                this.FormClosed += LoginForm_Close;
+            }
+        }
+
+        void LoginForm_Close(object sender, EventArgs e)
+        {
+            configuracionForm = new ConfiguracionForm(flag, configuration_path);
+            configuracionForm.ShowDialog();
         }
 
         void RemoveText(object sender, EventArgs e)

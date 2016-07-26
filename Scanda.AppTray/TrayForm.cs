@@ -11,6 +11,7 @@ using System.IO;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.ServiceProcess;
+using System.Reflection;
 
 namespace Scanda.AppTray
 {
@@ -19,32 +20,14 @@ namespace Scanda.AppTray
         private RecuperarForm recoverForm;
         private ConfiguracionForm configuracionForm;
         private string selectedPath = "";
+        private bool flag;
+        private string configuration_path;
         // private ProcessInfo notePad;
-        public FormTray()
+        public FormTray(bool isNuevaInstancia, string configPath)
         {
             InitializeComponent();
-            if (!Directory.Exists("C:\\Scanda"))
-            {
-                // Creamos el Directorio
-                Directory.CreateDirectory("C:\\Scanda");
-            }
-            if (!File.Exists(@"C:\Scanda\configuration.json"))
-            {
-                // Si no existe lo creamos
-                // Creamos el archivo de configuracion
-                JObject configSettings = new JObject(
-                    new JProperty("path", ""),
-                    new JProperty("time_type", ""),
-                    new JProperty("time", ""),
-                    new JProperty("id_customer", ""),
-                    new JProperty("user", ""),
-                    new JProperty("password", ""),
-                    new JProperty("token", "")
-                );
-                // escribimos el archivo
-                File.WriteAllText(@"C:\Scanda\configuration.json", configSettings.ToString());
-            }
-            
+            flag = isNuevaInstancia;
+            configuration_path = configPath;
         }
 
         private void lblInfo_Click(object sender, EventArgs e)
@@ -72,6 +55,8 @@ namespace Scanda.AppTray
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            
+            //MessageBox.Show(exeFolder);
             this.Close();
         }
 
@@ -79,7 +64,7 @@ namespace Scanda.AppTray
         {
             Activate();
             // notifyIconScanda.Icon = new System.Drawing.Icon(Application.StartupPath + @"\Resources\111.ico");
-            configuracionForm = new ConfiguracionForm();
+            configuracionForm = new ConfiguracionForm(flag, configuration_path);
             configuracionForm.ShowDialog();
             // recoverForm = new RecuperarForm();
             // recoverForm.ShowDialog();
@@ -124,7 +109,7 @@ namespace Scanda.AppTray
             if (DoesServiceExist("ServiceScanda", "."))
             {
                 ServiceController sc = new ServiceController("ServiceScanda");
-
+                
                 switch (sc.Status)
                 {
                     case ServiceControllerStatus.Running:

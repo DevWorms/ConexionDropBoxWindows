@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,7 +19,39 @@ namespace Scanda.AppTray
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormTray());
+            // Obtenemos el Folder donde se aloja nuestra aplicacion
+            string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+            string settingsFolder = appFolder + "\\Settings";
+            string confFile = settingsFolder + "\\configuration.json";
+            // Revisamos si existe el directorio de Settings
+            if (!Directory.Exists(settingsFolder))
+            {
+                // No existe lo creamos el Directorio
+                Directory.CreateDirectory(settingsFolder);
+
+                
+                if (!File.Exists(confFile))
+                {
+                    // Si no existe lo creamos
+                    // Creamos el archivo de configuracion
+                    JObject configSettings = new JObject(
+                        new JProperty("path", ""),
+                        new JProperty("time_type", ""),
+                        new JProperty("time", ""),
+                        new JProperty("id_customer", ""),
+                        new JProperty("user", ""),
+                        new JProperty("password", ""),
+                        new JProperty("token", "")
+                    );
+                    // escribimos el archivo
+                    File.WriteAllText(confFile, configSettings.ToString());
+                }
+                Application.Run(new LoginForm(true, confFile));
+            } else
+            {
+                Application.Run(new FormTray(false, confFile));
+            }
+            
         }
     }
 }

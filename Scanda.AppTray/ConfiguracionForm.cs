@@ -27,13 +27,17 @@ namespace Scanda.AppTray
         private Config config;
         private List<TimeIntervals> intervals;
         private string url;
-        public ConfiguracionForm()
+        private bool flag;
+        private string configuration_path;
+        public ConfiguracionForm(bool isNuevaInstancia, string configPath)
         {
             InitializeComponent();
             // leemos el archivo de configuracion
-            json = File.ReadAllText(@"C:\Scanda\configuration.json");
+            json = File.ReadAllText(configPath);
             config = JsonConvert.DeserializeObject<Config>(json);
             url = ConfigurationManager.AppSettings["api_url"];
+            flag = isNuevaInstancia;
+            configuration_path = configPath;
             intervals = new List<TimeIntervals>()
             {
                 new TimeIntervals() {Name= "Horas", Value="horas" },
@@ -113,7 +117,7 @@ namespace Scanda.AppTray
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            loginForm = new LoginForm();
+            loginForm = new LoginForm(false, configuration_path);
             loginForm.FormClosed += ConfiguracionForm_Refresh;
             loginForm.ShowDialog();
         }
