@@ -188,6 +188,7 @@ namespace Scanda.AppTray
             }
         }
 
+
         private void ConfiguracionForm_Load(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(config.id_customer))
@@ -204,5 +205,8 @@ namespace Scanda.AppTray
         public string DBoxPassword;
         public int StorageLimit;
         public int UsedStorage;
+        public int FileTreatmen;
+        public int UploadFrecuency;
+        public int FileHistoricalNumber;
     }
 }

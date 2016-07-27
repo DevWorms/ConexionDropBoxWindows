@@ -83,26 +83,27 @@ namespace Scanda.AppTray
         }
 
 
-        public static List<string> getFiles(string usrID, string year, string month)
+        public static async Task<List<string>> getFiles(string usrID, string year, string month)
         {
-            return getFolders(usrID + "/" + year + "/" + month);
+            // return await getFolders(usrID + "/" + year + "/" + month);
+            return await getFiles(usrID + "/" + year + "/" + month);
         }
-        public static List<string> getMonths(string usrID, string year)
+        public static async Task<List<string>> getMonths(string usrID, string year)
         {
-            return getFolders(usrID + "/" + year);
+            return await getFolders(usrID + "/" + year);
         }
-        public static List<string> getYears(string usrID)
+        public static async Task<List<string>> getYears(string usrID)
         {
-            return getFolders(usrID);
+            return await getFolders(usrID);
         }
-        public static List<string> getFolders(string path)
+        public static async Task<List<string>> getFolders(string path)
         {
             try
             {
                 List<string> lista = new List<string>();
-                var x = listFiles(path);
-                x.Wait();
-                ListFolderResult res = x.Result;
+                var x = await listFiles(path);
+                // x.Wait();
+                ListFolderResult res = x; //.Result;
                 foreach (Metadata m in res.Entries)
                 {
                     if (m.IsFolder)
@@ -117,14 +118,14 @@ namespace Scanda.AppTray
                 return new List<string>(); //Lista vacia
             }
         }
-        public static List<string> getFiles(string path)
+        public static async Task<List<string>> getFiles(string path)
         {
             try
             {
                 List<string> lista = new List<string>();
-                var x = listFiles(path);
-                x.Wait();
-                ListFolderResult res = x.Result;
+                var x = await listFiles(path);
+                // x.Wait();
+                ListFolderResult res = x; //x.Result;
                 foreach (Metadata m in res.Entries)
                 {
                     if (m.IsFile)

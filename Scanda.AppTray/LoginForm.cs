@@ -82,9 +82,6 @@ namespace Scanda.AppTray
                         config.id_customer = r.IdCustomer.ToString();
                         File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                         Close();
-                        configuracionForm = new ConfiguracionForm(flag, configuration_path);
-                        configuracionForm.FormClosed += ConfiguracionForm_Close;
-                        configuracionForm.ShowDialog();
                     } else
                     {
                         lblMessages.Text = "Contraseña/Usuario incorrectos";
@@ -126,13 +123,19 @@ namespace Scanda.AppTray
             // var form = (LoginForm)sender;
             // form.Close();
             // Close();
+            configuracionForm = new ConfiguracionForm(flag, configuration_path);
+            // configuracionForm.Activate();
+            configuracionForm.FormClosed += ConfiguracionForm_Close;
+            configuracionForm.ShowDialog();
+            this.Hide();
         }
 
         void ConfiguracionForm_Close(object sender, EventArgs e)
         {
             var form = (ConfiguracionForm)sender;
-            form.Close();
+            form.Hide();
             frmTray = new FormTray(flag, configuration_path);
+            // frmTray.Activate();
             frmTray.ShowDialog();
         }
 

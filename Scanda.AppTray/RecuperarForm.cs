@@ -28,29 +28,22 @@ namespace Scanda.AppTray
             config = JsonConvert.DeserializeObject<Config>(json);
 
             tableLayoutPanel_Main.Visible = false;
-            int x = 0;
-            foreach (string anio in anio_respaldos)
-            {
-                var tile = new MetroTile();
-                tile.Text = anio;
-                tile.TextAlign = ContentAlignment.MiddleCenter;
-                tile.Location = new Point(x, 19);
-                tile.Width = 150;
-                tile.Height = 150;
-                tile.Click += MetroTile_Click;
-                metroTabPageRespaldos.Controls.Add(tile);
-                x += 160; 
-            }
         }
 
-        void MetroTile_Click(object sender, EventArgs e)
+        private async void MetroTile_Click(object sender, EventArgs e)
         {
             var obj = (MetroTile)sender;
             var tab = new MetroTabPage();
             tab.Name = "Tab_" + obj.Text; 
             tab.Text = obj.Text;
-
-            
+            List<string> storage_files = new List<string>() { };
+            // Obtenemos el Listado de meses de ese año
+            List<string> meses = await ScandaConector.getMonths(config.id_customer, obj.Text);
+            foreach(string mes in meses)
+            {
+                List<string> files = await ScandaConector.getFiles(config.id_customer, obj.Text, mes);
+                storage_files.AddRange(files);
+            }
             int y = 20;
             //int start_x = 0; int start_y = 20;
             for (int i = 0; i < 12; i++)
@@ -139,10 +132,24 @@ namespace Scanda.AppTray
                                       .Where(c => c.GetType() == type);
         }
 
-        private void RecuperarForm_Load(object sender, EventArgs e)
+        private async void RecuperarForm_Load(object sender, EventArgs e)
         {
             // Obtenemos el listado de Folders
-            var years = ScandaConector.getYears("1");
+            List<string> files = await ScandaConector.getFolders(config.id_customer);
+            // Task.WhenAll(files);
+            int x = 0;
+            foreach (string anio in files)
+            {
+                var tile = new MetroTile();
+                tile.Text = anio;
+                tile.TextAlign = ContentAlignment.MiddleCenter;
+                tile.Location = new Point(x, 19);
+                tile.Width = 150;
+                tile.Height = 150;
+                tile.Click += MetroTile_Click;
+                metroTabPageRespaldos.Controls.Add(tile);
+                x += 160;
+            }
         }
     }
 }

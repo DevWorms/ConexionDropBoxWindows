@@ -24,6 +24,9 @@ namespace Scanda.AppTray
             string settingsFolder = appFolder + "\\Settings";
             string confFile = settingsFolder + "\\configuration.json";
             // Revisamos si existe el directorio de Settings
+            string startPath = Environment.GetFolderPath(Environment.SpecialFolder.Programs)
+                   + @"\YourPublisher\YourSuite\YourProduct";
+
             if (!Directory.Exists(settingsFolder))
             {
                 // No existe lo creamos el Directorio
@@ -53,5 +56,7 @@ namespace Scanda.AppTray
             }
             
         }
+
+        
     }
 }
