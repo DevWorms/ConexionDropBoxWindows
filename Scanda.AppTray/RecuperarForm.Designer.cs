@@ -102,6 +102,7 @@
             this.MaximizeBox = false;
             this.Name = "RecuperarForm";
             this.Text = "Respaldos";
+            this.Load += new System.EventHandler(this.RecuperarForm_Load);
             this.metroTabControlPrincipal.ResumeLayout(false);
             this.metroTabPageRespaldos.ResumeLayout(false);
             this.ResumeLayout(false);

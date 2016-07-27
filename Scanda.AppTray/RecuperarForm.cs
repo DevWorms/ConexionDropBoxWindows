@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace Scanda.AppTray
 {
@@ -17,9 +19,14 @@ namespace Scanda.AppTray
         public List<Control> controls = new List<Control>() { };
         // Mockup Respaldo
         List<string> anio_respaldos = new List<string>() { "2016", "2015", "2014"};
-        public RecuperarForm()
+        private Config config;
+        private string json;
+        public RecuperarForm(bool isNuevaInstancia, string configPath)
         {
             InitializeComponent();
+            json = File.ReadAllText(configPath);
+            config = JsonConvert.DeserializeObject<Config>(json);
+
             tableLayoutPanel_Main.Visible = false;
             int x = 0;
             foreach (string anio in anio_respaldos)
@@ -34,28 +41,6 @@ namespace Scanda.AppTray
                 metroTabPageRespaldos.Controls.Add(tile);
                 x += 160; 
             }
-            /*var row = 0;
-            for(int i = 0; i < anio_respaldos.Count; i ++)
-            {
-                for(int z = 0; z < anio_respaldos.Take(4).Count(); z++)
-                {
-                    if (z == 4)
-                    {
-                        i += 4;
-                    }
-                    var tile = new MetroTile();
-                    tile.Text = anio_respaldos[i];
-                    tile.TextAlign = ContentAlignment.MiddleCenter;
-                    tile.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right | AnchorStyles.Left | AnchorStyles.Top);
-                    tile.Width = 125;
-                    tile.Height = 125;4
-                    tile.Click += MetroTile_Click;
-                    // tableLayoutPanel_Main.Width = tableLayoutPanel_Main.Width + 130;
-                    tableLayoutPanel_Main.Controls.Add(tile);
-                }
-                row++;
-                
-            }*/
         }
 
         void MetroTile_Click(object sender, EventArgs e)
@@ -152,6 +137,12 @@ namespace Scanda.AppTray
             return controls.SelectMany(ctrl => GetAll(ctrl, type))
                                       .Concat(controls)
                                       .Where(c => c.GetType() == type);
+        }
+
+        private void RecuperarForm_Load(object sender, EventArgs e)
+        {
+            // Obtenemos el listado de Folders
+            var years = ScandaConector.getYears("1");
         }
     }
 }

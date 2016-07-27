@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scanda.Service", "Scanda.Service\Scanda.Service.csproj", "{89D922F7-F4FB-4406-8660-C1FC07B07442}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scanda.AppTray", "Scanda.AppTray\Scanda.AppTray.csproj", "{8A811882-A3AD-402E-B2F0-D8963A938D18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scanda.ConsoleApp", "Scanda.ConsoleApp\Scanda.ConsoleApp.csproj", "{903F96D6-222A-4B1C-90B2-9AEB1846D96D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{8A811882-A3AD-402E-B2F0-D8963A938D18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A811882-A3AD-402E-B2F0-D8963A938D18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A811882-A3AD-402E-B2F0-D8963A938D18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{903F96D6-222A-4B1C-90B2-9AEB1846D96D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{903F96D6-222A-4B1C-90B2-9AEB1846D96D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{903F96D6-222A-4B1C-90B2-9AEB1846D96D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{903F96D6-222A-4B1C-90B2-9AEB1846D96D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

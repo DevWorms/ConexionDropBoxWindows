@@ -9,14 +9,14 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Scanda.AppTray
+namespace Scanda.ConsoleApp
 {
     public class ScandaConector
     {
         static DropboxClient client;
         static DropboxClientConfig clientConf;
         //static string APITOKEN = "";
-        static string APITOKEN = "DnYsuEHH3ssAAAAAAAAYodsCelGBXj22nko-HeIh5ENG5OFjSpmelu6R-_Obw0jM";
+        static string APITOKEN = "";
 
         static int B_TO_MB = 1024 * 1024;
         static int CHUNK_SIZE = 1 * B_TO_MB;

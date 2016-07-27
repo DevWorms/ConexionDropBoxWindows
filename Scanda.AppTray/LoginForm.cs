@@ -31,6 +31,7 @@ namespace Scanda.AppTray
         private bool flag;
         private string configuration_path;
         private ConfiguracionForm configuracionForm;
+        private FormTray frmTray;
         private Config config;
         public LoginForm(bool isNuevaInstancia, string configPath)
         {
@@ -79,8 +80,11 @@ namespace Scanda.AppTray
                         config.user = username;
                         config.password = password;
                         config.id_customer = r.IdCustomer.ToString();
-                        File.WriteAllText(@"C:\Scanda\configuration.json", JsonConvert.SerializeObject(config));
+                        File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                         Close();
+                        configuracionForm = new ConfiguracionForm(flag, configuration_path);
+                        configuracionForm.FormClosed += ConfiguracionForm_Close;
+                        configuracionForm.ShowDialog();
                     } else
                     {
                         lblMessages.Text = "Contraseña/Usuario incorrectos";
@@ -119,8 +123,17 @@ namespace Scanda.AppTray
 
         void LoginForm_Close(object sender, EventArgs e)
         {
-            configuracionForm = new ConfiguracionForm(flag, configuration_path);
-            configuracionForm.ShowDialog();
+            // var form = (LoginForm)sender;
+            // form.Close();
+            // Close();
+        }
+
+        void ConfiguracionForm_Close(object sender, EventArgs e)
+        {
+            var form = (ConfiguracionForm)sender;
+            form.Close();
+            frmTray = new FormTray(flag, configuration_path);
+            frmTray.ShowDialog();
         }
 
         void RemoveText(object sender, EventArgs e)

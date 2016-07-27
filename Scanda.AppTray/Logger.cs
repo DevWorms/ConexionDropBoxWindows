@@ -4,6 +4,7 @@ using System.Configuration;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 
 namespace Scanda.AppTray
 {
@@ -11,7 +12,10 @@ namespace Scanda.AppTray
     {
         public static void writeErrors(string strMensajeError)
         {
-            TextWriter twError = new StreamWriter(@"c:\Scanda\log.txt", true);
+            string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+            string settingsFolder = appFolder;
+            string logFile = settingsFolder + "\\log.txt";
+            TextWriter twError = new StreamWriter(logFile, true);
             twError.WriteLine(strMensajeError);
             twError.Close();
         }
@@ -20,7 +24,10 @@ namespace Scanda.AppTray
         {
             try
             {
-                string json = File.ReadAllText(@"C:\Scanda\configuration.json");
+                string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+                string settingsFolder = appFolder;
+                string logFile = settingsFolder + "\\log.txt";
+                string json = File.ReadAllText(logFile);
                 Config config = JsonConvert.DeserializeObject<Config>(json);
                 string url = ConfigurationManager.AppSettings["api_url"];
 

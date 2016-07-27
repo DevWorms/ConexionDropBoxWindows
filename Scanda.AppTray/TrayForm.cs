@@ -74,7 +74,7 @@ namespace Scanda.AppTray
         {
             Activate();
             List<Control> selectedDownload = new List<Control>() { };
-            recoverForm = new RecuperarForm();
+            recoverForm = new RecuperarForm(flag, configuration_path);
             recoverForm.FormClosed += RecuperarForm_Close;
             recoverForm.ShowDialog();
         }

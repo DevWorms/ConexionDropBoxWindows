@@ -62,8 +62,11 @@ namespace Scanda.AppTray
                 btnDesvincular.Enabled = true;
 
                 // Guardamos
-                mtxt_time.Text = config.time;
-                mcmbTime.SelectedValue = config.time_type;
+                if (!string.IsNullOrEmpty(config.time))
+                {
+                    mtxt_time.Text = config.time;
+                    mcmbTime.SelectedValue = config.time_type;
+                }
             }
         }
 
@@ -72,7 +75,7 @@ namespace Scanda.AppTray
             try
             {
                 // volvemos a abrir el archivo json
-                json = File.ReadAllText(@"C:\Scanda\configuration.json");
+                json = File.ReadAllText(configuration_path);
                 config = JsonConvert.DeserializeObject<Config>(json);
                 // Revisamos el archivo JSON
                 if (!string.IsNullOrWhiteSpace(config.user.Trim()) && !string.IsNullOrWhiteSpace(config.password.Trim()) && !string.IsNullOrWhiteSpace(config.id_customer.Trim()))
@@ -103,7 +106,7 @@ namespace Scanda.AppTray
                     mtxt_folder.Text = selectedPath;
                     config.path = selectedPath;
                     // Guardamos la ruta
-                    File.WriteAllText(@"C:\Scanda\configuration.json", JsonConvert.SerializeObject(config));
+                    File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                 }
             }catch(Exception ex)
             {
@@ -132,7 +135,7 @@ namespace Scanda.AppTray
             mtxt_avalaiblespace.Text = "";
             mtxt_usespace.Text = "";
             // Guardamos
-            File.WriteAllText(@"C:\Scanda\configuration.json", JsonConvert.SerializeObject(config));
+            File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
             // Habilitamos el Boton Add Acount
             btnLogin.Enabled = true;
         }
@@ -149,7 +152,7 @@ namespace Scanda.AppTray
                 config.time = mtxt_time.Text;
                 config.time_type = intervals[mcmbTime.SelectedIndex].Value;
                 // Guardamos
-                File.WriteAllText(@"C:\Scanda\configuration.json", JsonConvert.SerializeObject(config));
+                File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
             }
             Close();
         }
@@ -161,7 +164,7 @@ namespace Scanda.AppTray
                 config.time = mtxt_time.Text;
                 config.time_type = intervals[mcmbTime.SelectedIndex].Value;
                 // Guardamos
-                File.WriteAllText(@"C:\Scanda\configuration.json", JsonConvert.SerializeObject(config));
+                File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
             }
         }
 
