@@ -18,7 +18,7 @@
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Unc</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateEnabled>true</UpdateEnabled>
     <UpdateMode>Foreground</UpdateMode>
     <UpdateInterval>7</UpdateInterval>
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
@@ -29,9 +29,10 @@
     <ProductName>Scanda DB Protractor</ProductName>
     <PublisherName>Scanda</PublisherName>
     <SuiteName>ScandaSetup</SuiteName>
-    <ApplicationRevision>9</ApplicationRevision>
+    <ApplicationRevision>11</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -55,10 +56,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>05F420D194E4310E0FF0743DCA20FEB4B019C2C9</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>ED64B1C47A24BB1411DA7282E5D1B0FBCCDAB280</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>Scanda.AppTray_2_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>Scanda.AppTray_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -143,7 +144,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config.cs" />
     <Compile Include="ConfiguracionForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -158,6 +158,10 @@
     <Compile Include="LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\Account.cs" />
+    <Compile Include="Models\Config.cs" />
+    <Compile Include="Models\Extensions.cs" />
+    <Compile Include="Models\FileDetail.cs" />
     <Compile Include="RecuperarForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -218,6 +222,11 @@
   <ItemGroup>
     <Content Include="MetroFramework.txt" />
     <Content Include="Resources\111.ico" />
+    <None Include="Resources\Gakuseisean-Ivista-2-Misc-Database-3.ico" />
+    <None Include="Resources\QuotaNearing.png" />
+    <None Include="Resources\QuotaError.png" />
+    <None Include="Resources\QuotaCritical.png" />
+    <None Include="Resources\cloud-download-icon.png" />
     <None Include="Resources\devworms.png" />
   </ItemGroup>
   <ItemGroup>
@@ -238,6 +247,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

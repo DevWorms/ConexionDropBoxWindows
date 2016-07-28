@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using System.IO;
+using Scanda.AppTray.Models;
 
 namespace Scanda.AppTray
 {
@@ -34,32 +35,47 @@ namespace Scanda.AppTray
             var tab = new MetroTabPage();
             tab.Name = "Tab_" + obj.Text; 
             tab.Text = obj.Text;
-            List<string> storage_files = new List<string>() { };
+            List<FileDetail> storage_files = new List<FileDetail>() { };
             // Obtenemos el Listado de meses de ese año
             List<string> meses = await ScandaConector.getMonths(config.id_customer, obj.Text);
             foreach(string mes in meses)
             {
                 List<string> files = await ScandaConector.getFiles(config.id_customer, obj.Text, mes);
-                storage_files.AddRange(files);
+                foreach(string file in files)
+                {
+                    storage_files.Add(new FileDetail() { file = file, mes = mes});
+                }
+                // storage_files.AddRange(files);
             }
             int y = 20;
-            //int start_x = 0; int start_y = 20;
-            for (int i = 0; i < storage_files.Count; i++)
+            foreach(FileDetail file in storage_files)
             {
+                var checkbox = new MetroCheckBox();
+
+                checkbox.Text = file.file;// string.Format("archivo_{0}.zip", i);
+                checkbox.Name = obj.Text + "_" + file.mes + "_" + file.file;
+                checkbox.Location = new Point(0, y);
+                y += 20;
+                tab.Controls.Add(checkbox);
+            }
+            //int start_x = 0; int start_y = 20;
+            //// for (int i = 0; i < storage_files.Count; i++)
+            //// {
                 /*var groupbox = new GroupBox();
                 groupbox.Text = "Mes " + i.ToString();
                 groupbox.Location = new Point(start_x, start_y);
                 for (int z = 0; z < 3; z++)
                 {*/
-                    var checkbox = new MetroCheckBox();
-                    checkbox.Text = storage_files[i];// string.Format("archivo_{0}.zip", i);
-                    checkbox.Location = new Point(0, y);
-                    y += 20;
+                    ////var checkbox = new MetroCheckBox();
+                    
+                    ////checkbox.Text = storage_files[i];// string.Format("archivo_{0}.zip", i);
+                    ////checkbox.Location = new Point(0, y);
+                    ////y += 20;
                     //groupbox.Controls.Add(checkbox);
                // }
                 //start_y = start_y + y + 20;
-                tab.Controls.Add(checkbox);
-            }
+                /////tab.Controls.Add(checkbox);
+            //// }
 
             // Agregamos los botones
             // Boton Cerrar

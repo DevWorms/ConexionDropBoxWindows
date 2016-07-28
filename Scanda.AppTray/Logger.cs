@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Scanda.AppTray.Models;
 using System;
 using System.Configuration;
 using System.IO;

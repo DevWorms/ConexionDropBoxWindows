@@ -15,6 +15,7 @@ using MetroFramework.Controls;
 using System.Windows.Forms;
 using System.Configuration;
 using System.Net.Http.Headers;
+using Scanda.AppTray.Models;
 
 namespace Scanda.AppTray
 {
@@ -83,6 +84,7 @@ namespace Scanda.AppTray
                     btnLogin.Enabled = false;
                     btnDesvincular.Enabled = true;
                     await sync_accountinfo();
+                    await sync_extensions();
                 }
             }catch(Exception ex)
             {
@@ -190,25 +192,74 @@ namespace Scanda.AppTray
             }
         }
 
+        public async Task sync_extensions()
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(url);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage response = await client.GetAsync(string.Format("Extensions_GET?User={0}&Password={0}", config.user, config.password));
+                if (response.IsSuccessStatusCode)
+                {
+                    var resp = await response.Content.ReadAsStringAsync();
+                    List<Ext> r = JsonConvert.DeserializeObject<List<Ext>>(resp);
+
+                    config.extensions = r.Select(ent => ent.Extension).ToList();
+                    //config.time_type = "Horas";
+                    //config.type_storage = r.FileTreatmen.ToString();
+                    //config.file_historical = r.FileHistoricalNumber.ToString();
+                    File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                }
+            }
+        }
 
         private async void ConfiguracionForm_Load(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(config.id_customer))
             {
                 await sync_accountinfo();
+                await sync_extensions();
+
+                switch(int.Parse(config.type_storage))
+                {
+                    case 1:
+                        mtxt_userfolder.Visible = false;
+                        btnUserFolder.Visible = false;
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        mtxt_userfolder.Visible = false;
+                        btnUserFolder.Visible = false;
+                        break;
+                }
             }
         }
-    }
 
-    public struct Account
-    {
-        public int Success;
-        public string DBoxUser;
-        public string DBoxPassword;
-        public int StorageLimit;
-        public int UsedStorage;
-        public int FileTreatmen;
-        public int UploadFrecuency;
-        public int FileHistoricalNumber;
+        private void btnUserFolder_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                FolderBrowserDialog fbd = new FolderBrowserDialog();
+                if (fbd.ShowDialog() == DialogResult.OK)
+                {
+                    selectedPath = fbd.SelectedPath;
+                    // txtRuta.Text = selectedPath;
+                    mtxt_userfolder.Text = selectedPath;
+                    config.user_path = selectedPath;
+                    // Guardamos la ruta
+                    File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
+            }
+        }
     }
 }

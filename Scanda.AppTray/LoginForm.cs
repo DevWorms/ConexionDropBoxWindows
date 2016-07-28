@@ -15,6 +15,7 @@ using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using MetroFramework.Forms;
 using MetroFramework.Controls;
+using Scanda.AppTray.Models;
 
 namespace Scanda.AppTray
 {

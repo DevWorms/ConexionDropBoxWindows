@@ -13,6 +13,7 @@ using System.Net.Http;
 using System.ServiceProcess;
 using System.Reflection;
 using Newtonsoft.Json;
+using Scanda.AppTray.Models;
 
 namespace Scanda.AppTray
 {
@@ -72,8 +73,8 @@ namespace Scanda.AppTray
             // notifyIconScanda.Icon = new System.Drawing.Icon(Application.StartupPath + @"\Resources\111.ico");
             configuracionForm = new ConfiguracionForm(flag, configuration_path);
             configuracionForm.ShowDialog();
-            // recoverForm = new RecuperarForm();
-            // recoverForm.ShowDialog();
+            // Bitmap bmp = Properties.Resources.QuotaDownload;
+            // notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
         }
 
         private void descargarToolStripMenuItem_Click(object sender, EventArgs e)
@@ -85,32 +86,26 @@ namespace Scanda.AppTray
             recoverForm.ShowDialog();
         }
 
-        void RecuperarForm_Close(object sender, EventArgs e)
+        async void RecuperarForm_Close(object sender, EventArgs e)
         {
             var form = (RecuperarForm)sender;
-            foreach(Control ctrl in form.controls)
-            {
-                
-            }
-            var test = form.controls.FirstOrDefault();
+            Bitmap bmp = Properties.Resources.QuotaDownload;
+            notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
             notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo", ToolTipIcon.Info);
-            // combinar co codigo de chemas
-            //using (var httpClient = new HttpClient())
-            //{
-            //    using (var request = new HttpRequestMessage(HttpMethod.Get, "ftp://speedtest:speedtest@ftp.otenet.gr/test10Mb.db"))
-            //    {
-            //        using (
-            //            Stream contentStream = await (await httpClient.SendAsync(request)).Content.ReadAsStreamAsync(),
-            //            stream = new FileStream(@"C:\Scanda\test.db", FileMode.Create, FileAccess.Write, FileShare.None, 1024 * 100, true))
-            //        {
-            //            await contentStream.CopyToAsync(stream);
-            //        }
-            //    }
-            //}
-            // string json = File.ReadAllText(configuration_path);
-            // Config config = JsonConvert.DeserializeObject<Config>(json);
+            foreach (Control ctrl in form.controls)
+            {
+                string[] file = ctrl.Name.Split('_');
+                var res = await ScandaConector.downloadFile(config.id_customer, file[0], file[1], file[2], config.path);
+                if (!res)
+                {
+                    notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
+                } else
+                {
+                    notifyIconScanda.ShowBalloonTip(1000, "Información", string.Format("Termino de sincronizar {0}", file[2]), ToolTipIcon.Info);
+                }
+            }
 
-            // ScandaConector.downloadFile("1", "2016", "07", test.Text, config.path);
+            notifyIconScanda.Icon = Properties.Resources.AppIcon;
         }
 
         private void FormTray_Load(object sender, EventArgs e)
@@ -152,7 +147,7 @@ namespace Scanda.AppTray
             {
                 servicioToolStripMenuItem.Visible = false;
             }
-            ScandaConector.uploadFile(config.path + "\\spoderman.zip", "1");
+            ScandaConector.uploadFile(config.path + "\\spoderman.zip", config.id_customer, config.extensions);
         }
 
         bool DoesServiceExist(string serviceName, string machineName)

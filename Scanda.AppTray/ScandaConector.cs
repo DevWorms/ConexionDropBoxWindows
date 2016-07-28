@@ -16,7 +16,7 @@ namespace Scanda.AppTray
         static DropboxClient client;
         static DropboxClientConfig clientConf;
         //static string APITOKEN = "";
-        static string APITOKEN = "";
+        static string APITOKEN = "DnYsuEHH3ssAAAAAAAAYodsCelGBXj22nko-HeIh5ENG5OFjSpmelu6R-_Obw0jM";
 
         static int B_TO_MB = 1024 * 1024;
         static int CHUNK_SIZE = 5 * B_TO_MB;
@@ -149,7 +149,7 @@ namespace Scanda.AppTray
                 double size = info.Length / B_TO_MB;
 
                 //Validamos el tamanio
-                if (validateSize(size, remmainingSpace))
+                if (!validateSize(size, remmainingSpace))
                     return false;
 
                 string nombre = info.Name;
@@ -179,7 +179,7 @@ namespace Scanda.AppTray
                 info.MoveTo(backendPath + "/" + info.Name);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return false;
             }
@@ -377,7 +377,8 @@ namespace Scanda.AppTray
             //SHA256 sha2 = SHA256.Create(usrId);
             zip.Password = SHA256string(usrId);
             zip.AddFile(info.Name);
-            zip.Save(info.Name + ".zip"); SHA256 mySHA256 = SHA256Managed.Create();
+            zip.Save(info.Name + ".zip");
+            SHA256 mySHA256 = SHA256Managed.Create();
             return info.Name + ".zip";
         }
         private static string decifrar(string origen, string usrId)

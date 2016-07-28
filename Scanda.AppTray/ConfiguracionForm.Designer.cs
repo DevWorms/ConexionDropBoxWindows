@@ -54,6 +54,8 @@
             this.mlbl_totalspace = new MetroFramework.Controls.MetroLabel();
             this.mtxt_user = new MetroFramework.Controls.MetroTextBox();
             this.mlbl_user = new MetroFramework.Controls.MetroLabel();
+            this.mtxt_userfolder = new MetroFramework.Controls.MetroTextBox();
+            this.btnUserFolder = new System.Windows.Forms.Button();
             this.mTabControlConfiguracion.SuspendLayout();
             this.metroTabPageConfiguration.SuspendLayout();
             this.gpbCredenciales.SuspendLayout();
@@ -113,7 +115,7 @@
             this.gpbCredenciales.Controls.Add(this.lblInfoCuenta);
             this.gpbCredenciales.Controls.Add(this.btnLogin);
             this.gpbCredenciales.Controls.Add(this.lblAlert);
-            this.gpbCredenciales.Location = new System.Drawing.Point(3, 271);
+            this.gpbCredenciales.Location = new System.Drawing.Point(3, 282);
             this.gpbCredenciales.Name = "gpbCredenciales";
             this.gpbCredenciales.Size = new System.Drawing.Size(382, 95);
             this.gpbCredenciales.TabIndex = 13;
@@ -165,7 +167,7 @@
             // 
             this.gpbIntervalo.Controls.Add(this.mtxt_time);
             this.gpbIntervalo.Controls.Add(this.lblTiempo);
-            this.gpbIntervalo.Location = new System.Drawing.Point(1, 146);
+            this.gpbIntervalo.Location = new System.Drawing.Point(1, 187);
             this.gpbIntervalo.Name = "gpbIntervalo";
             this.gpbIntervalo.Size = new System.Drawing.Size(384, 80);
             this.gpbIntervalo.TabIndex = 12;
@@ -195,12 +197,14 @@
             // 
             // gpbConfRuta
             // 
+            this.gpbConfRuta.Controls.Add(this.btnUserFolder);
+            this.gpbConfRuta.Controls.Add(this.mtxt_userfolder);
             this.gpbConfRuta.Controls.Add(this.mtxt_folder);
             this.gpbConfRuta.Controls.Add(this.lblCarpeta);
             this.gpbConfRuta.Controls.Add(this.btnElegir);
             this.gpbConfRuta.Location = new System.Drawing.Point(3, 9);
             this.gpbConfRuta.Name = "gpbConfRuta";
-            this.gpbConfRuta.Size = new System.Drawing.Size(384, 123);
+            this.gpbConfRuta.Size = new System.Drawing.Size(384, 172);
             this.gpbConfRuta.TabIndex = 6;
             this.gpbConfRuta.TabStop = false;
             this.gpbConfRuta.Text = "Configuración de Ruta de respaldos";
@@ -320,6 +324,25 @@
             this.mlbl_user.TabIndex = 2;
             this.mlbl_user.Text = "Usuario";
             // 
+            // mtxt_userfolder
+            // 
+            this.mtxt_userfolder.Enabled = false;
+            this.mtxt_userfolder.Location = new System.Drawing.Point(7, 102);
+            this.mtxt_userfolder.Name = "mtxt_userfolder";
+            this.mtxt_userfolder.ReadOnly = true;
+            this.mtxt_userfolder.Size = new System.Drawing.Size(358, 23);
+            this.mtxt_userfolder.TabIndex = 12;
+            // 
+            // btnUserFolder
+            // 
+            this.btnUserFolder.Location = new System.Drawing.Point(216, 132);
+            this.btnUserFolder.Name = "btnUserFolder";
+            this.btnUserFolder.Size = new System.Drawing.Size(145, 23);
+            this.btnUserFolder.TabIndex = 13;
+            this.btnUserFolder.Text = "Elegir Carpeta";
+            this.btnUserFolder.UseVisualStyleBackColor = true;
+            this.btnUserFolder.Click += new System.EventHandler(this.btnUserFolder_Click);
+            // 
             // ConfiguracionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -374,5 +397,7 @@
         private MetroFramework.Controls.MetroTextBox mtxt_totalspace;
         private MetroFramework.Controls.MetroLabel mlbl_totalspace;
         private MetroFramework.Controls.MetroTextBox mtxt_time;
+        private System.Windows.Forms.Button btnUserFolder;
+        private MetroFramework.Controls.MetroTextBox mtxt_userfolder;
     }
 }

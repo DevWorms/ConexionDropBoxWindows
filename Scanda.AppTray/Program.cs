@@ -22,6 +22,7 @@ namespace Scanda.AppTray
             // Obtenemos el Folder donde se aloja nuestra aplicacion
             string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
             string settingsFolder = appFolder + "\\Settings";
+            string respaldadosFolder = appFolder + "\\respaldados";
             string confFile = settingsFolder + "\\configuration.json";
             // Revisamos si existe el directorio de Settings
             string startPath = Environment.GetFolderPath(Environment.SpecialFolder.Programs)
@@ -31,14 +32,15 @@ namespace Scanda.AppTray
             {
                 // No existe lo creamos el Directorio
                 Directory.CreateDirectory(settingsFolder);
+                Directory.CreateDirectory(respaldadosFolder);
 
-                
                 if (!File.Exists(confFile))
                 {
                     // Si no existe lo creamos
                     // Creamos el archivo de configuracion
                     JObject configSettings = new JObject(
                         new JProperty("path", ""),
+                        new JProperty("user_path", respaldadosFolder),
                         new JProperty("time_type", ""),
                         new JProperty("time", ""),
                         new JProperty("id_customer", ""),
@@ -46,7 +48,8 @@ namespace Scanda.AppTray
                         new JProperty("password", ""),
                         new JProperty("token", ""),
                         new JProperty("type_storage", ""),
-                        new JProperty("file_historical", "")
+                        new JProperty("file_historical", ""),
+                        new JProperty("extensions", "")
                     );
                     // escribimos el archivo
                     File.WriteAllText(confFile, configSettings.ToString());
