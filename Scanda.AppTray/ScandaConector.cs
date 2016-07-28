@@ -141,7 +141,7 @@ namespace Scanda.AppTray
             }
 
         }
-        public static bool uploadFile(string archivo, string usrId)
+        public static async Task<bool> uploadFile(string archivo, string usrId)
         {
             try
             {
@@ -175,12 +175,12 @@ namespace Scanda.AppTray
             }
         }
 
-        public static bool downloadFile(string usrId, string year, string month, string fileN, string destino)
+        public static async Task<bool> downloadFile(string usrId, string year, string month, string fileN, string destino)
         {
             try
             {
                 string pathRemoto = usrId + "/" + year + "/" + month + "/" + fileN;
-                string zip = downloadZipFile(pathRemoto, destino);
+                string zip = await downloadZipFile(pathRemoto, destino);
                 //extraemos el archivo
                 string archivo = decifrar(zip, usrId);
                 //delete zip
@@ -199,7 +199,7 @@ namespace Scanda.AppTray
 
 
 
-        private static void uploadZipFile(string origen, string folder)
+        private static async void uploadZipFile(string origen, string folder)
         {
             try
             {
@@ -215,9 +215,10 @@ namespace Scanda.AppTray
 
                 if (nChunks == 0)
                 {
-                    var subidaS = client.Files.UploadAsync("/" + folder + "/" + nombre, OVERWRITE, false, body: stream);
-                    subidaS.Wait();
-                    Console.WriteLine(subidaS.Result.AsFile.Size);
+                    var subidaS = await client.Files.UploadAsync("/" + folder + "/" + nombre, OVERWRITE, false, body: stream);
+                    // subidaS.Wait();
+                    // Console.WriteLine(subidaS.Result.AsFile.Size);
+                    Console.WriteLine(subidaS.AsFile.Size);
                     stream.Close();
                 }
                 else
@@ -233,9 +234,9 @@ namespace Scanda.AppTray
                         {
                             if (idx == 0)
                             {
-                                var result = client.Files.UploadSessionStartAsync(body: memSream);
-                                result.Wait();
-                                sessionId = result.Result.SessionId;
+                                var result = await client.Files.UploadSessionStartAsync(body: memSream);
+                                // result.Wait();
+                                sessionId = result.SessionId;//result.Result.SessionId;
                             }
                             else
                             {
@@ -243,13 +244,14 @@ namespace Scanda.AppTray
 
                                 if (idx == nChunks)
                                 {
-                                    var x = client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
-                                    x.Wait();
+                                    var x = await client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
+                                    // x.Wait();
                                 }
                                 else
                                 {
+                                    // var x = await client.Files.UploadSessionAppendV2Async(cursor, memSream);
                                     var x = client.Files.UploadSessionAppendAsync(cursor, memSream);
-                                    x.Wait();
+                                    // x.Wait();
                                 }
                             }
                         }
@@ -314,23 +316,23 @@ namespace Scanda.AppTray
             return folder;
         }
 
-        private static string downloadZipFile(string path, string folderName)
+        private static async Task<string> downloadZipFile(string path, string folderName)
         {
             try
             {
                 clientConf = new DropboxClientConfig("ScandaV1");
                 client = new DropboxClient(APITOKEN);
                 path = "/" + path;
-                var x = client.Files.DownloadAsync(path);
-                x.Wait();
+                var x = await client.Files.DownloadAsync(path);
+                // x.Wait();
 
-                FileMetadata metadata = x.Result.Response;
+                FileMetadata metadata = x.Response;//.Result.Response;
                 FileStream archivo = File.Create(metadata.Name);
 
-                var y = x.Result.GetContentAsStreamAsync();
-                y.Wait();
+                var y = await x.GetContentAsStreamAsync(); // .Result.GetContentAsStreamAsync();
+                // y.Wait();
 
-                Stream stream = y.Result;
+                Stream stream = y; // y.Result;
                 stream.CopyTo(archivo);
 
                 archivo.Close();

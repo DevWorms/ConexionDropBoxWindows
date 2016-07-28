@@ -17,8 +17,6 @@ namespace Scanda.AppTray
     public partial class RecuperarForm : MetroForm
     {
         public List<Control> controls = new List<Control>() { };
-        // Mockup Respaldo
-        List<string> anio_respaldos = new List<string>() { "2016", "2015", "2014"};
         private Config config;
         private string json;
         public RecuperarForm(bool isNuevaInstancia, string configPath)
@@ -46,7 +44,7 @@ namespace Scanda.AppTray
             }
             int y = 20;
             //int start_x = 0; int start_y = 20;
-            for (int i = 0; i < 12; i++)
+            for (int i = 0; i < storage_files.Count; i++)
             {
                 /*var groupbox = new GroupBox();
                 groupbox.Text = "Mes " + i.ToString();
@@ -54,7 +52,7 @@ namespace Scanda.AppTray
                 for (int z = 0; z < 3; z++)
                 {*/
                     var checkbox = new MetroCheckBox();
-                    checkbox.Text = string.Format("archivo_{0}.zip", i);
+                    checkbox.Text = storage_files[i];// string.Format("archivo_{0}.zip", i);
                     checkbox.Location = new Point(0, y);
                     y += 20;
                     //groupbox.Controls.Add(checkbox);
@@ -136,7 +134,6 @@ namespace Scanda.AppTray
         {
             // Obtenemos el listado de Folders
             List<string> files = await ScandaConector.getFolders(config.id_customer);
-            // Task.WhenAll(files);
             int x = 0;
             foreach (string anio in files)
             {

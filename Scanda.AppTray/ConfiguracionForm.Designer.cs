@@ -40,7 +40,6 @@
             this.lblAlert = new System.Windows.Forms.Label();
             this.gpbIntervalo = new System.Windows.Forms.GroupBox();
             this.mtxt_time = new MetroFramework.Controls.MetroTextBox();
-            this.mcmbTime = new MetroFramework.Controls.MetroComboBox();
             this.lblTiempo = new System.Windows.Forms.Label();
             this.gpbConfRuta = new System.Windows.Forms.GroupBox();
             this.mtxt_folder = new MetroFramework.Controls.MetroTextBox();
@@ -165,43 +164,34 @@
             // gpbIntervalo
             // 
             this.gpbIntervalo.Controls.Add(this.mtxt_time);
-            this.gpbIntervalo.Controls.Add(this.mcmbTime);
             this.gpbIntervalo.Controls.Add(this.lblTiempo);
             this.gpbIntervalo.Location = new System.Drawing.Point(1, 146);
             this.gpbIntervalo.Name = "gpbIntervalo";
-            this.gpbIntervalo.Size = new System.Drawing.Size(384, 100);
+            this.gpbIntervalo.Size = new System.Drawing.Size(384, 80);
             this.gpbIntervalo.TabIndex = 12;
             this.gpbIntervalo.TabStop = false;
             this.gpbIntervalo.Text = "Configuración frecuencía de respaldos";
             // 
             // mtxt_time
             // 
+            this.mtxt_time.Enabled = false;
             this.mtxt_time.FontSize = MetroFramework.MetroTextBoxSize.Medium;
-            this.mtxt_time.Location = new System.Drawing.Point(12, 59);
+            this.mtxt_time.Location = new System.Drawing.Point(226, 33);
             this.mtxt_time.Name = "mtxt_time";
-            this.mtxt_time.Size = new System.Drawing.Size(177, 23);
+            this.mtxt_time.Size = new System.Drawing.Size(141, 23);
             this.mtxt_time.TabIndex = 13;
             this.mtxt_time.Text = "0";
-            // 
-            // mcmbTime
-            // 
-            this.mcmbTime.FormattingEnabled = true;
-            this.mcmbTime.ItemHeight = 23;
-            this.mcmbTime.Location = new System.Drawing.Point(207, 54);
-            this.mcmbTime.Name = "mcmbTime";
-            this.mcmbTime.Size = new System.Drawing.Size(160, 29);
-            this.mcmbTime.TabIndex = 12;
-            this.mcmbTime.SelectedIndexChanged += new System.EventHandler(this.mcmbTime_SelectedIndexChanged);
+            this.mtxt_time.Theme = MetroFramework.MetroThemeStyle.Light;
             // 
             // lblTiempo
             // 
             this.lblTiempo.AutoSize = true;
             this.lblTiempo.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTiempo.Location = new System.Drawing.Point(6, 35);
+            this.lblTiempo.Location = new System.Drawing.Point(9, 40);
             this.lblTiempo.Name = "lblTiempo";
-            this.lblTiempo.Size = new System.Drawing.Size(213, 16);
+            this.lblTiempo.Size = new System.Drawing.Size(102, 16);
             this.lblTiempo.TabIndex = 3;
-            this.lblTiempo.Text = "Configure los tiempos de respaldo";
+            this.lblTiempo.Text = "Respaldo cada";
             // 
             // gpbConfRuta
             // 
@@ -373,7 +363,6 @@
         private System.Windows.Forms.Button btnLogin;
         private System.Windows.Forms.Label lblAlert;
         private System.Windows.Forms.GroupBox gpbIntervalo;
-        private MetroFramework.Controls.MetroComboBox mcmbTime;
         private System.Windows.Forms.Label lblTiempo;
         private MetroFramework.Controls.MetroTextBox mtxt_folder;
         private MetroFramework.Controls.MetroTextBox mtxt_user;

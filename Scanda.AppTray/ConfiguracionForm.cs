@@ -25,7 +25,7 @@ namespace Scanda.AppTray
         private string selectedPath = "";
         private string json;
         private Config config;
-        private List<TimeIntervals> intervals;
+        //private List<TimeIntervals> intervals;
         private string url;
         private bool flag;
         private string configuration_path;
@@ -38,15 +38,15 @@ namespace Scanda.AppTray
             url = ConfigurationManager.AppSettings["api_url"];
             flag = isNuevaInstancia;
             configuration_path = configPath;
-            intervals = new List<TimeIntervals>()
-            {
-                new TimeIntervals() {Name= "Horas", Value="horas" },
-                new TimeIntervals() {Name= "Dias", Value="dias" }
-            };
-            mcmbTime.DataSource = intervals;
-            mcmbTime.DisplayMember = "Name";
-            mcmbTime.ValueMember = "Value";
-            mcmbTime.SelectedIndex = 0;
+            //intervals = new List<TimeIntervals>()
+            //{
+            //    new TimeIntervals() {Name= "Horas", Value="horas" },
+            //    new TimeIntervals() {Name= "Dias", Value="dias" }
+            //};
+            //mcmbTime.DataSource = intervals;
+            //mcmbTime.DisplayMember = "Name";
+            //mcmbTime.ValueMember = "Value";
+            //mcmbTime.SelectedIndex = 0;
 
 
             metroTabPageAccount.Enabled = false;
@@ -65,7 +65,7 @@ namespace Scanda.AppTray
                 if (!string.IsNullOrEmpty(config.time))
                 {
                     mtxt_time.Text = config.time;
-                    mcmbTime.SelectedValue = config.time_type;
+                    //mcmbTime.SelectedValue = config.time_type;
                 }
             }
         }
@@ -150,7 +150,8 @@ namespace Scanda.AppTray
             if (mtxt_time.Text != "0")
             {
                 config.time = mtxt_time.Text;
-                config.time_type = intervals[mcmbTime.SelectedIndex].Value;
+                config.time_type = "Horas";
+                // config.time_type = intervals[mcmbTime.SelectedIndex].Value;
                 // Guardamos
                 File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
             }
@@ -159,13 +160,7 @@ namespace Scanda.AppTray
 
         private void mcmbTime_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (mtxt_time.Text != "0")
-            {
-                config.time = mtxt_time.Text;
-                config.time_type = intervals[mcmbTime.SelectedIndex].Value;
-                // Guardamos
-                File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
-            }
+
         }
 
         private async Task sync_accountinfo()
@@ -184,16 +179,23 @@ namespace Scanda.AppTray
                     mtxt_totalspace.Text = r.StorageLimit.ToString();
                     mtxt_avalaiblespace.Text = (r.StorageLimit - r.UsedStorage).ToString();
                     mtxt_usespace.Text = r.UsedStorage.ToString();
+                    mtxt_time.Text = r.UploadFrecuency.ToString();
+
+                    config.time = r.UploadFrecuency.ToString();
+                    config.time_type = "Horas";
+                    config.type_storage = r.FileTreatmen.ToString();
+                    config.file_historical = r.FileHistoricalNumber.ToString();
+                    File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                 }
             }
         }
 
 
-        private void ConfiguracionForm_Load(object sender, EventArgs e)
+        private async void ConfiguracionForm_Load(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(config.id_customer))
             {
-                sync_accountinfo();
+                await sync_accountinfo();
             }
         }
     }

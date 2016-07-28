@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.ServiceProcess;
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace Scanda.AppTray
 {
@@ -22,12 +23,17 @@ namespace Scanda.AppTray
         private string selectedPath = "";
         private bool flag;
         private string configuration_path;
+        // Configuraciones
+        private string json;
+        private Config config;
         // private ProcessInfo notePad;
         public FormTray(bool isNuevaInstancia, string configPath)
         {
             InitializeComponent();
             flag = isNuevaInstancia;
             configuration_path = configPath;
+            json = File.ReadAllText(configPath);
+            config = JsonConvert.DeserializeObject<Config>(json);
         }
 
         private void lblInfo_Click(object sender, EventArgs e)
@@ -86,6 +92,7 @@ namespace Scanda.AppTray
             {
                 
             }
+            var test = form.controls.FirstOrDefault();
             notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo", ToolTipIcon.Info);
             // combinar co codigo de chemas
             //using (var httpClient = new HttpClient())
@@ -100,6 +107,10 @@ namespace Scanda.AppTray
             //        }
             //    }
             //}
+            // string json = File.ReadAllText(configuration_path);
+            // Config config = JsonConvert.DeserializeObject<Config>(json);
+
+            // ScandaConector.downloadFile("1", "2016", "07", test.Text, config.path);
         }
 
         private void FormTray_Load(object sender, EventArgs e)
@@ -141,6 +152,7 @@ namespace Scanda.AppTray
             {
                 servicioToolStripMenuItem.Visible = false;
             }
+            ScandaConector.uploadFile(config.path + "\\spoderman.zip", "1");
         }
 
         bool DoesServiceExist(string serviceName, string machineName)

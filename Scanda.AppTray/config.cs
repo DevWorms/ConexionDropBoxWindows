@@ -15,6 +15,8 @@ namespace Scanda.AppTray
         public string user { get; set; }
         public string password { get; set; }
         public string token { get; set; }
+        public string type_storage { get; set; }
+        public string file_historical { get; set; }
 
     }
 }

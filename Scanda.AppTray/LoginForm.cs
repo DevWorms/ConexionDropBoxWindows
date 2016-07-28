@@ -123,11 +123,11 @@ namespace Scanda.AppTray
             // var form = (LoginForm)sender;
             // form.Close();
             // Close();
+            this.Hide();
             configuracionForm = new ConfiguracionForm(flag, configuration_path);
             // configuracionForm.Activate();
             configuracionForm.FormClosed += ConfiguracionForm_Close;
             configuracionForm.ShowDialog();
-            this.Hide();
         }
 
         void ConfiguracionForm_Close(object sender, EventArgs e)

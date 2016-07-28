@@ -44,7 +44,9 @@ namespace Scanda.AppTray
                         new JProperty("id_customer", ""),
                         new JProperty("user", ""),
                         new JProperty("password", ""),
-                        new JProperty("token", "")
+                        new JProperty("token", ""),
+                        new JProperty("type_storage", ""),
+                        new JProperty("file_historical", "")
                     );
                     // escribimos el archivo
                     File.WriteAllText(confFile, configSettings.ToString());
