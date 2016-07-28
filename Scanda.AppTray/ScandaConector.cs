@@ -16,10 +16,10 @@ namespace Scanda.AppTray
         static DropboxClient client;
         static DropboxClientConfig clientConf;
         //static string APITOKEN = "";
-        static string APITOKEN = "DnYsuEHH3ssAAAAAAAAYodsCelGBXj22nko-HeIh5ENG5OFjSpmelu6R-_Obw0jM";
+        static string APITOKEN = "";
 
         static int B_TO_MB = 1024 * 1024;
-        static int CHUNK_SIZE = 1 * B_TO_MB;
+        static int CHUNK_SIZE = 5 * B_TO_MB;
 
         static string BACKEDFOLDER = "Backed";
 
@@ -81,11 +81,8 @@ namespace Scanda.AppTray
 
             return list;
         }
-
-
         public static async Task<List<string>> getFiles(string usrID, string year, string month)
         {
-            // return await getFolders(usrID + "/" + year + "/" + month);
             return await getFiles(usrID + "/" + year + "/" + month);
         }
         public static async Task<List<string>> getMonths(string usrID, string year)
@@ -102,8 +99,8 @@ namespace Scanda.AppTray
             {
                 List<string> lista = new List<string>();
                 var x = await listFiles(path);
-                // x.Wait();
-                ListFolderResult res = x; //.Result;
+                ListFolderResult res = x;
+
                 foreach (Metadata m in res.Entries)
                 {
                     if (m.IsFolder)
@@ -124,8 +121,7 @@ namespace Scanda.AppTray
             {
                 List<string> lista = new List<string>();
                 var x = await listFiles(path);
-                // x.Wait();
-                ListFolderResult res = x; //x.Result;
+                ListFolderResult res = x;
                 foreach (Metadata m in res.Entries)
                 {
                     if (m.IsFile)
@@ -141,10 +137,24 @@ namespace Scanda.AppTray
             }
 
         }
-        public static bool uploadFile(string archivo, string usrId)
+        public static bool uploadFile(string archivo, string usrId, List<string> extensions = null, double remmainingSpace = -1, string backendPath = "respaldados")
         {
             try
             {
+                FileInfo info = new FileInfo(archivo);
+                //validamos extensiones
+                if (validateExt(info.Extension, extensions) && extensions != null)
+                    return false; // No es una extension valida
+
+                double size = info.Length / B_TO_MB;
+
+                //Validamos el tamanio
+                if (validateSize(size, remmainingSpace))
+                    return false;
+
+                string nombre = info.Name;
+
+
                 //Generamos la ruta
                 DateTime date = DateTime.Today;
                 string year;
@@ -163,10 +173,10 @@ namespace Scanda.AppTray
                 //Eliminar el archivo Zip
                 File.Delete(zip);
                 //Mover el archivo a backuped
-                if (!Directory.Exists(BACKEDFOLDER))
-                    Directory.CreateDirectory(BACKEDFOLDER);
-                FileInfo info = new FileInfo(archivo);
-                info.MoveTo(BACKEDFOLDER + "/" + info.Name);
+                if (!Directory.Exists(backendPath))
+                    Directory.CreateDirectory(backendPath);
+
+                info.MoveTo(backendPath + "/" + info.Name);
                 return true;
             }
             catch (Exception)
@@ -174,13 +184,12 @@ namespace Scanda.AppTray
                 return false;
             }
         }
-
-        public static bool downloadFile(string usrId, string year, string month, string fileN, string destino)
+        public static async Task<bool> downloadFile(string usrId, string year, string month, string fileN, string destino)
         {
             try
             {
                 string pathRemoto = usrId + "/" + year + "/" + month + "/" + fileN;
-                string zip = downloadZipFile(pathRemoto, destino);
+                string zip = await downloadZipFile(pathRemoto, destino);
                 //extraemos el archivo
                 string archivo = decifrar(zip, usrId);
                 //delete zip
@@ -196,9 +205,15 @@ namespace Scanda.AppTray
             }
 
         }
-
-
-
+        private static bool validateExt(string ext, List<String> extensions)
+        {
+            return extensions.Contains(ext);
+        }
+        private static bool validateSize(double tam, double res)
+        {
+            if (res == -1) return true;//Amacenamiento ilimitado
+            return tam <= res;
+        }
         private static void uploadZipFile(string origen, string folder)
         {
             try
@@ -274,7 +289,6 @@ namespace Scanda.AppTray
                 Console.WriteLine(ex);
             }
         }
-
         private static async Task<FolderMetadata> createFolder(string path, string folderName)
         {
             FolderMetadata folder = null;
@@ -313,24 +327,21 @@ namespace Scanda.AppTray
 
             return folder;
         }
-
-        private static string downloadZipFile(string path, string folderName)
+        private static async Task<string> downloadZipFile(string path, string folderName)
         {
             try
             {
                 clientConf = new DropboxClientConfig("ScandaV1");
                 client = new DropboxClient(APITOKEN);
                 path = "/" + path;
-                var x = client.Files.DownloadAsync(path);
-                x.Wait();
+                var x = await client.Files.DownloadAsync(path);
 
-                FileMetadata metadata = x.Result.Response;
+                FileMetadata metadata = x.Response;
                 FileStream archivo = File.Create(metadata.Name);
 
-                var y = x.Result.GetContentAsStreamAsync();
-                y.Wait();
+                var y = await x.GetContentAsStreamAsync();
 
-                Stream stream = y.Result;
+                Stream stream = y;
                 stream.CopyTo(archivo);
 
                 archivo.Close();
@@ -358,9 +369,6 @@ namespace Scanda.AppTray
                 return null;
             }
         }
-
-
-
         private static string cifrar(string origen, string usrId)
         {
             FileInfo info = new FileInfo(origen);
@@ -394,7 +402,6 @@ namespace Scanda.AppTray
             }
 
         }
-
         private static string SHA256string(string text)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(text);
@@ -405,7 +412,7 @@ namespace Scanda.AppTray
             {
                 hashString += String.Format("{0:x2}", x);
             }
-            Console.WriteLine(hashString);
+            //Console.WriteLine(hashString);
             return hashString;
         }
     }
