@@ -112,6 +112,7 @@ namespace Scanda.AppTray
         {
             // ServiceBase service = new ServiceBase();
             // Scanda.Service.ScandaService.Run(service);
+            
             if (DoesServiceExist("ServiceScanda", "."))
             {
                 ServiceController sc = new ServiceController("ServiceScanda");
@@ -147,7 +148,26 @@ namespace Scanda.AppTray
             {
                 servicioToolStripMenuItem.Visible = false;
             }
-            ScandaConector.uploadFile(config.path + "\\spoderman.zip", config.id_customer, config.extensions);
+            // Start();
+            // ScandaConector.uploadFile(config.path + "\\spoderman.zip", config.id_customer, config.extensions);
+        }
+
+        private void Start()
+        {
+            // Es en milisegundos 48 * 60 * 1000
+            // convertimos a segundos nuestras horas
+            int timestamp = int.Parse(config.time) * 3600; // horas * 60 * 1000
+            timerUpload = new System.Windows.Forms.Timer();
+            timerUpload.Tick += OnTimedEvent;
+            timerUpload.Interval = timestamp;
+            timerUpload.Start();
+        }
+
+        private static void OnTimedEvent(object sender, EventArgs e)
+        {
+            // Comienza a subir los archivos
+
+            // Termino de hacer todos los respaldos
         }
 
         bool DoesServiceExist(string serviceName, string machineName)
@@ -179,6 +199,22 @@ namespace Scanda.AppTray
             startToolStripMenuItem.Checked = false;
             pauseToolStripMenuItem.Checked = true;
             stopToolStripMenuItem.Checked = false;
+        }
+
+        private void watch()
+        {
+            fileSystemWatcherScanda = new FileSystemWatcher();
+            fileSystemWatcherScanda.Path = config.path;
+            fileSystemWatcherScanda.NotifyFilter = NotifyFilters.LastWrite;
+            fileSystemWatcherScanda.Filter = ".";
+            fileSystemWatcherScanda.Changed += new FileSystemEventHandler(OnChanged);
+            fileSystemWatcherScanda.EnableRaisingEvents = true;
+        }
+
+        private void OnChanged(object source, FileSystemEventArgs e)
+        {
+            var x = 1 + 1;
+            MessageBox.Show("Nuevo Archivo creado ->" + e.Name);
         }
     }
 }
