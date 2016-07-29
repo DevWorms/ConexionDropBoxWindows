@@ -42,6 +42,7 @@
             this.lblInfo = new System.Windows.Forms.Label();
             this.ScandaServiceController = new System.ServiceProcess.ServiceController();
             this.fileSystemWatcherScanda = new System.IO.FileSystemWatcher();
+            this.timerUpload = new System.Windows.Forms.Timer(this.components);
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcherScanda)).BeginInit();
             this.SuspendLayout();
@@ -170,6 +171,7 @@
         private System.Windows.Forms.ToolStripMenuItem configuracionToolStripMenuItem;
         private System.ServiceProcess.ServiceController ScandaServiceController;
         private System.IO.FileSystemWatcher fileSystemWatcherScanda;
+        private System.Windows.Forms.Timer timerUpload;
     }
 }
 

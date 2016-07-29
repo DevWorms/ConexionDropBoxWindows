@@ -56,10 +56,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>ED64B1C47A24BB1411DA7282E5D1B0FBCCDAB280</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>05F420D194E4310E0FF0743DCA20FEB4B019C2C9</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>Scanda.AppTray_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>Scanda.AppTray_2_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
