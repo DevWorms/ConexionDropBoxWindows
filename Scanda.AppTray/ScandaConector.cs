@@ -296,8 +296,8 @@ namespace Scanda.AppTray
                                     //var x =  client.Files.UploadSessionAppendAsync(cursor, memSream);
                                     //x.Wait();
                                     //var x = await client.Files.UploadSessionAppendAsync(cursor, memSream);
-                                    var x = client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
-                                    x.Wait();
+                                    await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
+                                    // x.Wait();
                                     //await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
                                 }
                             }
@@ -372,8 +372,10 @@ namespace Scanda.AppTray
             //Crifrar Password
             //SHA256 sha2 = SHA256.Create(usrId);
             zip.Password = SHA256string(usrId);
-            zip.AddFile(info.Name);
-            zip.Save(info.Name + ".zip"); SHA256 mySHA256 = SHA256Managed.Create();
+            // zip.AddFile(info.Name);
+            zip.AddFile(origen);
+            zip.Save(info.Name + ".zip");
+            SHA256 mySHA256 = SHA256Managed.Create();
             return info.Name + ".zip";
         }
         private static string decifrar(string origen, string usrId)

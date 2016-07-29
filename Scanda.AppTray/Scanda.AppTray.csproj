@@ -65,7 +65,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -231,12 +231,6 @@
     <None Include="Resources\QuotaCritical.png" />
     <None Include="Resources\cloud-download-icon.png" />
     <None Include="Resources\devworms.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Scanda.Service\Scanda.Service.csproj">
-      <Project>{89d922f7-f4fb-4406-8660-c1fc07b07442}</Project>
-      <Name>Scanda.Service</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">

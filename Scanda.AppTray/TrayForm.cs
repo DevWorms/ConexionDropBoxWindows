@@ -77,13 +77,21 @@ namespace Scanda.AppTray
             // notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
         }
 
-        private void descargarToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void descargarToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Activate();
             List<Control> selectedDownload = new List<Control>() { };
             recoverForm = new RecuperarForm(flag, configuration_path);
             recoverForm.FormClosed += RecuperarForm_Close;
             recoverForm.ShowDialog();
+            
+            /* while (!x.IsCompleted)
+            {
+                Console.WriteLine(temp2.upload.file);
+                Console.WriteLine(temp2.upload.chunk + " MB Subidos");
+                Console.WriteLine("de : " + temp2.upload.total + " MB Totales");
+                System.Threading.Thread.Sleep(10000); // 10 segundos
+            } */
         }
 
         async void RecuperarForm_Close(object sender, EventArgs e)
@@ -95,13 +103,13 @@ namespace Scanda.AppTray
             foreach (Control ctrl in form.controls)
             {
                 string[] file = ctrl.Name.Split('_');
-                var res = await ScandaConector.downloadFile(config.id_customer, file[0], file[1], file[2], config.path);
+                Status temp = new Status();
+                var res = await ScandaConector.downloadFile(config.id_customer, file[0], file[1], file[2], temp, config.path);
                 if (!res)
                 {
                     notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
-                } else
-                {
-                    notifyIconScanda.ShowBalloonTip(1000, "Información", string.Format("Termino de sincronizar {0}", file[2]), ToolTipIcon.Info);
+                } else {
+                    notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
                 }
             }
 
@@ -149,7 +157,6 @@ namespace Scanda.AppTray
                 servicioToolStripMenuItem.Visible = false;
             }
             // Start();
-            // ScandaConector.uploadFile(config.path + "\\spoderman.zip", config.id_customer, config.extensions);
         }
 
         private void Start()
@@ -163,11 +170,30 @@ namespace Scanda.AppTray
             timerUpload.Start();
         }
 
-        private static void OnTimedEvent(object sender, EventArgs e)
+        private async void OnTimedEvent(object sender, EventArgs e)
         {
+            // Obtenemos listado de archivos del directorio
+            string[] fileEntries = Directory.GetFiles(config.path);
             // Comienza a subir los archivos
-
+            Bitmap bmp = Properties.Resources.QuotaNearing;
+            notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
+            notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
+            foreach (string file in fileEntries)
+            {
+                Status temp2 = new Status();
+                FileInfo info = new FileInfo(file);
+                var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
+                if (!x)
+                {
+                    notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
+                }
+                else
+                {
+                    notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
+                }
+            }
             // Termino de hacer todos los respaldos
+            notifyIconScanda.Icon = Properties.Resources.AppIcon;
         }
 
         bool DoesServiceExist(string serviceName, string machineName)
