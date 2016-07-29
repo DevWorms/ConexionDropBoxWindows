@@ -160,8 +160,11 @@
     </Compile>
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\Config.cs" />
+    <Compile Include="Models\Download.cs" />
     <Compile Include="Models\Extensions.cs" />
     <Compile Include="Models\FileDetail.cs" />
+    <Compile Include="Models\Status.cs" />
+    <Compile Include="Models\Upload.cs" />
     <Compile Include="RecuperarForm.cs">
       <SubType>Form</SubType>
     </Compile>

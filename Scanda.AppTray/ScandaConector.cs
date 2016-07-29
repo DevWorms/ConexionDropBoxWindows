@@ -1,12 +1,15 @@
 ﻿using Dropbox.Api;
 using Dropbox.Api.Files;
 using Ionic.Zip;
+using Newtonsoft.Json;
+using Scanda.AppTray.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Scanda.AppTray
@@ -15,72 +18,19 @@ namespace Scanda.AppTray
     {
         static DropboxClient client;
         static DropboxClientConfig clientConf;
-        //static string APITOKEN = "";
+        //static string APITOKEN = "f-taP7WG2wAAAAAAAAAAEPgxbzHQ7EDctvivjSJCqLwCA0tcsgyuRT7H9vnxqwVK";
         static string APITOKEN = "DnYsuEHH3ssAAAAAAAAYodsCelGBXj22nko-HeIh5ENG5OFjSpmelu6R-_Obw0jM";
 
         static int B_TO_MB = 1024 * 1024;
         static int CHUNK_SIZE = 5 * B_TO_MB;
 
-        static string BACKEDFOLDER = "Backed";
+        static string STATUSFILE = "status.json";
+        //static string BACKEDFOLDER = "Backed";
 
         static WriteMode OVERWRITE = WriteMode.Overwrite.Instance;
 
+        static string REGEXP = "([A-Zz-z]{4}\\d{6})(---|\\w{3})?(\\d{14}).(\\w{3})";
 
-        private static async Task<ListFolderResult> listFiles(string path)
-        {
-            ListFolderResult list = null;
-            try
-            {
-                clientConf = new DropboxClientConfig("ScandaV1");
-                client = new DropboxClient(APITOKEN);
-                list = await client.Files.ListFolderAsync("/" + path);
-            }
-            catch (BadInputException ex)
-            {
-                Console.WriteLine("Error de Token");
-                Console.WriteLine(ex.Message);
-            }
-            catch (ApiException<ListFolderError> ex)
-            {
-                //ApiException<ListFolderError>
-                ListFolderError err = ex.ErrorResponse;
-                if (err.IsPath)
-                {
-                    LookupError lerr = err.AsPath.Value;
-                    if (lerr.IsMalformedPath)
-                    {
-                        Console.WriteLine("Ruta Mal Formateada");
-                    }
-                    if (lerr.IsNotFile)
-                    {
-                        Console.WriteLine("No es un archivo");
-                    }
-                    if (lerr.IsNotFolder)
-                    {
-                        Console.WriteLine("No es un Folder");
-                    }
-                    if (lerr.IsNotFound)
-                    {
-                        Console.WriteLine("Ruta no Hallada");
-                    }
-                    if (lerr.IsRestrictedContent)
-                    {
-                        Console.WriteLine("No tiene permisos");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Error No Indentificado");
-                }
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Fallo Desconocido");
-            }
-
-
-            return list;
-        }
         public static async Task<List<string>> getFiles(string usrID, string year, string month)
         {
             return await getFiles(usrID + "/" + year + "/" + month);
@@ -137,22 +87,31 @@ namespace Scanda.AppTray
             }
 
         }
-        public static bool uploadFile(string archivo, string usrId, List<string> extensions = null, double remmainingSpace = -1, string backendPath = "respaldados")
+
+        public static async Task<bool> uploadFile(string archivo, string usrId, Status status, List<string> extensions = null, double remmainingSpace = -1)
         {
+            status.upload.file = archivo;
+            status.upload.status = 0;
             try
             {
                 FileInfo info = new FileInfo(archivo);
                 //validamos extensiones
-                if (validateExt(info.Extension, extensions) && extensions != null)
+                if (!isValidExt(info.Extension, extensions))
                     return false; // No es una extension valida
+
 
                 double size = info.Length / B_TO_MB;
 
                 //Validamos el tamanio
-                if (!validateSize(size, remmainingSpace))
+                if (!isValidSize(size, remmainingSpace))
                     return false;
 
-                string nombre = info.Name;
+
+                string name = info.Name;
+                status.upload.file = info.Name;
+                //NOmbre del archivo
+                if (!isValidFileName(name))
+                    return false;
 
 
                 //Generamos la ruta
@@ -169,25 +128,34 @@ namespace Scanda.AppTray
                 //Zipeamos l archivo
                 string zip = cifrar(archivo, usrId);
                 string ruta = usrId + "/" + year + "/" + month;
-                uploadZipFile(zip, ruta);
-                //Eliminar el archivo Zip
-                File.Delete(zip);
-                //Mover el archivo a backuped
-                if (!Directory.Exists(backendPath))
-                    Directory.CreateDirectory(backendPath);
+                status.upload.status = 1;
+                await uploadZipFile(zip, ruta, status);
 
-                info.MoveTo(backendPath + "/" + info.Name);
+                //Eliminar el archivo Zip
+                //File.Delete(zip);
+                //Mover el archivo a backuped
+                //if (!Directory.Exists(backendPath))
+                //    Directory.CreateDirectory(backendPath);
+
+                //info.MoveTo(backendPath + "/" + info.Name);
                 return true;
+
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
+
             }
         }
-        public static async Task<bool> downloadFile(string usrId, string year, string month, string fileN, string destino)
+        public static async Task<bool> downloadFile(string usrId, string year, string month, string fileN, Status status, string destino)
         {
             try
             {
+                status.download.file = fileN;
+                status.download.status = 0;
+
+
+
                 string pathRemoto = usrId + "/" + year + "/" + month + "/" + fileN;
                 string zip = await downloadZipFile(pathRemoto, destino);
                 //extraemos el archivo
@@ -196,6 +164,9 @@ namespace Scanda.AppTray
                 File.Delete(zip);
                 //Moverlo a la ruta
                 File.Move(archivo, destino + "/" + archivo);
+
+                status.download.status = 1;
+                status.download.path = destino + "/" + archivo;
                 return true;
             }
             catch (Exception ex)
@@ -205,23 +176,74 @@ namespace Scanda.AppTray
             }
 
         }
-        private static bool validateExt(string ext, List<String> extensions)
+
+        private static async Task<ListFolderResult> listFiles(string path)
         {
-            return extensions.Contains(ext);
+            ListFolderResult list = null;
+            try
+            {
+                clientConf = new DropboxClientConfig("ScandaV1");
+                client = new DropboxClient(APITOKEN);
+                list = await client.Files.ListFolderAsync("/" + path);
+            }
+            catch (BadInputException ex)
+            {
+                Console.WriteLine("Error de Token");
+                Console.WriteLine(ex.Message);
+            }
+            catch (ApiException<ListFolderError> ex)
+            {
+                //ApiException<ListFolderError>
+                ListFolderError err = ex.ErrorResponse;
+                if (err.IsPath)
+                {
+                    LookupError lerr = err.AsPath.Value;
+                    if (lerr.IsMalformedPath)
+                    {
+                        Console.WriteLine("Ruta Mal Formateada");
+                    }
+                    if (lerr.IsNotFile)
+                    {
+                        Console.WriteLine("No es un archivo");
+                    }
+                    if (lerr.IsNotFolder)
+                    {
+                        Console.WriteLine("No es un Folder");
+                    }
+                    if (lerr.IsNotFound)
+                    {
+                        Console.WriteLine("Ruta no Hallada");
+                    }
+                    if (lerr.IsRestrictedContent)
+                    {
+                        Console.WriteLine("No tiene permisos");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Error No Indentificado");
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Fallo Desconocido");
+            }
+
+
+            return list;
         }
-        private static bool validateSize(double tam, double res)
-        {
-            if (res == -1) return true;//Amacenamiento ilimitado
-            return tam <= res;
-        }
-        private static void uploadZipFile(string origen, string folder)
+        private static async Task uploadZipFile(string origen, string folder, Status status)
         {
             try
             {
                 clientConf = new DropboxClientConfig("ScandaV1");
                 client = new DropboxClient(APITOKEN);
 
+
                 FileInfo info = new FileInfo(origen);
+
+                status.upload.total = ((info.Length * 1.0) / B_TO_MB) + ""; //Lo convierte a MB y a string
+
                 string extension = info.Extension;
                 float size = info.Length / (B_TO_MB * 1.0f);
                 long nChunks = info.Length / CHUNK_SIZE;
@@ -230,27 +252,33 @@ namespace Scanda.AppTray
 
                 if (nChunks == 0)
                 {
-                    var subidaS = client.Files.UploadAsync("/" + folder + "/" + nombre, OVERWRITE, false, body: stream);
-                    subidaS.Wait();
-                    Console.WriteLine(subidaS.Result.AsFile.Size);
-                    stream.Close();
+                    var subidaS = await client.Files.UploadAsync("/" + folder + "/" + nombre, OVERWRITE, false, body: stream);
+                    //subidaS.Wait();
+                    //Console.WriteLine(subidaS.Result.AsFile.Size);
+                    //stream.Close();
                 }
                 else
                 {
                     byte[] buffer = new byte[CHUNK_SIZE];
                     string sessionId = null;
 
+
+
                     for (var idx = 0; idx <= nChunks; idx++)
                     {
+                        status.upload.status = 2;
                         var byteRead = stream.Read(buffer, 0, CHUNK_SIZE);
+
+                        status.upload.chunk = (idx * CHUNK_SIZE * 1.0) / B_TO_MB + "";
 
                         using (var memSream = new MemoryStream(buffer, 0, byteRead))
                         {
                             if (idx == 0)
                             {
-                                var result = client.Files.UploadSessionStartAsync(body: memSream);
-                                result.Wait();
-                                sessionId = result.Result.SessionId;
+                                //var result = client.Files.UploadSessionStartAsync(body: memSream);
+                                //result.Wait();
+                                var result = await client.Files.UploadSessionStartAsync(body: memSream);
+                                sessionId = result.SessionId;
                             }
                             else
                             {
@@ -258,13 +286,19 @@ namespace Scanda.AppTray
 
                                 if (idx == nChunks)
                                 {
-                                    var x = client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
-                                    x.Wait();
+                                    //var x = client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
+                                    //x.Wait();
+                                    var x = await client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
+                                    status.upload.status = 3;
                                 }
                                 else
                                 {
-                                    var x = client.Files.UploadSessionAppendAsync(cursor, memSream);
+                                    //var x =  client.Files.UploadSessionAppendAsync(cursor, memSream);
+                                    //x.Wait();
+                                    //var x = await client.Files.UploadSessionAppendAsync(cursor, memSream);
+                                    var x = client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
                                     x.Wait();
+                                    //await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
                                 }
                             }
                         }
@@ -288,44 +322,6 @@ namespace Scanda.AppTray
             {
                 Console.WriteLine(ex);
             }
-        }
-        private static async Task<FolderMetadata> createFolder(string path, string folderName)
-        {
-            FolderMetadata folder = null;
-            try
-            {
-                clientConf = new DropboxClientConfig("ScandaV1");
-                client = new DropboxClient(APITOKEN);
-                folder = await client.Files.CreateFolderAsync("/" + path + "/" + folderName);
-            }
-            catch (ApiException<CreateFolderError> ex)
-            {
-                CreateFolderError err = ex.ErrorResponse;
-
-                if (err.AsPath.Value.IsConflict)
-                {
-                    Console.WriteLine("Nombre Conflictivo");
-                }
-                if (err.AsPath.Value.IsInsufficientSpace)
-                {
-                    Console.WriteLine("No hay Espacio");
-                }
-                if (err.AsPath.Value.IsNoWritePermission)
-                {
-                    Console.WriteLine("No hay PErmisos de Escritura");
-                }
-                if (err.AsPath.Value.IsMalformedPath)
-                {
-                    Console.WriteLine("Ruta Invalida");
-                }
-
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Fallo Desconocido");
-            }
-
-            return folder;
         }
         private static async Task<string> downloadZipFile(string path, string folderName)
         {
@@ -377,8 +373,7 @@ namespace Scanda.AppTray
             //SHA256 sha2 = SHA256.Create(usrId);
             zip.Password = SHA256string(usrId);
             zip.AddFile(info.Name);
-            zip.Save(info.Name + ".zip");
-            SHA256 mySHA256 = SHA256Managed.Create();
+            zip.Save(info.Name + ".zip"); SHA256 mySHA256 = SHA256Managed.Create();
             return info.Name + ".zip";
         }
         private static string decifrar(string origen, string usrId)
@@ -416,5 +411,68 @@ namespace Scanda.AppTray
             //Console.WriteLine(hashString);
             return hashString;
         }
+        private static bool isValidSize(double tam, double res)
+        {
+            if (res == -1) return true;//Amacenamiento ilimitado
+            return tam <= res;
+        }
+        private static bool isValidFileName(string fileName)
+        {
+            if (String.IsNullOrEmpty(fileName))
+                return false;
+            try
+            {
+                return Regex.IsMatch(fileName, REGEXP);
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                return false;
+            }
+        }
+        private static bool isValidExt(string ext, List<String> extensions)
+        {
+            if (extensions == null)
+                return true;
+            return extensions.Contains(ext);
+        }
+        private static async Task<FolderMetadata> createFolder(string path, string folderName)
+        {
+            FolderMetadata folder = null;
+            try
+            {
+                clientConf = new DropboxClientConfig("ScandaV1");
+                client = new DropboxClient(APITOKEN);
+                folder = await client.Files.CreateFolderAsync("/" + path + "/" + folderName);
+            }
+            catch (ApiException<CreateFolderError> ex)
+            {
+                CreateFolderError err = ex.ErrorResponse;
+
+                if (err.AsPath.Value.IsConflict)
+                {
+                    Console.WriteLine("Nombre Conflictivo");
+                }
+                if (err.AsPath.Value.IsInsufficientSpace)
+                {
+                    Console.WriteLine("No hay Espacio");
+                }
+                if (err.AsPath.Value.IsNoWritePermission)
+                {
+                    Console.WriteLine("No hay PErmisos de Escritura");
+                }
+                if (err.AsPath.Value.IsMalformedPath)
+                {
+                    Console.WriteLine("Ruta Invalida");
+                }
+
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Fallo Desconocido");
+            }
+
+            return folder;
+        }
+
     }
 }
