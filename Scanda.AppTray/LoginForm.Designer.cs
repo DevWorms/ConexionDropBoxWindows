@@ -90,7 +90,7 @@
             // 
             // pbx_logo
             // 
-            this.pbx_logo.Image = ((System.Drawing.Image)(resources.GetObject("pbx_logo.Image")));
+            this.pbx_logo.Image = global::Scanda.AppTray.Properties.Resources.DB_Protector_64X64;
             this.pbx_logo.Location = new System.Drawing.Point(181, 28);
             this.pbx_logo.Name = "pbx_logo";
             this.pbx_logo.Size = new System.Drawing.Size(117, 73);

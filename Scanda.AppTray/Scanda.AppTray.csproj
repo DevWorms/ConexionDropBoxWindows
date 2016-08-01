@@ -225,6 +225,9 @@
   <ItemGroup>
     <Content Include="MetroFramework.txt" />
     <Content Include="Resources\111.ico" />
+    <None Include="Resources\DB_Protector_16X16-01.png" />
+    <None Include="Resources\DB_Protector_32X32.png" />
+    <None Include="Resources\DB_Protector_64X64.png" />
     <None Include="Resources\Gakuseisean-Ivista-2-Misc-Database-3.ico" />
     <None Include="Resources\QuotaNearing.png" />
     <None Include="Resources\QuotaError.png" />

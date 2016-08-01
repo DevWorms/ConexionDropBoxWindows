@@ -73,6 +73,36 @@ namespace Scanda.AppTray.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DB_Protector_16X16_01 {
+            get {
+                object obj = ResourceManager.GetObject("DB_Protector_16X16-01", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DB_Protector_32X32 {
+            get {
+                object obj = ResourceManager.GetObject("DB_Protector_32X32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DB_Protector_64X64 {
+            get {
+                object obj = ResourceManager.GetObject("DB_Protector_64X64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap devworms {
             get {
                 object obj = ResourceManager.GetObject("devworms", resourceCulture);

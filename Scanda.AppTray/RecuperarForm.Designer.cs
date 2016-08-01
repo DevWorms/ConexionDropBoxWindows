@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RecuperarForm));
             this.metroTabControlPrincipal = new MetroFramework.Controls.MetroTabControl();
             this.metroTabPageRespaldos = new MetroFramework.Controls.MetroTabPage();
             this.tableLayoutPanel_Main = new System.Windows.Forms.TableLayoutPanel();
@@ -99,9 +100,11 @@
             this.Controls.Add(this.mbtnDownload);
             this.Controls.Add(this.mbtnCancel);
             this.Controls.Add(this.metroTabControlPrincipal);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "RecuperarForm";
             this.Text = "Respaldos";
+            this.Theme = MetroFramework.MetroThemeStyle.Light;
             this.Load += new System.EventHandler(this.RecuperarForm_Load);
             this.metroTabControlPrincipal.ResumeLayout(false);
             this.metroTabPageRespaldos.ResumeLayout(false);

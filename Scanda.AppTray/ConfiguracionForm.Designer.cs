@@ -42,6 +42,8 @@
             this.mtxt_time = new MetroFramework.Controls.MetroTextBox();
             this.lblTiempo = new System.Windows.Forms.Label();
             this.gpbConfRuta = new System.Windows.Forms.GroupBox();
+            this.btnUserFolder = new System.Windows.Forms.Button();
+            this.mtxt_userfolder = new MetroFramework.Controls.MetroTextBox();
             this.mtxt_folder = new MetroFramework.Controls.MetroTextBox();
             this.lblCarpeta = new System.Windows.Forms.Label();
             this.btnElegir = new System.Windows.Forms.Button();
@@ -54,8 +56,6 @@
             this.mlbl_totalspace = new MetroFramework.Controls.MetroLabel();
             this.mtxt_user = new MetroFramework.Controls.MetroTextBox();
             this.mlbl_user = new MetroFramework.Controls.MetroLabel();
-            this.mtxt_userfolder = new MetroFramework.Controls.MetroTextBox();
-            this.btnUserFolder = new System.Windows.Forms.Button();
             this.mTabControlConfiguracion.SuspendLayout();
             this.metroTabPageConfiguration.SuspendLayout();
             this.gpbCredenciales.SuspendLayout();
@@ -209,6 +209,25 @@
             this.gpbConfRuta.TabStop = false;
             this.gpbConfRuta.Text = "Configuración de Ruta de respaldos";
             // 
+            // btnUserFolder
+            // 
+            this.btnUserFolder.Location = new System.Drawing.Point(216, 132);
+            this.btnUserFolder.Name = "btnUserFolder";
+            this.btnUserFolder.Size = new System.Drawing.Size(145, 23);
+            this.btnUserFolder.TabIndex = 13;
+            this.btnUserFolder.Text = "Elegir Carpeta";
+            this.btnUserFolder.UseVisualStyleBackColor = true;
+            this.btnUserFolder.Click += new System.EventHandler(this.btnUserFolder_Click);
+            // 
+            // mtxt_userfolder
+            // 
+            this.mtxt_userfolder.Enabled = false;
+            this.mtxt_userfolder.Location = new System.Drawing.Point(7, 102);
+            this.mtxt_userfolder.Name = "mtxt_userfolder";
+            this.mtxt_userfolder.ReadOnly = true;
+            this.mtxt_userfolder.Size = new System.Drawing.Size(358, 23);
+            this.mtxt_userfolder.TabIndex = 12;
+            // 
             // mtxt_folder
             // 
             this.mtxt_folder.Enabled = false;
@@ -323,25 +342,6 @@
             this.mlbl_user.Size = new System.Drawing.Size(53, 19);
             this.mlbl_user.TabIndex = 2;
             this.mlbl_user.Text = "Usuario";
-            // 
-            // mtxt_userfolder
-            // 
-            this.mtxt_userfolder.Enabled = false;
-            this.mtxt_userfolder.Location = new System.Drawing.Point(7, 102);
-            this.mtxt_userfolder.Name = "mtxt_userfolder";
-            this.mtxt_userfolder.ReadOnly = true;
-            this.mtxt_userfolder.Size = new System.Drawing.Size(358, 23);
-            this.mtxt_userfolder.TabIndex = 12;
-            // 
-            // btnUserFolder
-            // 
-            this.btnUserFolder.Location = new System.Drawing.Point(216, 132);
-            this.btnUserFolder.Name = "btnUserFolder";
-            this.btnUserFolder.Size = new System.Drawing.Size(145, 23);
-            this.btnUserFolder.TabIndex = 13;
-            this.btnUserFolder.Text = "Elegir Carpeta";
-            this.btnUserFolder.UseVisualStyleBackColor = true;
-            this.btnUserFolder.Click += new System.EventHandler(this.btnUserFolder_Click);
             // 
             // ConfiguracionForm
             // 
