@@ -77,7 +77,7 @@ namespace Scanda.AppTray
             // notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
         }
 
-        private async void descargarToolStripMenuItem_Click(object sender, EventArgs e)
+        private void descargarToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Activate();
             List<Control> selectedDownload = new List<Control>() { };
@@ -156,7 +156,7 @@ namespace Scanda.AppTray
             {
                 servicioToolStripMenuItem.Visible = false;
             }
-            // Start();
+            Start();
         }
 
         private void Start()

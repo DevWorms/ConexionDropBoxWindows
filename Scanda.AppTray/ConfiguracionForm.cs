@@ -205,7 +205,7 @@ namespace Scanda.AppTray
                     var resp = await response.Content.ReadAsStringAsync();
                     List<Ext> r = JsonConvert.DeserializeObject<List<Ext>>(resp);
 
-                    config.extensions = r.Select(ent => ent.Extension).ToList();
+                    config.extensions = r.Select(ent => "." + ent.Extension.ToLower()).ToList();
                     //config.time_type = "Horas";
                     //config.type_storage = r.FileTreatmen.ToString();
                     //config.file_historical = r.FileHistoricalNumber.ToString();
