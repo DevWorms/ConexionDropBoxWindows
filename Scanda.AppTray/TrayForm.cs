@@ -47,7 +47,7 @@ namespace Scanda.AppTray
             if(this.WindowState == FormWindowState.Minimized)
             {
                 this.Hide();
-                notifyIconScanda.ShowBalloonTip(1000, "Important notice", "Scanda Service is Running", ToolTipIcon.Info);
+                notifyIconScanda.ShowBalloonTip(1000, "Important notice", "DB Protector Service is Running", ToolTipIcon.Info);
             }
         }
 

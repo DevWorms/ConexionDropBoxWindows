@@ -71,6 +71,15 @@ namespace Scanda.AppTray.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error al crear cron.
+        /// </summary>
+        internal static string cron_error {
+            get {
+                return ResourceManager.GetString("cron_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap DB_Protector_16X16_01 {
@@ -111,6 +120,141 @@ namespace Scanda.AppTray.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error archivo inexistente.
+        /// </summary>
+        internal static string error_404 {
+            get {
+                return ResourceManager.GetString("error_404", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error comprimir arhivo.
+        /// </summary>
+        internal static string error_compress {
+            get {
+                return ResourceManager.GetString("error_compress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error extension invalida.
+        /// </summary>
+        internal static string error_ext {
+            get {
+                return ResourceManager.GetString("error_ext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ruta respaldos incorrecta.
+        /// </summary>
+        internal static string error_path {
+            get {
+                return ResourceManager.GetString("error_path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error eliminando .zip.
+        /// </summary>
+        internal static string error_remove_file {
+            get {
+                return ResourceManager.GetString("error_remove_file", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: enviar Log: {0}.
+        /// </summary>
+        internal static string error_report {
+            get {
+                return ResourceManager.GetString("error_report", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Espacio insuficiente.
+        /// </summary>
+        internal static string error_size {
+            get {
+                return ResourceManager.GetString("error_size", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error subir archivo.
+        /// </summary>
+        internal static string error_upload {
+            get {
+                return ResourceManager.GetString("error_upload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: enviar solicitud HTTP: {0}.
+        /// </summary>
+        internal static string http_error {
+            get {
+                return ResourceManager.GetString("http_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: abrir archivo de configuracion: {0}.
+        /// </summary>
+        internal static string load_config_file {
+            get {
+                return ResourceManager.GetString("load_config_file", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: abrir archivo de errores: {0}.
+        /// </summary>
+        internal static string load_errors_file {
+            get {
+                return ResourceManager.GetString("load_errors_file", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: autenticarse con API REST: {0}.
+        /// </summary>
+        internal static string login_api_error {
+            get {
+                return ResourceManager.GetString("login_api_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usuario con Status: {0}.
+        /// </summary>
+        internal static string login_status_error {
+            get {
+                return ResourceManager.GetString("login_status_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: obtener nombre de proceso con API.
+        /// </summary>
+        internal static string process_api {
+            get {
+                return ResourceManager.GetString("process_api", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nombre de proceso invalido.
+        /// </summary>
+        internal static string process_incorrect {
+            get {
+                return ResourceManager.GetString("process_incorrect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap QuotaCritical {
@@ -147,6 +291,24 @@ namespace Scanda.AppTray.Properties {
             get {
                 object obj = ResourceManager.GetObject("QuotaNearing", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Archivo descargado.
+        /// </summary>
+        internal static string success_download {
+            get {
+                return ResourceManager.GetString("success_download", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subida exitosa.
+        /// </summary>
+        internal static string success_upload {
+            get {
+                return ResourceManager.GetString("success_upload", resourceCulture);
             }
         }
     }

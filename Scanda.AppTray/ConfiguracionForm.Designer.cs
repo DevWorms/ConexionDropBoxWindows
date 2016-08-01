@@ -90,7 +90,7 @@
             this.mTabControlConfiguracion.Controls.Add(this.metroTabPageAccount);
             this.mTabControlConfiguracion.Location = new System.Drawing.Point(14, 64);
             this.mTabControlConfiguracion.Name = "mTabControlConfiguracion";
-            this.mTabControlConfiguracion.SelectedIndex = 0;
+            this.mTabControlConfiguracion.SelectedIndex = 1;
             this.mTabControlConfiguracion.Size = new System.Drawing.Size(395, 449);
             this.mTabControlConfiguracion.TabIndex = 10;
             // 
@@ -288,9 +288,9 @@
             this.mlbl_usespace.AutoSize = true;
             this.mlbl_usespace.Location = new System.Drawing.Point(19, 253);
             this.mlbl_usespace.Name = "mlbl_usespace";
-            this.mlbl_usespace.Size = new System.Drawing.Size(94, 19);
+            this.mlbl_usespace.Size = new System.Drawing.Size(123, 19);
             this.mlbl_usespace.TabIndex = 8;
-            this.mlbl_usespace.Text = "Espacio Usado";
+            this.mlbl_usespace.Text = "Espacio en mi nube";
             // 
             // mtxt_avalaiblespace
             // 

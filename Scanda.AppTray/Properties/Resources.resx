@@ -145,4 +145,58 @@
   <data name="DB_Protector_16X16-01" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DB_Protector_16X16-01.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="cron_error" xml:space="preserve">
+    <value>Error al crear cron</value>
+  </data>
+  <data name="error_404" xml:space="preserve">
+    <value>Error archivo inexistente</value>
+  </data>
+  <data name="error_compress" xml:space="preserve">
+    <value>Error comprimir arhivo</value>
+  </data>
+  <data name="error_ext" xml:space="preserve">
+    <value>Error extension invalida</value>
+  </data>
+  <data name="error_path" xml:space="preserve">
+    <value>Ruta respaldos incorrecta</value>
+  </data>
+  <data name="error_remove_file" xml:space="preserve">
+    <value>Error eliminando .zip</value>
+  </data>
+  <data name="error_report" xml:space="preserve">
+    <value>Error: enviar Log: {0}</value>
+  </data>
+  <data name="error_size" xml:space="preserve">
+    <value>Espacio insuficiente</value>
+  </data>
+  <data name="error_upload" xml:space="preserve">
+    <value>Error subir archivo</value>
+  </data>
+  <data name="http_error" xml:space="preserve">
+    <value>Error: enviar solicitud HTTP: {0}</value>
+  </data>
+  <data name="load_config_file" xml:space="preserve">
+    <value>Error: abrir archivo de configuracion: {0}</value>
+  </data>
+  <data name="load_errors_file" xml:space="preserve">
+    <value>Error: abrir archivo de errores: {0}</value>
+  </data>
+  <data name="login_api_error" xml:space="preserve">
+    <value>Error: autenticarse con API REST: {0}</value>
+  </data>
+  <data name="login_status_error" xml:space="preserve">
+    <value>Usuario con Status: {0}</value>
+  </data>
+  <data name="process_api" xml:space="preserve">
+    <value>Error: obtener nombre de proceso con API</value>
+  </data>
+  <data name="process_incorrect" xml:space="preserve">
+    <value>Nombre de proceso invalido</value>
+  </data>
+  <data name="success_download" xml:space="preserve">
+    <value>Archivo descargado</value>
+  </data>
+  <data name="success_upload" xml:space="preserve">
+    <value>Subida exitosa</value>
+  </data>
 </root>

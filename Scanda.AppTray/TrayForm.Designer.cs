@@ -123,9 +123,9 @@
             this.lblInfo.AutoSize = true;
             this.lblInfo.Location = new System.Drawing.Point(79, 25);
             this.lblInfo.Name = "lblInfo";
-            this.lblInfo.Size = new System.Drawing.Size(123, 13);
+            this.lblInfo.Size = new System.Drawing.Size(147, 13);
             this.lblInfo.TabIndex = 0;
-            this.lblInfo.Text = "Scanda Tray Application";
+            this.lblInfo.Text = "DB Protector Tray Application";
             this.lblInfo.Click += new System.EventHandler(this.lblInfo_Click);
             // 
             // ScandaServiceController
