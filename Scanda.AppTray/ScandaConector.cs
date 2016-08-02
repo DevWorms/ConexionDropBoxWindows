@@ -256,6 +256,7 @@ namespace Scanda.AppTray
                     //subidaS.Wait();
                     //Console.WriteLine(subidaS.Result.AsFile.Size);
                     //stream.Close();
+                    await status.updateStatusFile(status.upload);
                 }
                 else
                 {
@@ -290,6 +291,7 @@ namespace Scanda.AppTray
                                     //x.Wait();
                                     var x = await client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
                                     status.upload.status = 3;
+                                    await status.updateStatusFile(status.upload);
                                 }
                                 else
                                 {
@@ -297,6 +299,7 @@ namespace Scanda.AppTray
                                     //x.Wait();
                                     //var x = await client.Files.UploadSessionAppendAsync(cursor, memSream);
                                     await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
+                                    await status.updateStatusFile(status.upload);
                                     // x.Wait();
                                     //await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
                                 }
