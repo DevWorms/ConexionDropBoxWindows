@@ -45,23 +45,23 @@ namespace Scanda.AppTray.Models
             }
         }
 
-        public async Task downloadStatusFile(Download download)
-        {
-            // No se implementa :P
-            // this.icon.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
-            int unixTimestamp = (int)(DateTime.UtcNow.Subtract(DateTime.Now)).TotalSeconds;
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(this.base_url);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage response = await client.GetAsync(string.Format("FileTransaction_SET?User={0}&Password={1}&StartDate={2}&ActualChunk={3}&TotalChunk={4}&Status={4}&FileName={5}", this.username, this.password, unixTimestamp, download.));
-                if (response.IsSuccessStatusCode)
-                {
-                    var resp = await response.Content.ReadAsStringAsync();
-                }
-            }
-        }
+        //public async Task downloadStatusFile(Download download)
+        //{
+        //    // No se implementa :P
+        //    // this.icon.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
+        //    int unixTimestamp = (int)(DateTime.UtcNow.Subtract(DateTime.Now)).TotalSeconds;
+        //    using (var client = new HttpClient())
+        //    {
+        //        client.BaseAddress = new Uri(this.base_url);
+        //        client.DefaultRequestHeaders.Accept.Clear();
+        //        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //        HttpResponseMessage response = await client.GetAsync(string.Format("FileTransaction_SET?User={0}&Password={1}&StartDate={2}&ActualChunk={3}&TotalChunk={4}&Status={4}&FileName={5}", this.username, this.password, unixTimestamp, download.file));
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            var resp = await response.Content.ReadAsStringAsync();
+        //        }
+        //    }
+        //}
 
     }
 }
