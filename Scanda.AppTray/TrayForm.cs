@@ -183,7 +183,7 @@ namespace Scanda.AppTray
             }
             Start();
         }
-
+        
         private void Start()
         {
             // Es en milisegundos 48 * 60 * 1000

@@ -385,21 +385,15 @@ namespace Scanda.AppTray
         private static string cifrar(string origen, string usrId)
         {
             FileInfo info = new FileInfo(origen);
-            ZipFile zip = new ZipFile();
-            //Crifrar Password
-            //SHA256 sha2 = SHA256.Create(usrId);
-            zip.Password = SHA256string(usrId);
-            // zip.AddFile(info.Name);
-            //Muevo al archivo a mi alcance
+            using (ZipFile zip = new ZipFile())
+            {
+                //Crifrar Password
+                zip.Password = SHA256string(usrId);
 
-            File.Move(origen, info.Name);
+                zip.AddFile(origen, ".");
+                zip.Save(info.Name + ".zip");
+            }
 
-            zip.AddFile(info.Name);
-            zip.Save(info.Name + ".zip");
-
-            File.Delete(info.Name);
-
-            SHA256 mySHA256 = SHA256Managed.Create();
             return info.Name + ".zip";
         }
         private static string decifrar(string origen, string usrId)
