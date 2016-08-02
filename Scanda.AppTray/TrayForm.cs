@@ -97,23 +97,48 @@ namespace Scanda.AppTray
         async void RecuperarForm_Close(object sender, EventArgs e)
         {
             var form = (RecuperarForm)sender;
-            Bitmap bmp = Properties.Resources.QuotaDownload;
-            notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
-            notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo", ToolTipIcon.Info);
-            foreach (Control ctrl in form.controls)
+            //Bitmap bmp = Properties.Resources.QuotaDownload;
+            //notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
+            if (form.controls.Count > 0)
             {
-                string[] file = ctrl.Name.Split('_');
-                Status temp = new Status();
-                var res = await ScandaConector.downloadFile(config.id_customer, file[0], file[1], file[2], temp, config.path);
-                if (!res)
+                notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo", ToolTipIcon.Info);
+                foreach (Control ctrl in form.controls)
                 {
-                    notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
-                } else {
-                    notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
+                    string[] file = ctrl.Name.Split('_');
+                    Status temp = new Status();
+                    var res = await ScandaConector.downloadFile(config.id_customer, file[0], file[1], file[2], temp, config.path);
+                    if (!res)
+                    {
+                        notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
+                    }
+                    else
+                    {
+                        notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
+                        switch (int.Parse(config.type_storage))
+                        {
+                            case 1:
+                                if (File.Exists(config.path + "\\" + file[2]))
+                                {
+                                    File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
+                                }
+                                break;
+                            case 2:
+                                if (File.Exists(config.path + "\\" + file[2]))
+                                {
+                                    File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
+                                }
+                                break;
+                            case 3:
+                                if (File.Exists(config.path + "\\" + file[2]))
+                                {
+                                    File.Delete(config.path + "\\" + file[2]);
+                                }
+                                break;
+                        }
+                    }
                 }
             }
-
-            notifyIconScanda.Icon = Properties.Resources.AppIcon;
+            // notifyIconScanda.Icon = Properties.Resources.AppIcon;
         }
 
         private void FormTray_Load(object sender, EventArgs e)
@@ -163,7 +188,7 @@ namespace Scanda.AppTray
         {
             // Es en milisegundos 48 * 60 * 1000
             // convertimos a segundos nuestras horas
-            int timestamp = int.Parse(config.time) * 3600; // horas * 60 * 1000
+            int timestamp = int.Parse(config.time) * 3600 * 1000; // horas * 60 * 1000
             timerUpload = new System.Windows.Forms.Timer();
             timerUpload.Tick += OnTimedEvent;
             timerUpload.Interval = timestamp;
@@ -175,8 +200,8 @@ namespace Scanda.AppTray
             // Obtenemos listado de archivos del directorio
             string[] fileEntries = Directory.GetFiles(config.path);
             // Comienza a subir los archivos
-            Bitmap bmp = Properties.Resources.QuotaNearing;
-            notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
+            //Bitmap bmp = Properties.Resources.QuotaNearing;
+            //notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
             notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
             foreach (string file in fileEntries)
             {
@@ -193,7 +218,7 @@ namespace Scanda.AppTray
                 }
             }
             // Termino de hacer todos los respaldos
-            notifyIconScanda.Icon = Properties.Resources.AppIcon;
+            // notifyIconScanda.Icon = Properties.Resources.AppIcon;
         }
 
         bool DoesServiceExist(string serviceName, string machineName)

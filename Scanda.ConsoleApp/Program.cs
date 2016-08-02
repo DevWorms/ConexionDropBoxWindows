@@ -30,6 +30,21 @@ namespace Scanda.ConsoleApp
             //ScandaConector.uploadFile("test.jpg", "1");
             //ScandaConector.downloadFile("1","2016","07","test.jpg.zip", "Downloaded");
 
+        //    EventArgs e)
+        //{
+        //        Status temp = new Status();
+        //        await ScandaConector.downloadFile("1", "2016", "07", "test.jpg.zip", temp, ".");
+        //        //while (!x.IsCompleted)
+        //        //{
+        //        //    Console.WriteLine(temp.download.file);
+        //        //    Console.WriteLine(temp.download.status);
+        //        //    Console.WriteLine(temp.download.path);
+
+        //        //    System.Threading.Thread.Sleep(10000); // 10 segundos
+        //        //}
+
+        //    }
+
             ScandaConector.uploadFile("testP.mkv", "1");
             ScandaConector.downloadFile("1", "2016", "07", "testP.mkv.zip", "Downloaded");
         }
