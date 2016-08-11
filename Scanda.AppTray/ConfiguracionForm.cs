@@ -135,7 +135,7 @@ namespace Scanda.AppTray
             mtxt_user.Text = "";
             mtxt_totalspace.Text = "";
             mtxt_avalaiblespace.Text = "";
-            mtxt_usespace.Text = "";
+            // mtxt_usespace.Text = "";
             // Guardamos
             File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
             // Habilitamos el Boton Add Acount
@@ -178,9 +178,10 @@ namespace Scanda.AppTray
                     var resp = await response.Content.ReadAsStringAsync();
                     Account r = JsonConvert.DeserializeObject<Account>(resp);
                     mtxt_user.Text = config.user; // r.DBoxUser;
-                    mtxt_totalspace.Text = r.StorageLimit.ToString();
+                    mtxt_totalspace.Text = r.StorageLimit.ToString() + " MB";
                     mtxt_avalaiblespace.Text = (r.StorageLimit - r.UsedStorage).ToString();
-                    mtxt_usespace.Text = (r.UsedStorage* 100 / r.StorageLimit).ToString() + "%";
+                    metroPB_CloudSpace.Value = (r.UsedStorage * 100 / r.StorageLimit);
+                    // mtxt_usespace.Text = (r.UsedStorage* 100 / r.StorageLimit).ToString() + "%";
                     mtxt_time.Text = r.UploadFrecuency.ToString() + " Horas";
 
                     config.time = r.UploadFrecuency.ToString();

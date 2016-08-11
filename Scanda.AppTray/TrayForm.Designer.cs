@@ -43,6 +43,7 @@
             this.ScandaServiceController = new System.ServiceProcess.ServiceController();
             this.fileSystemWatcherScanda = new System.IO.FileSystemWatcher();
             this.timerUpload = new System.Windows.Forms.Timer(this.components);
+            this.syncNowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcherScanda)).BeginInit();
             this.SuspendLayout();
@@ -60,11 +61,12 @@
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.servicioToolStripMenuItem,
+            this.syncNowToolStripMenuItem,
             this.descargarToolStripMenuItem,
             this.configuracionToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(172, 92);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(172, 136);
             // 
             // servicioToolStripMenuItem
             // 
@@ -79,21 +81,21 @@
             // startToolStripMenuItem
             // 
             this.startToolStripMenuItem.Name = "startToolStripMenuItem";
-            this.startToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.startToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.startToolStripMenuItem.Text = "Start";
             this.startToolStripMenuItem.Click += new System.EventHandler(this.startToolStripMenuItem_Click);
             // 
             // pauseToolStripMenuItem
             // 
             this.pauseToolStripMenuItem.Name = "pauseToolStripMenuItem";
-            this.pauseToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.pauseToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.pauseToolStripMenuItem.Text = "Pause";
             this.pauseToolStripMenuItem.Click += new System.EventHandler(this.pauseToolStripMenuItem_Click);
             // 
             // stopToolStripMenuItem
             // 
             this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
-            this.stopToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.stopToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.stopToolStripMenuItem.Text = "Stop";
             this.stopToolStripMenuItem.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
             // 
@@ -137,6 +139,13 @@
             this.fileSystemWatcherScanda.EnableRaisingEvents = true;
             this.fileSystemWatcherScanda.SynchronizingObject = this;
             // 
+            // syncNowToolStripMenuItem
+            // 
+            this.syncNowToolStripMenuItem.Name = "syncNowToolStripMenuItem";
+            this.syncNowToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.syncNowToolStripMenuItem.Text = "Sincronizar Ahora";
+            this.syncNowToolStripMenuItem.Click += new System.EventHandler(this.syncNowToolStripMenuItem_Click);
+            // 
             // FormTray
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -173,6 +182,7 @@
         private System.ServiceProcess.ServiceController ScandaServiceController;
         private System.IO.FileSystemWatcher fileSystemWatcherScanda;
         private System.Windows.Forms.Timer timerUpload;
+        private System.Windows.Forms.ToolStripMenuItem syncNowToolStripMenuItem;
     }
 }
 

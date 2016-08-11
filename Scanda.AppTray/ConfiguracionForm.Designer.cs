@@ -48,7 +48,6 @@
             this.lblCarpeta = new System.Windows.Forms.Label();
             this.btnElegir = new System.Windows.Forms.Button();
             this.metroTabPageAccount = new MetroFramework.Controls.MetroTabPage();
-            this.mtxt_usespace = new MetroFramework.Controls.MetroTextBox();
             this.mlbl_usespace = new MetroFramework.Controls.MetroLabel();
             this.mtxt_avalaiblespace = new MetroFramework.Controls.MetroTextBox();
             this.mlbl_avalaiblespace = new MetroFramework.Controls.MetroLabel();
@@ -56,6 +55,7 @@
             this.mlbl_totalspace = new MetroFramework.Controls.MetroLabel();
             this.mtxt_user = new MetroFramework.Controls.MetroTextBox();
             this.mlbl_user = new MetroFramework.Controls.MetroLabel();
+            this.metroPB_CloudSpace = new MetroFramework.Controls.MetroProgressBar();
             this.mTabControlConfiguracion.SuspendLayout();
             this.metroTabPageConfiguration.SuspendLayout();
             this.gpbCredenciales.SuspendLayout();
@@ -259,7 +259,6 @@
             // 
             // metroTabPageAccount
             // 
-            this.metroTabPageAccount.Controls.Add(this.mtxt_usespace);
             this.metroTabPageAccount.Controls.Add(this.mlbl_usespace);
             this.metroTabPageAccount.Controls.Add(this.mtxt_avalaiblespace);
             this.metroTabPageAccount.Controls.Add(this.mlbl_avalaiblespace);
@@ -267,6 +266,7 @@
             this.metroTabPageAccount.Controls.Add(this.mlbl_totalspace);
             this.metroTabPageAccount.Controls.Add(this.mtxt_user);
             this.metroTabPageAccount.Controls.Add(this.mlbl_user);
+            this.metroTabPageAccount.Controls.Add(this.metroPB_CloudSpace);
             this.metroTabPageAccount.HorizontalScrollbarBarColor = true;
             this.metroTabPageAccount.Location = new System.Drawing.Point(4, 35);
             this.metroTabPageAccount.Name = "metroTabPageAccount";
@@ -274,14 +274,6 @@
             this.metroTabPageAccount.TabIndex = 1;
             this.metroTabPageAccount.Text = "Mi Cuenta";
             this.metroTabPageAccount.VerticalScrollbarBarColor = true;
-            // 
-            // mtxt_usespace
-            // 
-            this.mtxt_usespace.Enabled = false;
-            this.mtxt_usespace.Location = new System.Drawing.Point(19, 286);
-            this.mtxt_usespace.Name = "mtxt_usespace";
-            this.mtxt_usespace.Size = new System.Drawing.Size(349, 23);
-            this.mtxt_usespace.TabIndex = 9;
             // 
             // mlbl_usespace
             // 
@@ -322,9 +314,9 @@
             this.mlbl_totalspace.AutoSize = true;
             this.mlbl_totalspace.Location = new System.Drawing.Point(16, 99);
             this.mlbl_totalspace.Name = "mlbl_totalspace";
-            this.mlbl_totalspace.Size = new System.Drawing.Size(83, 19);
+            this.mlbl_totalspace.Size = new System.Drawing.Size(118, 19);
             this.mlbl_totalspace.TabIndex = 4;
-            this.mlbl_totalspace.Text = "Espacio total";
+            this.mlbl_totalspace.Text = "Espacio en la nube";
             // 
             // mtxt_user
             // 
@@ -342,6 +334,20 @@
             this.mlbl_user.Size = new System.Drawing.Size(53, 19);
             this.mlbl_user.TabIndex = 2;
             this.mlbl_user.Text = "Usuario";
+            // 
+            // metroPB_CloudSpace
+            // 
+            this.metroPB_CloudSpace.FontWeight = MetroFramework.MetroProgressBarWeight.Regular;
+            this.metroPB_CloudSpace.HideProgressText = false;
+            this.metroPB_CloudSpace.Location = new System.Drawing.Point(19, 287);
+            this.metroPB_CloudSpace.Name = "metroPB_CloudSpace";
+            this.metroPB_CloudSpace.ProgressBarStyle = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.metroPB_CloudSpace.RightToLeftLayout = true;
+            this.metroPB_CloudSpace.Size = new System.Drawing.Size(349, 29);
+            this.metroPB_CloudSpace.TabIndex = 10;
+            this.metroPB_CloudSpace.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.metroPB_CloudSpace.Theme = MetroFramework.MetroThemeStyle.Light;
+            this.metroPB_CloudSpace.Value = 45;
             // 
             // ConfiguracionForm
             // 
@@ -390,7 +396,6 @@
         private MetroFramework.Controls.MetroTextBox mtxt_folder;
         private MetroFramework.Controls.MetroTextBox mtxt_user;
         private MetroFramework.Controls.MetroLabel mlbl_user;
-        private MetroFramework.Controls.MetroTextBox mtxt_usespace;
         private MetroFramework.Controls.MetroLabel mlbl_usespace;
         private MetroFramework.Controls.MetroTextBox mtxt_avalaiblespace;
         private MetroFramework.Controls.MetroLabel mlbl_avalaiblespace;
@@ -399,5 +404,6 @@
         private MetroFramework.Controls.MetroTextBox mtxt_time;
         private System.Windows.Forms.Button btnUserFolder;
         private MetroFramework.Controls.MetroTextBox mtxt_userfolder;
+        private MetroFramework.Controls.MetroProgressBar metroPB_CloudSpace;
     }
 }

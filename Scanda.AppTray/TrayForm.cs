@@ -267,5 +267,10 @@ namespace Scanda.AppTray
             var x = 1 + 1;
             MessageBox.Show("Nuevo Archivo creado ->" + e.Name);
         }
+
+        private void syncNowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            syncNowToolStripMenuItem.Text = "Sincronizando...";
+        }
     }
 }
