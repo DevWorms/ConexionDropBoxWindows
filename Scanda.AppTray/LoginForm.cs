@@ -92,6 +92,7 @@ namespace Scanda.AppTray
             }
             catch(Exception ex)
             {
+                lblMessages.Text = ex.Message;
                 // Para los logs
                 Logger.sendLog(ex.Message
                     + "\n" + ex.Source

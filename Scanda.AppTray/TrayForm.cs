@@ -14,6 +14,8 @@ using System.ServiceProcess;
 using System.Reflection;
 using Newtonsoft.Json;
 using Scanda.AppTray.Models;
+using System.Net.Http.Headers;
+using System.Configuration;
 
 namespace Scanda.AppTray
 {
@@ -106,35 +108,70 @@ namespace Scanda.AppTray
                 {
                     string[] file = ctrl.Name.Split('_');
                     Status temp = new Status();
-                    var res = await ScandaConector.downloadFile(config.id_customer, file[0], file[1], file[2], temp, config.path);
-                    if (!res)
+                    // Pedimos donde descargar el archivo
+                    FolderBrowserDialog fbd = new FolderBrowserDialog();
+                    fbd.Description = "Seleccione el folder donde desea almacenar su historico";
+                    if (fbd.ShowDialog() == DialogResult.OK)
                     {
-                        notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
-                    }
-                    else
-                    {
-                        notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
-                        switch (int.Parse(config.type_storage))
+                        var selectedPath = fbd.SelectedPath;
+                        var res = await ScandaConector.downloadFile(config.id_customer, file[0], file[1], file[2], temp, config.path);
+                        if (!res)
                         {
-                            case 1:
-                                if (File.Exists(config.path + "\\" + file[2]))
-                                {
-                                    File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
-                                }
-                                break;
-                            case 2:
-                                if (File.Exists(config.path + "\\" + file[2]))
-                                {
-                                    File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
-                                }
-                                break;
-                            case 3:
-                                if (File.Exists(config.path + "\\" + file[2]))
-                                {
-                                    File.Delete(config.path + "\\" + file[2]);
-                                }
-                                break;
+                            notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
                         }
+                        else
+                        {
+                            notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
+                            switch (int.Parse(config.type_storage))
+                            {
+                                case 1:
+                                    if (File.Exists(config.path + "\\" + file[2]))
+                                    {
+                                        // Se copia a respaldados
+                                        File.Move(config.path + "\\" + file[2], selectedPath + "\\" + file[2]);
+                                    }
+                                    break;
+                                case 2:
+                                    if (File.Exists(config.path + "\\" + file[2]))
+                                    {
+                                        // Se copia a la carpeta seleccionada
+                                        File.Move(config.path + "\\" + file[2], selectedPath + "\\" + file[2]);
+                                        // File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
+                                    }
+                                    break;
+                                case 3:
+                                    if (File.Exists(config.path + "\\" + file[2]))
+                                    {
+                                        // Se copia a la carpeta seleccionada
+                                        File.Move(config.path + "\\" + file[2], selectedPath + "\\" + file[2]);
+                                        // File.Delete(config.path + "\\" + file[2]);
+                                    }
+                                    break;
+                            }
+                        }
+                        //switch (int.Parse(config.type_storage))
+                        //{
+                        //    case 1:
+                        //        // Se copia a respaldados
+                        //        if (File.Exists(config.path + "\\" + file[2]))
+                        //        {
+                        //            File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
+                        //        }
+                        //        break;
+                        //    case 2:
+                        //        if (File.Exists(config.path + "\\" + file[2]))
+                        //        {
+                        //            File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
+                        //        }
+                        //        break;
+                        //    case 3:
+                        //        if (File.Exists(config.path + "\\" + file[2]))
+                        //        {
+                        //            File.Delete(config.path + "\\" + file[2]);
+                        //        }
+                        //        break;
+                        //}
+                        
                     }
                 }
             }
@@ -180,6 +217,7 @@ namespace Scanda.AppTray
             }else
             {
                 servicioToolStripMenuItem.Visible = false;
+                exitToolStripMenuItem.Visible = false;
             }
             Start();
         }
@@ -268,9 +306,50 @@ namespace Scanda.AppTray
             MessageBox.Show("Nuevo Archivo creado ->" + e.Name);
         }
 
-        private void syncNowToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void syncNowToolStripMenuItem_Click(object sender, EventArgs e)
         {
             syncNowToolStripMenuItem.Text = "Sincronizando...";
+            // Obtenemos listado de archivos del directorio
+            string[] fileEntries = Directory.GetFiles(config.path);
+            notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
+            foreach (string file in fileEntries)
+            {
+                Status temp2 = new Status();
+                FileInfo info = new FileInfo(file);
+                var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
+                if (!x)
+                {
+                    notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
+                }
+                else
+                {
+                    notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
+                }
+            }
+            // Termino de hacer todos los respaldos
+            syncNowToolStripMenuItem.Text = "Sincronizar ahora";
+        }
+
+        private async Task sync_accountinfo()
+        {
+            string url = ConfigurationManager.AppSettings["api_url"];
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(url);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage response = await client.GetAsync(string.Format("Account_GET?User={0}&Password={0}", config.user, config.password));
+                if (response.IsSuccessStatusCode)
+                {
+                    var resp = await response.Content.ReadAsStringAsync();
+                    Account r = JsonConvert.DeserializeObject<Account>(resp);
+                    config.time = r.UploadFrecuency.ToString();
+                    config.time_type = "Horas";
+                    config.type_storage = r.FileTreatmen.ToString();
+                    config.file_historical = r.FileHistoricalNumber.ToString();
+                    File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                }
+            }
         }
     }
 }

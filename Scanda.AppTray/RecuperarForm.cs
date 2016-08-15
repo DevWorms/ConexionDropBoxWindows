@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using System.IO;
 using Scanda.AppTray.Models;
+using System.Text.RegularExpressions;
 
 namespace Scanda.AppTray
 {
@@ -20,6 +21,7 @@ namespace Scanda.AppTray
         public List<Control> controls = new List<Control>() { };
         private Config config;
         private string json;
+        private string RFCregexp = "([A-Zz-z]{4}\\d{6}(---|\\w{3})?)";
         public RecuperarForm(bool isNuevaInstancia, string configPath)
         {
             InitializeComponent();
@@ -35,6 +37,7 @@ namespace Scanda.AppTray
             var tab = new MetroTabPage();
             tab.Name = "Tab_" + obj.Text; 
             tab.Text = obj.Text;
+            tab.AutoScroll = true;
             List<FileDetail> storage_files = new List<FileDetail>() { };
             // Obtenemos el Listado de meses de ese año
             List<string> meses = await ScandaConector.getMonths(config.id_customer, obj.Text);
@@ -43,57 +46,36 @@ namespace Scanda.AppTray
                 List<string> files = await ScandaConector.getFiles(config.id_customer, obj.Text, mes);
                 foreach(string file in files)
                 {
-                    storage_files.Add(new FileDetail() { file = file, mes = mes});
+                    var match = Regex.Match(file, RFCregexp);
+                    storage_files.Add(new FileDetail() { file = file, mes = mes, rfc = match.ToString() });
                 }
                 // storage_files.AddRange(files);
             }
             int y = 20;
-            foreach(FileDetail file in storage_files)
+            var parents = storage_files.Where(ent => ent.rfc != "").Select(ent => ent.rfc).ToArray();
+            foreach (var parent in parents)
             {
-                var checkbox = new MetroCheckBox();
-
-                checkbox.Text = file.file;// string.Format("archivo_{0}.zip", i);
-                checkbox.Name = obj.Text + "_" + file.mes + "_" + file.file;
-                checkbox.Location = new Point(0, y);
-                y += 20;
-                tab.Controls.Add(checkbox);
+                FileDetail[] files = storage_files.Where(ent => ent.rfc == parent).ToArray<FileDetail>();
+                Label lblGroup = new Label();
+                lblGroup.Text = parent + "\n______________________________________";
+                lblGroup.BackColor = Color.White;
+                lblGroup.Width = 200;
+                lblGroup.TextAlign = ContentAlignment.MiddleCenter;
+                lblGroup.Location = new Point(0, y);
+                y += 25;
+                tab.Controls.Add(lblGroup);
+                foreach (FileDetail file in files)
+                {
+                    var checkbox = new MetroCheckBox();
+                    checkbox.Text = file.file;// string.Format("archivo_{0}.zip", i);
+                    checkbox.Name = obj.Text + "_" + file.mes + "_" + file.file;
+                    checkbox.Width = 300;
+                    checkbox.Location = new Point(0, y);
+                    y += 20;
+                    tab.Controls.Add(checkbox);
+                }
+                y += 30;
             }
-            //int start_x = 0; int start_y = 20;
-            //// for (int i = 0; i < storage_files.Count; i++)
-            //// {
-                /*var groupbox = new GroupBox();
-                groupbox.Text = "Mes " + i.ToString();
-                groupbox.Location = new Point(start_x, start_y);
-                for (int z = 0; z < 3; z++)
-                {*/
-                    ////var checkbox = new MetroCheckBox();
-                    
-                    ////checkbox.Text = storage_files[i];// string.Format("archivo_{0}.zip", i);
-                    ////checkbox.Location = new Point(0, y);
-                    ////y += 20;
-                    //groupbox.Controls.Add(checkbox);
-               // }
-                //start_y = start_y + y + 20;
-                /////tab.Controls.Add(checkbox);
-            //// }
-
-            // Agregamos los botones
-            // Boton Cerrar
-            //var btnClose = new MetroButton();
-            //btnClose.Text = "Cerrar";
-            //btnClose.Location = new Point(566, 209);
-            //btnClose.Size = new Size(86, 30);
-            //btnClose.Click += btnClose_Click;
-
-            //// Boton Descargar
-            //var btnDownload = new MetroButton();
-            //btnDownload.Text = "Descargar";
-            //btnDownload.Location = new Point(463, 209);
-            //btnDownload.Size = new Size(88, 30);
-            //btnDownload.Click += btnClose_Click;
-
-            //tab.Controls.Add(btnClose);
-            //tab.Controls.Add(btnDownload);
             bool found = false;
             foreach (MetroTabPage page in metroTabControlPrincipal.TabPages)
             {

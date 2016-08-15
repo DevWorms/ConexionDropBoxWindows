@@ -1,17 +1,12 @@
 ﻿using MetroFramework.Forms;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using MetroFramework.Controls;
 using System.Windows.Forms;
 using System.Configuration;
 using System.Net.Http.Headers;
@@ -19,7 +14,7 @@ using Scanda.AppTray.Models;
 
 namespace Scanda.AppTray
 {
-    
+
     public partial class ConfiguracionForm : MetroForm
     {
         private LoginForm loginForm;
@@ -30,6 +25,7 @@ namespace Scanda.AppTray
         private string url;
         private bool flag;
         private string configuration_path;
+
         public ConfiguracionForm(bool isNuevaInstancia, string configPath)
         {
             InitializeComponent();
@@ -39,23 +35,13 @@ namespace Scanda.AppTray
             url = ConfigurationManager.AppSettings["api_url"];
             flag = isNuevaInstancia;
             configuration_path = configPath;
-            //intervals = new List<TimeIntervals>()
-            //{
-            //    new TimeIntervals() {Name= "Horas", Value="horas" },
-            //    new TimeIntervals() {Name= "Dias", Value="dias" }
-            //};
-            //mcmbTime.DataSource = intervals;
-            //mcmbTime.DisplayMember = "Name";
-            //mcmbTime.ValueMember = "Value";
-            //mcmbTime.SelectedIndex = 0;
-
 
             metroTabPageAccount.Enabled = false;
             metroTabPageAccount.Visible = false;
 
             // txtRuta.Text = config.path;
             mtxt_folder.Text = config.path;
-
+            mtxt_userfolder.Text = config.user_path;
             if (!string.IsNullOrWhiteSpace(config.id_customer))
             {
                 // Hay un usuario logueado
@@ -86,7 +72,9 @@ namespace Scanda.AppTray
                     await sync_accountinfo();
                     await sync_extensions();
                 }
-            }catch(Exception ex)
+                this.Show();
+            }
+            catch(Exception ex)
             {
                 Logger.sendLog(ex.Message
                     + "\n" + ex.Source
@@ -122,6 +110,7 @@ namespace Scanda.AppTray
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
+            this.Hide();
             loginForm = new LoginForm(false, configuration_path);
             loginForm.FormClosed += ConfiguracionForm_Refresh;
             loginForm.ShowDialog();
@@ -129,13 +118,26 @@ namespace Scanda.AppTray
 
         private void btnDesvincular_Click(object sender, EventArgs e)
         {
-            config.user = "";
-            config.password = "";
-            config.id_customer = "";
             mtxt_user.Text = "";
             mtxt_totalspace.Text = "";
             mtxt_avalaiblespace.Text = "";
-            // mtxt_usespace.Text = "";
+            metroPB_CloudSpace.Value = 0;
+            mtxt_time.Text = "0 Horas";
+            mtxt_localHist.Text = "0";
+            mtxt_cloudHist.Text = "0";
+            mtxt_userfolder.Text = "";
+            mtxt_folder.Text = "";
+            metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Default;
+
+            config.user = "";
+            config.password = "";
+            config.id_customer = "";
+            config.time = "0";
+            config.time_type = "Horas";
+            config.type_storage = "0";
+            config.file_historical = "0";
+            config.path = "";
+            config.user_path = "";
             // Guardamos
             File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
             // Habilitamos el Boton Add Acount
@@ -160,11 +162,6 @@ namespace Scanda.AppTray
             Close();
         }
 
-        private void mcmbTime_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private async Task sync_accountinfo()
         {
             using (var client = new HttpClient())
@@ -181,8 +178,19 @@ namespace Scanda.AppTray
                     mtxt_totalspace.Text = r.StorageLimit.ToString() + " MB";
                     mtxt_avalaiblespace.Text = (r.StorageLimit - r.UsedStorage).ToString();
                     metroPB_CloudSpace.Value = (r.UsedStorage * 100 / r.StorageLimit);
-                    // mtxt_usespace.Text = (r.UsedStorage* 100 / r.StorageLimit).ToString() + "%";
                     mtxt_time.Text = r.UploadFrecuency.ToString() + " Horas";
+                    mtxt_localHist.Text = r.FileHistoricalNumber.ToString();
+                    mtxt_cloudHist.Text = r.FileHistoricalNumberCloud.ToString();
+                    if (metroPB_CloudSpace.Value < 50)
+                    {
+                        metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Default;
+                    } else if (metroPB_CloudSpace.Value < 80)
+                    {
+                        metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Yellow;
+                    } else if (metroPB_CloudSpace.Value < 50)
+                    {
+                        metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Red;
+                    }
 
                     config.time = r.UploadFrecuency.ToString();
                     config.time_type = "Horas";
@@ -191,6 +199,19 @@ namespace Scanda.AppTray
                     File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                 }
             }
+        }
+
+        private async Task sync_lastestUploads()
+        {
+            List<Historico> items = new List<Historico>() { };
+            var response = await ScandaConector.getLastUploads(config.id_customer);
+            foreach(string key in response.Keys)
+            {
+                string item = response[key];
+                var strs = item.Split(' ');
+                items.Add(new Historico() { RFC = key, Fecha = strs[0] + " " + strs[1] + " " + strs[2] });
+            }
+            dataGridViewHistoricos.DataSource = items;
         }
 
         public async Task sync_extensions()
@@ -221,18 +242,19 @@ namespace Scanda.AppTray
             {
                 await sync_accountinfo();
                 await sync_extensions();
+                await sync_lastestUploads();
 
-                switch(int.Parse(config.type_storage))
+                switch (int.Parse(config.type_storage))
                 {
                     case 1:
-                        mtxt_userfolder.Visible = false;
-                        btnUserFolder.Visible = false;
+                        // mtxt_userfolder.Visible = false;
+                        // btnUserFolder.Visible = false;
                         break;
                     case 2:
                         break;
                     case 3:
-                        mtxt_userfolder.Visible = false;
-                        btnUserFolder.Visible = false;
+                        // mtxt_userfolder.Visible = false;
+                        // btnUserFolder.Visible = false;
                         break;
                 }
             }

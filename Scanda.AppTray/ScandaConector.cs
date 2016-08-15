@@ -30,6 +30,7 @@ namespace Scanda.AppTray
         static WriteMode OVERWRITE = WriteMode.Overwrite.Instance;
 
         static string REGEXP = "([A-Zz-z]{4}\\d{6})(---|\\w{3})?(\\d{14}).(\\w{3})";
+        static string RFCregexp = "([A-Zz-z]{4}\\d{6}(---|\\w{3})?)";
 
         public static async Task<List<string>> getFiles(string usrID, string year, string month)
         {
@@ -43,12 +44,12 @@ namespace Scanda.AppTray
         {
             return await getFolders(usrID);
         }
-        public static async Task<List<string>> getFolders(string path)
+        public static async Task<List<string>> getFolders(string path, bool recursive = false)
         {
             try
             {
                 List<string> lista = new List<string>();
-                var x = await listFiles(path);
+                var x = await listFiles(path, recursive);
                 ListFolderResult res = x;
 
                 foreach (Metadata m in res.Entries)
@@ -65,20 +66,32 @@ namespace Scanda.AppTray
                 return new List<string>(); //Lista vacia
             }
         }
-        public static async Task<List<string>> getFiles(string path)
+        public static async Task<List<string>> getFiles(string path, bool recursive = false)
         {
             try
             {
                 List<string> lista = new List<string>();
-                var x = await listFiles(path);
+                List<FileMetadata> preLista = new List<FileMetadata>();
+                var x = await listFiles(path, recursive);
                 ListFolderResult res = x;
                 foreach (Metadata m in res.Entries)
                 {
                     if (m.IsFile)
                     {
-                        lista.Add(m.Name);
+                        preLista.Add(m.AsFile);
+                        //lista.Add(m.Name);
                     }
                 }
+
+                //ordenamos
+                preLista.Sort((a, b) => a.ServerModified.CompareTo(b.ServerModified) * -1); // El menos uno invierte el orden natural
+
+                foreach (FileMetadata fm in preLista)
+                {
+                    lista.Add(fm.Name);
+
+                }
+
                 return lista;
             }
             catch (Exception)
@@ -87,6 +100,97 @@ namespace Scanda.AppTray
             }
 
         }
+
+        public static async Task<Dictionary<string, string>> getLastUploads(string userID)
+        {
+            try
+            {
+                Regex exp = new Regex(RFCregexp);
+
+                Dictionary<string, Metadata> metadatos = new Dictionary<string, Metadata>();
+
+                Dictionary<string, string> ret = new Dictionary<string, string>();
+
+                ListFolderResult res = await listFiles(userID, true);
+
+                foreach (Metadata m in res.Entries)
+                {
+                    if (m.IsFile && exp.IsMatch(m.AsFile.Name))
+                    {
+                        //Obtenemos el RFC
+                        string[] arr = exp.Split(m.AsFile.Name);
+
+                        if (!metadatos.ContainsKey(arr[1]))//No existe
+                        {
+                            metadatos.Add(arr[1], m);
+                        }
+                        else
+                        {
+                            Metadata pre = metadatos[arr[1]];
+                            //La fecha de M es mas reciente
+                            if (pre.AsFile.ServerModified.CompareTo(m.AsFile.ServerModified) < 0)
+                            {
+                                metadatos.Remove(arr[1]);
+                                metadatos.Add(arr[1], m);
+                            }
+                        }
+                    }
+                }
+
+                foreach (string client in metadatos.Keys)
+                {
+                    FileMetadata fileData = metadatos[client].AsFile;
+                    ret.Add(client, fileData.ServerModified.ToString() + " " + fileData.Name);
+                }
+
+                return ret;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        //si cantidad -1 no hay limite
+        public static async Task deleteHistory(string userID, int cant)
+        {
+            if (cant == -1)
+            {
+                return;
+            }
+            else
+            {
+                //obtengo todos los archivos 
+                ListFolderResult res = await listFiles(userID, true);
+                List<Metadata> todo = res.Entries as List<Metadata>;
+                List<FileMetadata> archivos = todo.Where(x => x.IsFile).Select(y => y.AsFile).ToList();
+                archivos.Sort((a, b) => a.ServerModified.CompareTo(b.ServerModified)); //Ordenamos , mas viejos primero
+
+                if (archivos.Count < cant)//Aun tiene lugar en el historico
+                {
+                    return;
+                }
+                else
+                {
+                    int dif = archivos.Count - cant; //Cuantos debo de eliminar
+                    foreach (FileMetadata fm in archivos.Take(dif))
+                    {
+                        //Necesitamos crear un cliente
+                        try
+                        {
+                            await client.Files.DeleteAsync(fm.PathDisplay);
+                        }
+                        catch (BadInputException ex)
+                        {
+                            Console.WriteLine("Error de Token");
+                            Console.WriteLine(ex.Message);
+                        }
+                    }
+                }
+            }
+        }
+
+
 
         public static async Task<bool> uploadFile(string archivo, string usrId, Status status, List<string> extensions = null, double remmainingSpace = -1)
         {
@@ -129,15 +233,8 @@ namespace Scanda.AppTray
                 string zip = cifrar(archivo, usrId);
                 string ruta = usrId + "/" + year + "/" + month;
                 status.upload.status = 1;
-                await uploadZipFile(zip, ruta, status);
+                var res = await uploadZipFile(zip, ruta, status);
 
-                //Eliminar el archivo Zip
-                //File.Delete(zip);
-                //Mover el archivo a backuped
-                //if (!Directory.Exists(backendPath))
-                //    Directory.CreateDirectory(backendPath);
-
-                //info.MoveTo(backendPath + "/" + info.Name);
                 return true;
 
             }
@@ -177,14 +274,16 @@ namespace Scanda.AppTray
 
         }
 
-        private static async Task<ListFolderResult> listFiles(string path)
+
+
+        private static async Task<ListFolderResult> listFiles(string path, bool recursive)
         {
             ListFolderResult list = null;
             try
             {
                 clientConf = new DropboxClientConfig("ScandaV1");
                 client = new DropboxClient(APITOKEN);
-                list = await client.Files.ListFolderAsync("/" + path);
+                list = await client.Files.ListFolderAsync("/" + path, recursive);
             }
             catch (BadInputException ex)
             {
@@ -232,7 +331,7 @@ namespace Scanda.AppTray
 
             return list;
         }
-        private static async Task uploadZipFile(string origen, string folder, Status status)
+        private static async Task<bool> uploadZipFile(string origen, string folder, Status status)
         {
             try
             {
@@ -307,23 +406,28 @@ namespace Scanda.AppTray
                         }
                     }
                 }
+                return true;
             }
             catch (OutOfMemoryException)
             {
                 Console.WriteLine("Se acabo la memoria");
+                return false;
             }
             catch (FileNotFoundException)
             {
                 Console.WriteLine("No existe el archivo");
+                return false;
             }
             catch (AggregateException ex) //Excepciones al vuelo
             {
 
                 Console.WriteLine("Tarea Cancelada");
+                return false;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
+                return false;
             }
         }
         private static async Task<string> downloadZipFile(string path, string folderName)
@@ -368,20 +472,6 @@ namespace Scanda.AppTray
                 return null;
             }
         }
-        //private static string cifrar(string origen, string usrId)
-        //{
-        //    FileInfo info = new FileInfo(origen);
-        //    ZipFile zip = new ZipFile();
-        //    //Crifrar Password
-        //    //SHA256 sha2 = SHA256.Create(usrId);
-        //    zip.Password = SHA256string(usrId);
-        //    // zip.AddFile(info.Name);
-        //    zip.AddFile(origen);
-        //    zip.Save(info.Name + ".zip");
-        //    SHA256 mySHA256 = SHA256Managed.Create();
-        //    return info.Name + ".zip";
-        //}
-
         private static string cifrar(string origen, string usrId)
         {
             FileInfo info = new FileInfo(origen);
@@ -449,7 +539,7 @@ namespace Scanda.AppTray
                 return false;
             }
         }
-        private static bool isValidExt(string ext, List<String> extensions)
+        private static bool isValidExt(string ext, List<string> extensions)
         {
             if (extensions == null)
                 return true;
@@ -493,6 +583,5 @@ namespace Scanda.AppTray
 
             return folder;
         }
-
     }
 }

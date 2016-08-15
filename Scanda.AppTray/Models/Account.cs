@@ -10,5 +10,11 @@
         public int FileTreatmen { get; set; }
         public int UploadFrecuency { get; set; }
         public int FileHistoricalNumber { get; set; }
+        public int FileHistoricalNumberCloud { get; set; }
+        public int PBYellowPercentage { get; set; }
+        public int PBRedPercentage { get; set; }
+        public string PBGreenColorCode { get; set; }
+        public string PBYellowColorCode { get; set; }
+        public string PBRedColorCode { get; set; }
     }
 }

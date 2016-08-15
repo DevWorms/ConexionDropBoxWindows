@@ -25,7 +25,7 @@ namespace Scanda.AppTray
             string respaldadosFolder = appFolder + "\\respaldados";
             string confFile = settingsFolder + "\\configuration.json";
             // Revisamos si existe el directorio de Settings
-            string startPath = Environment.GetFolderPath(Environment.SpecialFolder.Programs);
+            // string startPath = Environment.GetFolderPath(Environment.SpecialFolder.Programs);
             //       + @"\YourPublisher\YourSuite\YourProduct";
 
             if (!Directory.Exists(settingsFolder))
@@ -49,6 +49,7 @@ namespace Scanda.AppTray
                         new JProperty("token", ""),
                         new JProperty("type_storage", ""),
                         new JProperty("file_historical", ""),
+                        new JProperty("cloud_historical", ""),
                         new JProperty("extensions", "")
                     );
                     // escribimos el archivo

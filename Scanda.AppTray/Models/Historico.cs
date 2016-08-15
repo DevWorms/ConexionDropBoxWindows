@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Scanda.AppTray.Models
 {
-    public class FileDetail
+    public class Historico
     {
-        public string rfc { get; set; }
-        public string file { get; set; }
-        public string mes { get; set; }
+        public string RFC { get; set; }
+        public string Fecha { get; set; }
     }
 }
