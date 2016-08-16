@@ -6,6 +6,7 @@ namespace Scanda.AppTray.Models
     {
         public string path { get; set; }
         public string user_path { get; set; }
+        public string hist_path { get; set; }
         public string time_type { get; set; }
         public string time { get; set; }
         public string id_customer { get; set; }

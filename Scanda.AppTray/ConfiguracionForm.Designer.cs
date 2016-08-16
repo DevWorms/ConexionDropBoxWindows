@@ -225,7 +225,7 @@
             this.mtxt_time.Name = "mtxt_time";
             this.mtxt_time.Size = new System.Drawing.Size(141, 23);
             this.mtxt_time.TabIndex = 13;
-            this.mtxt_time.Text = "0";
+            this.mtxt_time.Text = "0 Horas";
             this.mtxt_time.Theme = MetroFramework.MetroThemeStyle.Light;
             // 
             // lblTiempo
@@ -405,10 +405,10 @@
             this.metroPB_CloudSpace.ProgressBarStyle = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.metroPB_CloudSpace.RightToLeftLayout = true;
             this.metroPB_CloudSpace.Size = new System.Drawing.Size(349, 29);
+            this.metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
             this.metroPB_CloudSpace.TabIndex = 10;
             this.metroPB_CloudSpace.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.metroPB_CloudSpace.Theme = MetroFramework.MetroThemeStyle.Light;
-            this.metroPB_CloudSpace.Value = 45;
             // 
             // metroTabPageHistorico
             // 

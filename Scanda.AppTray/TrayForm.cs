@@ -30,6 +30,11 @@ namespace Scanda.AppTray
         private string json;
         private Config config;
         // private ProcessInfo notePad;
+        /// <summary>
+        /// Constructor de la aplicacion principal
+        /// </summary>
+        /// <param name="isNuevaInstancia">Indica si es una instancia nueva, o ya esta instalada</param>
+        /// <param name="configPath">Indica el path de configuracion de la aplicacion</param>
         public FormTray(bool isNuevaInstancia, string configPath)
         {
             InitializeComponent();

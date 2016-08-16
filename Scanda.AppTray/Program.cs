@@ -41,8 +41,9 @@ namespace Scanda.AppTray
                     JObject configSettings = new JObject(
                         new JProperty("path", ""),
                         new JProperty("user_path", respaldadosFolder),
-                        new JProperty("time_type", ""),
-                        new JProperty("time", ""),
+                        new JProperty("hist_path", ""),
+                        new JProperty("time_type", "Horas"),
+                        new JProperty("time", "0"),
                         new JProperty("id_customer", ""),
                         new JProperty("user", ""),
                         new JProperty("password", ""),

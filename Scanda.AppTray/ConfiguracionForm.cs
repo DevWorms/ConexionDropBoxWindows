@@ -95,6 +95,13 @@ namespace Scanda.AppTray
                     // txtRuta.Text = selectedPath;
                     mtxt_folder.Text = selectedPath;
                     config.path = selectedPath;
+                    // Historicos
+                    string historicosFolder = selectedPath + "\\historicos";
+                    config.hist_path = historicosFolder;
+                    mtxt_userfolder.Text = historicosFolder;
+                    // Respaldados
+                    string respaldadosFolder = selectedPath + "\\respaldados";
+                    config.user_path = respaldadosFolder;
                     // Guardamos la ruta
                     File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                 }
@@ -127,7 +134,7 @@ namespace Scanda.AppTray
             mtxt_cloudHist.Text = "0";
             mtxt_userfolder.Text = "";
             mtxt_folder.Text = "";
-            metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Default;
+            metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
 
             config.user = "";
             config.password = "";
@@ -138,6 +145,7 @@ namespace Scanda.AppTray
             config.file_historical = "0";
             config.path = "";
             config.user_path = "";
+            config.hist_path = "";
             // Guardamos
             File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
             // Habilitamos el Boton Add Acount
@@ -183,7 +191,7 @@ namespace Scanda.AppTray
                     mtxt_cloudHist.Text = r.FileHistoricalNumberCloud.ToString();
                     if (metroPB_CloudSpace.Value < 50)
                     {
-                        metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Default;
+                        metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
                     } else if (metroPB_CloudSpace.Value < 80)
                     {
                         metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Yellow;
@@ -270,7 +278,7 @@ namespace Scanda.AppTray
                     selectedPath = fbd.SelectedPath;
                     // txtRuta.Text = selectedPath;
                     mtxt_userfolder.Text = selectedPath;
-                    config.user_path = selectedPath;
+                    config.hist_path = selectedPath;
                     // Guardamos la ruta
                     File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                 }

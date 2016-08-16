@@ -264,6 +264,7 @@ namespace Scanda.AppTray
 
                 status.download.status = 1;
                 status.download.path = destino + "/" + archivo;
+                await status.downloadStatusFile(status.download);
                 return true;
             }
             catch (Exception ex)
