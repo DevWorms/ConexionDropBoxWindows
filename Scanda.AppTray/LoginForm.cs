@@ -1,20 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
-using Newtonsoft.Json.Linq;
 using System.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using MetroFramework.Forms;
-using MetroFramework.Controls;
 using Scanda.AppTray.Models;
 
 namespace Scanda.AppTray
@@ -67,22 +59,27 @@ namespace Scanda.AppTray
 
                 using (var client = new HttpClient())
                 {
-                    // TODO - Send HTTP requests
-                    // var query = HttpUtility.ParseQueryString(string.Empty);
                     client.BaseAddress = new Uri(url);
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                    HttpResponseMessage response = await client.GetAsync(string.Format("Login_GET?User={0}&Password={0}", username, password));
+                    string responseUrl = string.Format("Login_GET?User={0}&Password={1}", username, password);
+                    HttpResponseMessage response = await client.GetAsync(responseUrl);
                     if (response.IsSuccessStatusCode)
                     {
                         var resp = await response.Content.ReadAsStringAsync();
                         LoginResponse r = JsonConvert.DeserializeObject<LoginResponse>(resp);
-                        config.user = username;
-                        config.password = password;
-                        config.id_customer = r.IdCustomer.ToString();
-                        File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
-                        Close();
+                        if (r.Success == 1)
+                        {
+                            config.user = username;
+                            config.password = password;
+                            config.id_customer = r.IdCustomer.ToString();
+                            File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                            Close();
+                        } else
+                        {
+                            lblMessages.Text = "Contraseña/Usuario incorrectos";
+                            throw new Exception("Contraseña/Usuario incorrectos");
+                        }
                     } else
                     {
                         lblMessages.Text = "Contraseña/Usuario incorrectos";

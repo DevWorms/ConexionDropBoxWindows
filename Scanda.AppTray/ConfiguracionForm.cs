@@ -41,7 +41,7 @@ namespace Scanda.AppTray
 
             // txtRuta.Text = config.path;
             mtxt_folder.Text = config.path;
-            mtxt_userfolder.Text = config.user_path;
+            mtxt_userfolder.Text = config.hist_path;
             if (!string.IsNullOrWhiteSpace(config.id_customer))
             {
                 // Hay un usuario logueado
@@ -71,6 +71,9 @@ namespace Scanda.AppTray
                     btnDesvincular.Enabled = true;
                     await sync_accountinfo();
                     await sync_extensions();
+                    await sync_lastestUploads();
+                    btnElegir.Enabled = true;
+                    btnUserFolder.Enabled = true;
                 }
                 this.Show();
             }
@@ -150,6 +153,9 @@ namespace Scanda.AppTray
             File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
             // Habilitamos el Boton Add Acount
             btnLogin.Enabled = true;
+            btnElegir.Enabled = false;
+            btnUserFolder.Enabled = false;
+            dataGridViewHistoricos.DataSource = new List<Historico>() { };
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)
@@ -220,6 +226,8 @@ namespace Scanda.AppTray
                 items.Add(new Historico() { RFC = key, Fecha = strs[0] + " " + strs[1] + " " + strs[2] });
             }
             dataGridViewHistoricos.DataSource = items;
+            dataGridViewHistoricos.Columns[0].Width = 140;
+            dataGridViewHistoricos.Columns[1].Width = 170;
         }
 
         public async Task sync_extensions()
@@ -265,6 +273,12 @@ namespace Scanda.AppTray
                         // btnUserFolder.Visible = false;
                         break;
                 }
+                btnElegir.Enabled = true;
+                btnUserFolder.Enabled = true;
+            } else
+            {
+                btnElegir.Enabled = false;
+                btnUserFolder.Enabled = false;
             }
         }
 

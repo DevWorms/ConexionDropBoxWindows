@@ -132,7 +132,7 @@
             this.mTabControlConfiguracion.Controls.Add(this.metroTabPageHistorico);
             this.mTabControlConfiguracion.Location = new System.Drawing.Point(14, 64);
             this.mTabControlConfiguracion.Name = "mTabControlConfiguracion";
-            this.mTabControlConfiguracion.SelectedIndex = 0;
+            this.mTabControlConfiguracion.SelectedIndex = 2;
             this.mTabControlConfiguracion.Size = new System.Drawing.Size(395, 465);
             this.mTabControlConfiguracion.TabIndex = 10;
             // 
@@ -426,6 +426,8 @@
             this.dataGridViewHistoricos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewHistoricos.Location = new System.Drawing.Point(0, 13);
             this.dataGridViewHistoricos.Name = "dataGridViewHistoricos";
+            this.dataGridViewHistoricos.ReadOnly = true;
+            this.dataGridViewHistoricos.RowHeadersWidth = 61;
             this.dataGridViewHistoricos.Size = new System.Drawing.Size(391, 150);
             this.dataGridViewHistoricos.TabIndex = 2;
             // 

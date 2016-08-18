@@ -110,6 +110,7 @@
             this.lblCompany.Size = new System.Drawing.Size(75, 13);
             this.lblCompany.TabIndex = 7;
             this.lblCompany.Text = "@ 2016 Scanda";
+            this.lblCompany.Visible = false;
             // 
             // pictureBox1
             // 

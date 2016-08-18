@@ -73,12 +73,29 @@ namespace Scanda.AppTray
             //MessageBox.Show(exeFolder);
             this.Close();
         }
-
+        private void ConfigurationForm_Close(object sender, EventArgs e)
+        {
+            // abrimos de nuevo el json
+            json = File.ReadAllText(configuration_path);
+            config = JsonConvert.DeserializeObject<Config>(json);
+            if (string.IsNullOrEmpty(config.id_customer))
+            {
+                syncNowToolStripMenuItem.Enabled = false;
+                descargarToolStripMenuItem.Enabled = false;
+            }
+            else
+            {
+                syncNowToolStripMenuItem.Enabled = true;
+                descargarToolStripMenuItem.Enabled = true;
+                Start();
+            }
+        }
         private void configuracionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Activate();
             // notifyIconScanda.Icon = new System.Drawing.Icon(Application.StartupPath + @"\Resources\111.ico");
             configuracionForm = new ConfiguracionForm(flag, configuration_path);
+            configuracionForm.FormClosed += ConfigurationForm_Close;
             configuracionForm.ShowDialog();
             // Bitmap bmp = Properties.Resources.QuotaDownload;
             // notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
@@ -223,19 +240,32 @@ namespace Scanda.AppTray
             {
                 servicioToolStripMenuItem.Visible = false;
                 exitToolStripMenuItem.Visible = false;
+                if(string.IsNullOrEmpty(config.id_customer))
+                {
+                    syncNowToolStripMenuItem.Enabled = false;
+                    descargarToolStripMenuItem.Enabled = false;
+                } else
+                {
+                    syncNowToolStripMenuItem.Enabled = true;
+                    descargarToolStripMenuItem.Enabled = true;
+                }
             }
             Start();
         }
         
         private void Start()
         {
+            int xTime = int.Parse(config.time);
             // Es en milisegundos 48 * 60 * 1000
             // convertimos a segundos nuestras horas
-            int timestamp = int.Parse(config.time) * 3600 * 1000; // horas * 60 * 1000
-            timerUpload = new System.Windows.Forms.Timer();
-            timerUpload.Tick += OnTimedEvent;
-            timerUpload.Interval = timestamp;
-            timerUpload.Start();
+            if (xTime != 0)
+            {
+                int timestamp = xTime * 3600 * 1000; // horas * 60 * 1000
+                timerUpload = new System.Windows.Forms.Timer();
+                timerUpload.Tick += OnTimedEvent;
+                timerUpload.Interval = timestamp;
+                timerUpload.Start();
+            }
         }
 
         private async void OnTimedEvent(object sender, EventArgs e)
