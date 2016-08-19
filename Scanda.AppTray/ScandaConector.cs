@@ -88,8 +88,10 @@ namespace Scanda.AppTray
 
                 foreach (FileMetadata fm in preLista)
                 {
-                    lista.Add(fm.Name);
-
+                    int pos = fm.Name.LastIndexOf(".");
+                    string nom = fm.Name.Substring(0, pos);
+                    lista.Add(nom);
+                    //lista.Add(fm.Name);
                 }
 
                 return lista;
@@ -251,7 +253,7 @@ namespace Scanda.AppTray
                 status.download.file = fileN;
                 status.download.status = 0;
 
-
+                fileN = fileN + ".zip";
 
                 string pathRemoto = usrId + "/" + year + "/" + month + "/" + fileN;
                 string zip = await downloadZipFile(pathRemoto, destino);
