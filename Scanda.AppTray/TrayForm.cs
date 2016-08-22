@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Scanda.AppTray.Models;
 using System.Net.Http.Headers;
 using System.Configuration;
+using System.Text.RegularExpressions;
 
 namespace Scanda.AppTray
 {
@@ -26,6 +27,7 @@ namespace Scanda.AppTray
         private string selectedPath = "";
         private bool flag;
         private string configuration_path;
+        static string REGEXP = "([A-Zz-z]{4}\\d{6})(---|\\w{3})?(\\d{14}).(\\w{3})";
         // Configuraciones
         private string json;
         private Config config;
@@ -44,17 +46,12 @@ namespace Scanda.AppTray
             config = JsonConvert.DeserializeObject<Config>(json);
         }
 
-        private void lblInfo_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void FormTray_Move(object sender, EventArgs e)
         {
             if(this.WindowState == FormWindowState.Minimized)
             {
                 this.Hide();
-                notifyIconScanda.ShowBalloonTip(1000, "Important notice", "DB Protector Service is Running", ToolTipIcon.Info);
+                notifyIconScanda.ShowBalloonTip(1000, "Aviso importante", "DB Protector se está ejecutando", ToolTipIcon.Info);
             }
         }
 
@@ -121,15 +118,33 @@ namespace Scanda.AppTray
         async void RecuperarForm_Close(object sender, EventArgs e)
         {
             var form = (RecuperarForm)sender;
+            string base_url = ConfigurationManager.AppSettings["api_url"];
             //Bitmap bmp = Properties.Resources.QuotaDownload;
             //notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
+            #region Validacion de Directorios
+            // Revisamos si existe el directorio de respaldos
+            if (!Directory.Exists(config.path))
+            {
+                Directory.CreateDirectory(config.path);
+            }
+            // Revisamos si existe el directorio de historicos
+            if (!Directory.Exists(config.hist_path))
+            {
+                Directory.CreateDirectory(config.hist_path);
+            }
+            // Revisamos si existe el directorio de respaldados
+            if (!Directory.Exists(config.user_path))
+            {
+                Directory.CreateDirectory(config.user_path);
+            }
+            #endregion
             if (form.controls.Count > 0)
             {
                 notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo", ToolTipIcon.Info);
                 foreach (Control ctrl in form.controls)
                 {
                     string[] file = ctrl.Name.Split('_');
-                    Status temp = new Status();
+                    Status temp = new Status(base_url, notifyIconScanda, config.user, config.password);
                     // Pedimos donde descargar el archivo
                     FolderBrowserDialog fbd = new FolderBrowserDialog();
                     fbd.Description = "Seleccione el folder donde desea almacenar su historico";
@@ -143,7 +158,7 @@ namespace Scanda.AppTray
                         }
                         else
                         {
-                            notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
+                            notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
                             switch (int.Parse(config.type_storage))
                             {
                                 case 1:
@@ -270,28 +285,107 @@ namespace Scanda.AppTray
 
         private async void OnTimedEvent(object sender, EventArgs e)
         {
-            // Obtenemos listado de archivos del directorio
-            string[] fileEntries = Directory.GetFiles(config.path);
-            // Comienza a subir los archivos
-            //Bitmap bmp = Properties.Resources.QuotaNearing;
-            //notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
-            notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
-            foreach (string file in fileEntries)
+            try
             {
-                Status temp2 = new Status();
-                FileInfo info = new FileInfo(file);
-                var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
-                if (!x)
+                string base_url = ConfigurationManager.AppSettings["api_url"];
+                syncNowToolStripMenuItem.Text = "Sincronizando...";
+                #region Validacion de Directorios
+                // Revisamos si existe el directorio de respaldos
+                if (!Directory.Exists(config.path))
                 {
-                    notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
+                    Directory.CreateDirectory(config.path);
                 }
-                else
+                // Revisamos si existe el directorio de historicos
+                if (!Directory.Exists(config.hist_path))
                 {
-                    notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
+                    Directory.CreateDirectory(config.hist_path);
                 }
+                // Revisamos si existe el directorio de respaldados
+                if (!Directory.Exists(config.user_path))
+                {
+                    Directory.CreateDirectory(config.user_path);
+                }
+                #endregion
+                // Obtenemos listado de archivos del directorio
+                string[] fileEntries = Directory.GetFiles(config.path);
+                // Comienza a subir los archivos
+                //Bitmap bmp = Properties.Resources.QuotaNearing;
+                //notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
+                notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
+                foreach (string file in fileEntries)
+                {
+                    Status temp2 = new Status(base_url, notifyIconScanda, config.user, config.password);
+                    FileInfo info = new FileInfo(file);
+                    var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
+                    if (!x)
+                    {
+                        notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
+                    }
+                    else
+                    {
+                        notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
+                    }
+                }
+                // Realizamos el movimiento de los archivos que se suben a la carpeta historicos
+                List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                // verificamos el limite
+                bool canTransfer = false;
+                while (!canTransfer)
+                {
+                    if (histFileEntries.Count() < int.Parse(config.file_historical))
+                    {
+                        if (histFileEntries.Count() == 0)
+                        {
+                            canTransfer = true;
+                        }
+                        else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                        {
+                            canTransfer = true;
+                        }
+                        else
+                        {
+                            FileInfo item = histFileEntries.FirstOrDefault();
+                            if (item != null)
+                                histFileEntries.Remove(item);
+                        }
+                    }
+                    else
+                    {
+                        FileInfo item = histFileEntries.FirstOrDefault();
+                        if (item != null)
+                            File.Delete(config.hist_path + "\\" + item.Name);
+                            histFileEntries.Remove(item);
+                    }
+                }
+                // Comenzamos a mover los archivos 
+                List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                foreach (FileInfo file in fileEntries2)
+                {
+                    if (isValidFileName(file.Name))
+                    {
+                        // Se copia a Historicos
+                        File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
+                        // Se copia a Respaldados
+                        File.Copy(config.path + "\\" + file.Name, config.user_path + "\\" + file.Name);
+                        File.Delete(config.path + "\\" + file.Name);
+                    }
+                }
+                // Termino de hacer todos los respaldos
+                syncNowToolStripMenuItem.Text = "Sincronizar ahora";
+                syncNowToolStripMenuItem.Enabled = true;
+                // Termino de hacer todos los respaldos
+                // notifyIconScanda.Icon = Properties.Resources.AppIcon;
+            } catch(Exception ex)
+            {
+                // Fallo al realizar los respaldos
+                syncNowToolStripMenuItem.Text = "Sincronizar ahora";
+                syncNowToolStripMenuItem.Enabled = true;
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
             }
-            // Termino de hacer todos los respaldos
-            // notifyIconScanda.Icon = Properties.Resources.AppIcon;
         }
 
         bool DoesServiceExist(string serviceName, string machineName)
@@ -340,29 +434,119 @@ namespace Scanda.AppTray
             var x = 1 + 1;
             MessageBox.Show("Nuevo Archivo creado ->" + e.Name);
         }
-
+        private static bool isValidFileName(string fileName)
+        {
+            if (String.IsNullOrEmpty(fileName))
+                return false;
+            try
+            {
+                return Regex.IsMatch(fileName, REGEXP);
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                return false;
+            }
+        }
         private async void syncNowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            syncNowToolStripMenuItem.Text = "Sincronizando...";
-            // Obtenemos listado de archivos del directorio
-            string[] fileEntries = Directory.GetFiles(config.path);
-            notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
-            foreach (string file in fileEntries)
+            try
             {
-                Status temp2 = new Status();
-                FileInfo info = new FileInfo(file);
-                var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
-                if (!x)
+                string base_url = ConfigurationManager.AppSettings["api_url"];
+                syncNowToolStripMenuItem.Enabled = false;
+                syncNowToolStripMenuItem.Text = "Sincronizando...";
+                #region Validacion de Directorios
+                // Revisamos si existe el directorio de respaldos
+                if (!Directory.Exists(config.path))
                 {
-                    notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
+                    Directory.CreateDirectory(config.path);
                 }
-                else
+                // Revisamos si existe el directorio de historicos
+                if (!Directory.Exists(config.hist_path))
                 {
-                    notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
+                    Directory.CreateDirectory(config.hist_path);
                 }
+                // Revisamos si existe el directorio de respaldados
+                if (!Directory.Exists(config.user_path))
+                {
+                    Directory.CreateDirectory(config.user_path);
+                }
+                #endregion
+                // Obtenemos listado de archivos del directorio
+                string[] fileEntries = Directory.GetFiles(config.path);
+                notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
+                foreach (string file in fileEntries)
+                {
+                    Status temp2 = new Status(base_url, notifyIconScanda, config.user, config.password);
+                    FileInfo info = new FileInfo(file);
+                    var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
+                    if (!x)
+                    {
+                        notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
+                    }
+                    else
+                    {
+                        notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
+                    }
+                }
+                // Realizamos el movimiento de los archivos que se suben a la carpeta historicos
+                List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                // verificamos el limite
+                bool canTransfer = false;
+                while (!canTransfer)
+                {
+                    if (histFileEntries.Count() < int.Parse(config.file_historical))
+                    {
+                        if (histFileEntries.Count() == 0)
+                        {
+                            canTransfer = true;
+                        }
+                        else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                        {
+                            canTransfer = true;
+                        }
+                        else
+                        {
+                            FileInfo item = histFileEntries.FirstOrDefault();
+                            if (item != null)
+                                histFileEntries.Remove(item);
+                        }
+                    }
+                    else
+                    {
+                        FileInfo item = histFileEntries.FirstOrDefault();
+                        if (item != null)
+                            File.Delete(config.hist_path + "\\" + item.Name);
+                            histFileEntries.Remove(item);
+                    }
+                }
+                // Comenzamos a mover los archivos 
+                List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                foreach (FileInfo file in fileEntries2)
+                {
+                    if(isValidFileName(file.Name))
+                    {
+                        // Se copia a Historicos
+                        File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
+                        // Se copia a Respaldados
+                        File.Copy(config.path + "\\" + file.Name, config.user_path + "\\" + file.Name);
+                        File.Delete(config.path + "\\" + file.Name);
+                    }
+                }
+                // Termino de hacer todos los respaldos
+                syncNowToolStripMenuItem.Text = "Sincronizar ahora";
+                syncNowToolStripMenuItem.Enabled = true;
+            } catch (Exception ex)
+            {
+                // Termino de hacer todos los respaldos
+                syncNowToolStripMenuItem.Text = "Sincronizar ahora";
+                syncNowToolStripMenuItem.Enabled = true;
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
             }
-            // Termino de hacer todos los respaldos
-            syncNowToolStripMenuItem.Text = "Sincronizar ahora";
+
         }
 
         private async Task sync_accountinfo()

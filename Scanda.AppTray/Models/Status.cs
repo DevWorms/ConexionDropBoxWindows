@@ -27,17 +27,17 @@ namespace Scanda.AppTray.Models
             this.icon = icon;
         }
 
-        public async Task updateStatusFile(Upload upload)
+        public async Task uploadStatusFile(Upload upload)
         {
             // notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
-            int unixTimestamp = (int)(DateTime.UtcNow.Subtract(DateTime.Now)).TotalSeconds;
+            string unixTimestamp = DateTime.Now.ToString("yyyyMMddHHmmss");//(int)(DateTime.UtcNow.Subtract(DateTime.Now)).TotalSeconds;
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(this.base_url);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                string status = upload.status == 3 ? "Finalizado" : "En Progreso";
-                string requestUrl = string.Format("FileTransaction_SET?User={0}&Password={1}&StartDate={2}&ActualChunk={3}&TotalChunk={4}&Status={4}&FileName={5}&TransactionType=1", this.username, this.password, unixTimestamp, upload.chunk, upload.total, status, upload.file);
+                string status = upload.status == 3 ? "Finalizado" : "EnProgreso";
+                string requestUrl = string.Format("FileTransaction_SET?User={0}&Password={1}&StartDate={2}&ActualChunk={3}&TotalChunk={4}&Status={5}&FileName={6}&TransactionType=1", this.username, this.password, unixTimestamp, upload.chunk, upload.total, status, upload.file);
                 HttpResponseMessage response = await client.GetAsync(requestUrl);
                 if (response.IsSuccessStatusCode)
                 {
@@ -56,8 +56,8 @@ namespace Scanda.AppTray.Models
                 client.BaseAddress = new Uri(this.base_url);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                string status = upload.status == 3 ? "Finalizado" : "En Progreso";
-                string requestUrl = string.Format("FileTransaction_SET?User={0}&Password={1}&StartDate={2}&ActualChunk={3}&TotalChunk={4}&Status={4}&FileName={5}&TransactionType=5", this.username, this.password, unixTimestamp, 2, 2, status, download.file);
+                string status = upload.status == 3 ? "Finalizado" : "EnProgreso";
+                string requestUrl = string.Format("FileTransaction_SET?User={0}&Password={1}&StartDate={2}&ActualChunk={3}&TotalChunk={4}&Status={5}&FileName={6}&TransactionType=5", this.username, this.password, unixTimestamp, 2, 2, status, download.file);
                 HttpResponseMessage response = await client.GetAsync(requestUrl); if (response.IsSuccessStatusCode)
                 {
                     var resp = await response.Content.ReadAsStringAsync();

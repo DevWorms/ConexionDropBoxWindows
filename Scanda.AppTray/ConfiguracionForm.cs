@@ -128,34 +128,43 @@ namespace Scanda.AppTray
 
         private void btnDesvincular_Click(object sender, EventArgs e)
         {
-            mtxt_user.Text = "";
-            mtxt_totalspace.Text = "";
-            mtxt_avalaiblespace.Text = "";
-            metroPB_CloudSpace.Value = 0;
-            mtxt_time.Text = "0 Horas";
-            mtxt_localHist.Text = "0";
-            mtxt_cloudHist.Text = "0";
-            mtxt_userfolder.Text = "";
-            mtxt_folder.Text = "";
-            metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
+            try
+            {
+                mtxt_user.Text = "";
+                mtxt_totalspace.Text = "";
+                // mtxt_avalaiblespace.Text = "";
+                metroPB_CloudSpace.Value = 0;
+                mtxt_time.Text = "0 Horas";
+                mtxt_localHist.Text = "0";
+                mtxt_cloudHist.Text = "0";
+                mtxt_userfolder.Text = "";
+                mtxt_folder.Text = "";
+                metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
 
-            config.user = "";
-            config.password = "";
-            config.id_customer = "";
-            config.time = "0";
-            config.time_type = "Horas";
-            config.type_storage = "0";
-            config.file_historical = "0";
-            config.path = "";
-            config.user_path = "";
-            config.hist_path = "";
-            // Guardamos
-            File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
-            // Habilitamos el Boton Add Acount
-            btnLogin.Enabled = true;
-            btnElegir.Enabled = false;
-            btnUserFolder.Enabled = false;
-            dataGridViewHistoricos.DataSource = new List<Historico>() { };
+                config.user = "";
+                config.password = "";
+                config.id_customer = "";
+                config.time = "0";
+                config.time_type = "Horas";
+                config.type_storage = "0";
+                config.file_historical = "0";
+                config.path = "";
+                config.user_path = "";
+                config.hist_path = "";
+                // Guardamos
+                File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                // Habilitamos el Boton Add Acount
+                btnLogin.Enabled = true;
+                btnElegir.Enabled = false;
+                btnUserFolder.Enabled = false;
+                dataGridViewHistoricos.DataSource = new List<Historico>() { };
+            } catch (Exception ex) {
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
+            }
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)
@@ -178,107 +187,149 @@ namespace Scanda.AppTray
 
         private async Task sync_accountinfo()
         {
-            using (var client = new HttpClient())
+            try
             {
-                client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage response = await client.GetAsync(string.Format("Account_GET?User={0}&Password={0}", config.user, config.password));
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var resp = await response.Content.ReadAsStringAsync();
-                    Account r = JsonConvert.DeserializeObject<Account>(resp);
-                    mtxt_user.Text = config.user; // r.DBoxUser;
-                    mtxt_totalspace.Text = r.StorageLimit.ToString() + " MB";
-                    mtxt_avalaiblespace.Text = (r.StorageLimit - r.UsedStorage).ToString();
-                    metroPB_CloudSpace.Value = (r.UsedStorage * 100 / r.StorageLimit);
-                    mtxt_time.Text = r.UploadFrecuency.ToString() + " Horas";
-                    mtxt_localHist.Text = r.FileHistoricalNumber.ToString();
-                    mtxt_cloudHist.Text = r.FileHistoricalNumberCloud.ToString();
-                    if (metroPB_CloudSpace.Value < 50)
+                    client.BaseAddress = new Uri(url);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    HttpResponseMessage response = await client.GetAsync(string.Format("Account_GET?User={0}&Password={0}", config.user, config.password));
+                    if (response.IsSuccessStatusCode)
                     {
-                        metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
-                    } else if (metroPB_CloudSpace.Value < 80)
-                    {
-                        metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Yellow;
-                    } else if (metroPB_CloudSpace.Value < 50)
-                    {
-                        metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Red;
-                    }
+                        var resp = await response.Content.ReadAsStringAsync();
+                        Account r = JsonConvert.DeserializeObject<Account>(resp);
+                        mtxt_user.Text = config.user; // r.DBoxUser;
+                        mtxt_totalspace.Text = r.StorageLimit.ToString() + " MB";
+                        // mtxt_avalaiblespace.Text = (r.StorageLimit - r.UsedStorage).ToString();
+                        metroPB_CloudSpace.Value = (r.UsedStorage * 100 / r.StorageLimit);
+                        mtxt_time.Text = r.UploadFrecuency.ToString() + " Horas";
+                        mtxt_localHist.Text = r.FileHistoricalNumber.ToString();
+                        mtxt_cloudHist.Text = r.FileHistoricalNumberCloud.ToString();
+                        if (metroPB_CloudSpace.Value < r.PBYellowPercentage)
+                        {
+                            metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
+                        }
+                        else if (metroPB_CloudSpace.Value >= r.PBYellowPercentage && metroPB_CloudSpace.Value < r.PBRedPercentage)
+                        {
+                            metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Yellow;
+                        }
+                        else if (metroPB_CloudSpace.Value >= r.PBRedPercentage)
+                        {
+                            metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Red;
+                        }
 
-                    config.time = r.UploadFrecuency.ToString();
-                    config.time_type = "Horas";
-                    config.type_storage = r.FileTreatmen.ToString();
-                    config.file_historical = r.FileHistoricalNumber.ToString();
-                    File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                        config.time = r.UploadFrecuency.ToString();
+                        config.time_type = "Horas";
+                        config.type_storage = r.FileTreatmen.ToString();
+                        config.file_historical = r.FileHistoricalNumber.ToString();
+                        File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                    }
                 }
+            } catch(Exception ex)
+            {
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
             }
         }
 
         private async Task sync_lastestUploads()
         {
-            List<Historico> items = new List<Historico>() { };
-            var response = await ScandaConector.getLastUploads(config.id_customer);
-            foreach(string key in response.Keys)
+            try
             {
-                string item = response[key];
-                var strs = item.Split(' ');
-                items.Add(new Historico() { RFC = key, Fecha = strs[0] + " " + strs[1] + " " + strs[2] });
+                List<Historico> items = new List<Historico>() { };
+                var response = await ScandaConector.getLastUploads(config.id_customer);
+                foreach (string key in response.Keys)
+                {
+                    string item = response[key];
+                    var strs = item.Split(' ');
+                    items.Add(new Historico() { RFC = key, Fecha = strs[0] + " " + strs[1] + " " + strs[2] });
+                }
+                dataGridViewHistoricos.DataSource = items;
+                dataGridViewHistoricos.Columns[0].Width = 140;
+                dataGridViewHistoricos.Columns[1].Width = 170;
             }
-            dataGridViewHistoricos.DataSource = items;
-            dataGridViewHistoricos.Columns[0].Width = 140;
-            dataGridViewHistoricos.Columns[1].Width = 170;
+            catch (Exception ex)
+            {
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
+            }
         }
 
         public async Task sync_extensions()
         {
-            using (var client = new HttpClient())
+            try
             {
-                client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage response = await client.GetAsync(string.Format("Extensions_GET?User={0}&Password={0}", config.user, config.password));
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var resp = await response.Content.ReadAsStringAsync();
-                    List<Ext> r = JsonConvert.DeserializeObject<List<Ext>>(resp);
+                    client.BaseAddress = new Uri(url);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    HttpResponseMessage response = await client.GetAsync(string.Format("Extensions_GET?User={0}&Password={0}", config.user, config.password));
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var resp = await response.Content.ReadAsStringAsync();
+                        List<Ext> r = JsonConvert.DeserializeObject<List<Ext>>(resp);
 
-                    config.extensions = r.Select(ent => "." + ent.Extension.ToLower()).ToList();
-                    //config.time_type = "Horas";
-                    //config.type_storage = r.FileTreatmen.ToString();
-                    //config.file_historical = r.FileHistoricalNumber.ToString();
-                    File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                        config.extensions = r.Select(ent => "." + ent.Extension.ToLower()).ToList();
+                        //config.time_type = "Horas";
+                        //config.type_storage = r.FileTreatmen.ToString();
+                        //config.file_historical = r.FileHistoricalNumber.ToString();
+                        File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                    }
                 }
+            } catch (Exception ex) {
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
             }
         }
 
         private async void ConfiguracionForm_Load(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(config.id_customer))
+            try
             {
-                await sync_accountinfo();
-                await sync_extensions();
-                await sync_lastestUploads();
-
-                switch (int.Parse(config.type_storage))
+                if (!string.IsNullOrEmpty(config.id_customer))
                 {
-                    case 1:
-                        // mtxt_userfolder.Visible = false;
-                        // btnUserFolder.Visible = false;
-                        break;
-                    case 2:
-                        break;
-                    case 3:
-                        // mtxt_userfolder.Visible = false;
-                        // btnUserFolder.Visible = false;
-                        break;
+                    await sync_accountinfo();
+                    await sync_extensions();
+                    await sync_lastestUploads();
+
+                    switch (int.Parse(config.type_storage))
+                    {
+                        case 1:
+                            // mtxt_userfolder.Visible = false;
+                            // btnUserFolder.Visible = false;
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            // mtxt_userfolder.Visible = false;
+                            // btnUserFolder.Visible = false;
+                            break;
+                    }
+                    btnElegir.Enabled = true;
+                    btnUserFolder.Enabled = true;
                 }
-                btnElegir.Enabled = true;
-                btnUserFolder.Enabled = true;
-            } else
-            {
-                btnElegir.Enabled = false;
-                btnUserFolder.Enabled = false;
+                else
+                {
+                    btnElegir.Enabled = false;
+                    btnUserFolder.Enabled = false;
+                }
+            } catch (Exception ex) {
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
             }
         }
 
@@ -305,6 +356,12 @@ namespace Scanda.AppTray
                     + "\n" + ex.StackTrace
                     + "\n");
             }
+        }
+
+        private void dataGridViewHistoricos_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridViewHistoricos.SelectedCells.Count > 0)
+                dataGridViewHistoricos.ClearSelection();
         }
     }
 }

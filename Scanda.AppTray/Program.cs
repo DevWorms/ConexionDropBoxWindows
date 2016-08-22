@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -29,43 +30,52 @@ namespace Scanda.AppTray
             // Revisamos si existe el directorio de Settings
             // string startPath = Environment.GetFolderPath(Environment.SpecialFolder.Programs);
             //       + @"\YourPublisher\YourSuite\YourProduct";
-
-            if (!Directory.Exists(settingsFolder))
+            using (Mutex mutex = new Mutex(false, @"Global\" + "8a811882-a3ad-402e-b2f0-d8963a938d18"))
             {
-                // No existe lo creamos el Directorio
-                Directory.CreateDirectory(settingsFolder);
-                Directory.CreateDirectory(baseFolder);
-                Directory.CreateDirectory(respaldadosFolder);
-                Directory.CreateDirectory(historicosFolder);
-
-                if (!File.Exists(confFile))
+                if (!mutex.WaitOne(0, false))
                 {
-                    // Si no existe lo creamos
-                    // Creamos el archivo de configuracion
-                    JObject configSettings = new JObject(
-                        new JProperty("path", baseFolder),
-                        new JProperty("user_path", respaldadosFolder),
-                        new JProperty("hist_path", historicosFolder),
-                        new JProperty("time_type", "Horas"),
-                        new JProperty("time", "0"),
-                        new JProperty("id_customer", ""),
-                        new JProperty("user", ""),
-                        new JProperty("password", ""),
-                        new JProperty("token", ""),
-                        new JProperty("type_storage", ""),
-                        new JProperty("file_historical", ""),
-                        new JProperty("cloud_historical", ""),
-                        new JProperty("extensions", "")
-                    );
-                    // escribimos el archivo
-                    File.WriteAllText(confFile, configSettings.ToString());
+                    MessageBox.Show("Ya hay una instancia de DB Protector ejecutandose");
+                    return;
                 }
-                Application.Run(new LoginForm(true, confFile));
-            } else
-            {
-                Application.Run(new FormTray(false, confFile));
+
+                GC.Collect();
+                if (!Directory.Exists(settingsFolder))
+                {
+                    // No existe lo creamos el Directorio
+                    Directory.CreateDirectory(settingsFolder);
+                    Directory.CreateDirectory(baseFolder);
+                    Directory.CreateDirectory(respaldadosFolder);
+                    Directory.CreateDirectory(historicosFolder);
+
+                    if (!File.Exists(confFile))
+                    {
+                        // Si no existe lo creamos
+                        // Creamos el archivo de configuracion
+                        JObject configSettings = new JObject(
+                            new JProperty("path", baseFolder),
+                            new JProperty("user_path", respaldadosFolder),
+                            new JProperty("hist_path", historicosFolder),
+                            new JProperty("time_type", "Horas"),
+                            new JProperty("time", "0"),
+                            new JProperty("id_customer", ""),
+                            new JProperty("user", ""),
+                            new JProperty("password", ""),
+                            new JProperty("token", ""),
+                            new JProperty("type_storage", ""),
+                            new JProperty("file_historical", ""),
+                            new JProperty("cloud_historical", ""),
+                            new JProperty("extensions", "")
+                        );
+                        // escribimos el archivo
+                        File.WriteAllText(confFile, configSettings.ToString());
+                    }
+                    Application.Run(new LoginForm(true, confFile));
+                }
+                else
+                {
+                    Application.Run(new FormTray(false, confFile));
+                }
             }
-            
         }
 
         

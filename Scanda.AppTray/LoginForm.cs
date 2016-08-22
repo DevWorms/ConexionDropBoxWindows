@@ -83,6 +83,7 @@ namespace Scanda.AppTray
                     } else
                     {
                         lblMessages.Text = "Contraseña/Usuario incorrectos";
+                        throw new Exception("No se pudo iniciar sesión, revise su conexión de internet");
                     }
                 }
 
