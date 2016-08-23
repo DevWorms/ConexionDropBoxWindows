@@ -17,7 +17,7 @@ namespace Scanda.AppTray
     {
         static DropboxClient client;
         static DropboxClientConfig clientConf;
-        //static string APITOKEN = "f-taP7WG2wAAAAAAAAAAEPgxbzHQ7EDctvivjSJCqLwCA0tcsgyuRT7H9vnxqwVK";
+        //static string APITOKEN = "f-taP7WG2wAAAAAAAAAATT2oK8oc3cov6Bfk5dQlxjFubRX7cWBoJS5PyErF8HmQ";
         static string APITOKEN = "DnYsuEHH3ssAAAAAAAAYodsCelGBXj22nko-HeIh5ENG5OFjSpmelu6R-_Obw0jM";
 
         static int B_TO_MB = 1024 * 1024;

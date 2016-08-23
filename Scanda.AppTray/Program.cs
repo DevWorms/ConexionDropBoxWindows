@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,9 @@ namespace Scanda.AppTray
 {
     static class Program
     {
+        //Startup registry key and value
+        private static readonly string StartupKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+        private static readonly string StartupValue = "DB Protector";
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -68,6 +72,7 @@ namespace Scanda.AppTray
                         );
                         // escribimos el archivo
                         File.WriteAllText(confFile, configSettings.ToString());
+                        SetStartup();
                     }
                     Application.Run(new LoginForm(true, confFile));
                 }
@@ -78,6 +83,11 @@ namespace Scanda.AppTray
             }
         }
 
-        
+        private static void SetStartup()
+        {
+            // Set the application to run at startup
+            RegistryKey key = Registry.CurrentUser.OpenSubKey(StartupKey, true);
+            key.SetValue(StartupValue, Application.ExecutablePath.ToString());
+        }
     }
 }
