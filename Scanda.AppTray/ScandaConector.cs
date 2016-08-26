@@ -17,7 +17,7 @@ namespace Scanda.AppTray
     {
         static DropboxClient client;
         static DropboxClientConfig clientConf;
-        //static string APITOKEN = "f-taP7WG2wAAAAAAAAAATT2oK8oc3cov6Bfk5dQlxjFubRX7cWBoJS5PyErF8HmQ";
+        //static string APITOKEN = "DnYsuEHH3ssAAAAAAAAYodsCelGBXj22nko-HeIh5ENG5OFjSpmelu6R-_Obw0jM";
         static string APITOKEN = "DnYsuEHH3ssAAAAAAAAYodsCelGBXj22nko-HeIh5ENG5OFjSpmelu6R-_Obw0jM";
 
         static int B_TO_MB = 1024 * 1024;
@@ -481,8 +481,11 @@ namespace Scanda.AppTray
                 //Crifrar Password
                 zip.Password = SHA256string(usrId);
 
+                zip.UseZip64WhenSaving = Zip64Option.Always;
                 zip.AddFile(origen, ".");
-                zip.Save(info.Name + ".zip");
+                zip.Name = info.Name + ".zip";
+                zip.Save();
+
             }
 
             return info.Name + ".zip";

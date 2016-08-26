@@ -134,12 +134,14 @@ namespace Scanda.AppTray
                 mtxt_totalspace.Text = "";
                 // mtxt_avalaiblespace.Text = "";
                 metroPB_CloudSpace.Value = 0;
+                metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
+                metroPB_CloudSpace.Refresh();
                 mtxt_time.Text = "0 Horas";
                 mtxt_localHist.Text = "0";
                 mtxt_cloudHist.Text = "0";
                 mtxt_userfolder.Text = "";
                 mtxt_folder.Text = "";
-                metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
+                
 
                 config.user = "";
                 config.password = "";
@@ -194,7 +196,7 @@ namespace Scanda.AppTray
                     client.BaseAddress = new Uri(url);
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    HttpResponseMessage response = await client.GetAsync(string.Format("Account_GET?User={0}&Password={0}", config.user, config.password));
+                    HttpResponseMessage response = await client.GetAsync(string.Format("Account_GET?User={0}&Password={1}", config.user, config.password));
                     if (response.IsSuccessStatusCode)
                     {
                         var resp = await response.Content.ReadAsStringAsync();
@@ -271,7 +273,7 @@ namespace Scanda.AppTray
                     client.BaseAddress = new Uri(url);
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    HttpResponseMessage response = await client.GetAsync(string.Format("Extensions_GET?User={0}&Password={0}", config.user, config.password));
+                    HttpResponseMessage response = await client.GetAsync(string.Format("Extensions_GET?User={0}&Password={1}", config.user, config.password));
                     if (response.IsSuccessStatusCode)
                     {
                         var resp = await response.Content.ReadAsStringAsync();

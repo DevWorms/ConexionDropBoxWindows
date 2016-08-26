@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
-using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.ServiceProcess;
-using System.Reflection;
 using Newtonsoft.Json;
 using Scanda.AppTray.Models;
 using System.Net.Http.Headers;
@@ -117,102 +112,118 @@ namespace Scanda.AppTray
 
         async void RecuperarForm_Close(object sender, EventArgs e)
         {
-            var form = (RecuperarForm)sender;
-            string base_url = ConfigurationManager.AppSettings["api_url"];
-            //Bitmap bmp = Properties.Resources.QuotaDownload;
-            //notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
-            #region Validacion de Directorios
-            // Revisamos si existe el directorio de respaldos
-            if (!Directory.Exists(config.path))
+            try
             {
-                Directory.CreateDirectory(config.path);
-            }
-            // Revisamos si existe el directorio de historicos
-            if (!Directory.Exists(config.hist_path))
-            {
-                Directory.CreateDirectory(config.hist_path);
-            }
-            // Revisamos si existe el directorio de respaldados
-            if (!Directory.Exists(config.user_path))
-            {
-                Directory.CreateDirectory(config.user_path);
-            }
-            #endregion
-            if (form.controls.Count > 0)
-            {
-                notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo", ToolTipIcon.Info);
-                foreach (Control ctrl in form.controls)
+                var form = (RecuperarForm)sender;
+                string base_url = ConfigurationManager.AppSettings["api_url"];
+                //Bitmap bmp = Properties.Resources.QuotaDownload;
+                //notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
+                #region Validacion de Directorios
+                // Revisamos si existe el directorio de respaldos
+                if (!Directory.Exists(config.path))
                 {
-                    string[] file = ctrl.Name.Split('_');
-                    Status temp = new Status(base_url, notifyIconScanda, config.user, config.password);
-                    // Pedimos donde descargar el archivo
-                    FolderBrowserDialog fbd = new FolderBrowserDialog();
-                    fbd.Description = "Seleccione el folder donde desea almacenar su historico";
-                    if (fbd.ShowDialog() == DialogResult.OK)
-                    {
-                        var selectedPath = fbd.SelectedPath;
-                        var res = await ScandaConector.downloadFile(config.id_customer, file[0], file[1], file[2], temp, config.path);
-                        if (!res)
-                        {
-                            notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
-                        }
-                        else
-                        {
-                            notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
-                            switch (int.Parse(config.type_storage))
-                            {
-                                case 1:
-                                    if (File.Exists(config.path + "\\" + file[2]))
-                                    {
-                                        // Se copia a respaldados
-                                        File.Move(config.path + "\\" + file[2], selectedPath + "\\" + file[2]);
-                                    }
-                                    break;
-                                case 2:
-                                    if (File.Exists(config.path + "\\" + file[2]))
-                                    {
-                                        // Se copia a la carpeta seleccionada
-                                        File.Move(config.path + "\\" + file[2], selectedPath + "\\" + file[2]);
-                                        // File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
-                                    }
-                                    break;
-                                case 3:
-                                    if (File.Exists(config.path + "\\" + file[2]))
-                                    {
-                                        // Se copia a la carpeta seleccionada
-                                        File.Move(config.path + "\\" + file[2], selectedPath + "\\" + file[2]);
-                                        // File.Delete(config.path + "\\" + file[2]);
-                                    }
-                                    break;
-                            }
-                        }
-                        //switch (int.Parse(config.type_storage))
-                        //{
-                        //    case 1:
-                        //        // Se copia a respaldados
-                        //        if (File.Exists(config.path + "\\" + file[2]))
-                        //        {
-                        //            File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
-                        //        }
-                        //        break;
-                        //    case 2:
-                        //        if (File.Exists(config.path + "\\" + file[2]))
-                        //        {
-                        //            File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
-                        //        }
-                        //        break;
-                        //    case 3:
-                        //        if (File.Exists(config.path + "\\" + file[2]))
-                        //        {
-                        //            File.Delete(config.path + "\\" + file[2]);
-                        //        }
-                        //        break;
-                        //}
-                        
-                    }
+                    Directory.CreateDirectory(config.path);
                 }
+                // Revisamos si existe el directorio de historicos
+                if (!Directory.Exists(config.hist_path))
+                {
+                    Directory.CreateDirectory(config.hist_path);
+                }
+                // Revisamos si existe el directorio de respaldados
+                if (!Directory.Exists(config.user_path))
+                {
+                    Directory.CreateDirectory(config.user_path);
+                }
+                #endregion
+                if (form.controls.Count > 0)
+                {
+                    syncNowToolStripMenuItem.Enabled = false;
+                    configuracionToolStripMenuItem.Enabled = false;
+                    descargarToolStripMenuItem.Enabled = false;
+                    notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo", ToolTipIcon.Info);
+                    foreach (Control ctrl in form.controls)
+                    {
+                        string[] file = ctrl.Name.Split('_');
+                        Status temp = new Status(base_url, notifyIconScanda, config.user, config.password);
+                        // Pedimos donde descargar el archivo
+                        FolderBrowserDialog fbd = new FolderBrowserDialog();
+                        fbd.Description = "Seleccione el folder donde desea almacenar su historico";
+                        if (fbd.ShowDialog() == DialogResult.OK)
+                        {
+                            var selectedPath = fbd.SelectedPath;
+                            var res = await ScandaConector.downloadFile(config.id_customer, file[0], file[1], file[2], temp, config.path);
+                            if (!res)
+                            {
+                                notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
+                            }
+                            else
+                            {
+                                notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
+                                switch (int.Parse(config.type_storage))
+                                {
+                                    case 1:
+                                        if (File.Exists(config.path + "\\" + file[2]))
+                                        {
+                                            // Se copia a respaldados
+                                            File.Move(config.path + "\\" + file[2], selectedPath + "\\" + file[2]);
+                                        }
+                                        break;
+                                    case 2:
+                                        if (File.Exists(config.path + "\\" + file[2]))
+                                        {
+                                            // Se copia a la carpeta seleccionada
+                                            File.Move(config.path + "\\" + file[2], selectedPath + "\\" + file[2]);
+                                            // File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
+                                        }
+                                        break;
+                                    case 3:
+                                        if (File.Exists(config.path + "\\" + file[2]))
+                                        {
+                                            // Se copia a la carpeta seleccionada
+                                            File.Move(config.path + "\\" + file[2], selectedPath + "\\" + file[2]);
+                                            // File.Delete(config.path + "\\" + file[2]);
+                                        }
+                                        break;
+                                }
+                            }
+                            //switch (int.Parse(config.type_storage))
+                            //{
+                            //    case 1:
+                            //        // Se copia a respaldados
+                            //        if (File.Exists(config.path + "\\" + file[2]))
+                            //        {
+                            //            File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
+                            //        }
+                            //        break;
+                            //    case 2:
+                            //        if (File.Exists(config.path + "\\" + file[2]))
+                            //        {
+                            //            File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
+                            //        }
+                            //        break;
+                            //    case 3:
+                            //        if (File.Exists(config.path + "\\" + file[2]))
+                            //        {
+                            //            File.Delete(config.path + "\\" + file[2]);
+                            //        }
+                            //        break;
+                            //}
+
+                        }
+                    }
+                    syncNowToolStripMenuItem.Enabled = true;
+                    configuracionToolStripMenuItem.Enabled = true;
+                    descargarToolStripMenuItem.Enabled = true;
+                }
+                // notifyIconScanda.Icon = Properties.Resources.AppIcon;
+            } catch(Exception ex)
+            {
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
             }
-            // notifyIconScanda.Icon = Properties.Resources.AppIcon;
         }
 
         private void FormTray_Load(object sender, EventArgs e)
@@ -287,6 +298,9 @@ namespace Scanda.AppTray
         {
             try
             {
+                syncNowToolStripMenuItem.Enabled = false;
+                configuracionToolStripMenuItem.Enabled = false;
+                descargarToolStripMenuItem.Enabled = false;
                 string base_url = ConfigurationManager.AppSettings["api_url"];
                 syncNowToolStripMenuItem.Text = "Sincronizando...";
                 #region Validacion de Directorios
@@ -373,6 +387,8 @@ namespace Scanda.AppTray
                 // Termino de hacer todos los respaldos
                 syncNowToolStripMenuItem.Text = "Sincronizar ahora";
                 syncNowToolStripMenuItem.Enabled = true;
+                configuracionToolStripMenuItem.Enabled = true;
+                descargarToolStripMenuItem.Enabled = true;
                 // Termino de hacer todos los respaldos
                 // notifyIconScanda.Icon = Properties.Resources.AppIcon;
             } catch(Exception ex)
@@ -453,6 +469,8 @@ namespace Scanda.AppTray
             {
                 string base_url = ConfigurationManager.AppSettings["api_url"];
                 syncNowToolStripMenuItem.Enabled = false;
+                configuracionToolStripMenuItem.Enabled = false;
+                descargarToolStripMenuItem.Enabled = false;
                 syncNowToolStripMenuItem.Text = "Sincronizando...";
                 #region Validacion de Directorios
                 // Revisamos si existe el directorio de respaldos
@@ -535,6 +553,8 @@ namespace Scanda.AppTray
                 // Termino de hacer todos los respaldos
                 syncNowToolStripMenuItem.Text = "Sincronizar ahora";
                 syncNowToolStripMenuItem.Enabled = true;
+                configuracionToolStripMenuItem.Enabled = true;
+                descargarToolStripMenuItem.Enabled = true;
             } catch (Exception ex)
             {
                 // Termino de hacer todos los respaldos

@@ -1,12 +1,8 @@
 ﻿using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Scanda.AppTray
@@ -25,7 +21,7 @@ namespace Scanda.AppTray
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             // Obtenemos el Folder donde se aloja nuestra aplicacion
-            string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+            string appFolder = new FileInfo(Application.ExecutablePath.ToString()).Directory.FullName;
             string settingsFolder = appFolder + "\\Settings";
             string baseFolder = @"C:\Backups";
             string historicosFolder = baseFolder + "\\historicos";
