@@ -16,8 +16,9 @@ namespace Scanda.AppTray.Models
         public Download download;
         private string base_url, username, password;
         private NotifyIcon icon;
+        private ToolStripMenuItem menuItem;
 
-        public Status(string base_url = "", NotifyIcon icon = null, string username = "", string password = "")
+        public Status(string base_url = "", NotifyIcon icon = null, ToolStripMenuItem menuItem = null, string username = "", string password = "")
         {
             upload = new Upload();
             download = new Download();
@@ -25,10 +26,12 @@ namespace Scanda.AppTray.Models
             this.password = password;
             this.base_url = base_url;
             this.icon = icon;
+            this.menuItem = menuItem;
         }
 
         public async Task uploadStatusFile(Upload upload)
         {
+            this.menuItem.Text = string.Format("Sincronizando {0} de {1}", upload.chunk, upload.total);
             // notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
             string unixTimestamp = DateTime.Now.ToString("yyyyMMddHHmmss");//(int)(DateTime.UtcNow.Subtract(DateTime.Now)).TotalSeconds;
             using (var client = new HttpClient())

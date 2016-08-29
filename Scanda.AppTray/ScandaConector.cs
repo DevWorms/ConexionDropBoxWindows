@@ -475,6 +475,17 @@ namespace Scanda.AppTray
                 return null;
             }
         }
+        public static async Task<long> getUsedSpace(string userID, int s = 1)
+        {
+            //obtengo todos los archivos 
+            ListFolderResult res = await listFiles(userID, true);
+            List<Metadata> todo = res.Entries as List<Metadata>;
+            List<FileMetadata> archivos = todo.Where(x => x.IsFile).Select(y => y.AsFile).ToList();
+
+            long tam = (long)archivos.Select((x) => { return x.Size; }).Aggregate((x, y) => { return x + y; });
+
+            return tam / B_TO_MB;
+        }
         private static string cifrar(string origen, string usrId)
         {
             FileInfo info = new FileInfo(origen);

@@ -143,7 +143,7 @@ namespace Scanda.AppTray
                     foreach (Control ctrl in form.controls)
                     {
                         string[] file = ctrl.Name.Split('_');
-                        Status temp = new Status(base_url, notifyIconScanda, config.user, config.password);
+                        Status temp = new Status(base_url, notifyIconScanda, descargarToolStripMenuItem, config.user, config.password);
                         // Pedimos donde descargar el archivo
                         FolderBrowserDialog fbd = new FolderBrowserDialog();
                         fbd.Description = "Seleccione el folder donde desea almacenar su historico";
@@ -330,7 +330,7 @@ namespace Scanda.AppTray
                 notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
                 foreach (string file in fileEntries)
                 {
-                    Status temp2 = new Status(base_url, notifyIconScanda, config.user, config.password);
+                    Status temp2 = new Status(base_url, notifyIconScanda, syncNowToolStripMenuItem, config.user, config.password);
                     FileInfo info = new FileInfo(file);
                     var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
                     if (!x)
@@ -342,7 +342,9 @@ namespace Scanda.AppTray
                         notifyIconScanda.ShowBalloonTip(1000, "DBProtector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
                     }
                 }
-                // Realizamos el movimiento de los archivos que se suben a la carpeta historicos
+                // Realizamos la limpieza en Cloud
+                await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
+                #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
                 List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
                 // verificamos el limite
                 bool canTransfer = false;
@@ -389,6 +391,8 @@ namespace Scanda.AppTray
                         File.Delete(config.path + "\\" + file.Name);
                     }
                 }
+                #endregion
+                await sync_updateAccount();
                 // Termino de hacer todos los respaldos
                 syncNowToolStripMenuItem.Text = "Sincronizar ahora";
                 syncNowToolStripMenuItem.Enabled = true;
@@ -495,7 +499,7 @@ namespace Scanda.AppTray
                 notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
                 foreach (string file in fileEntries)
                 {
-                    Status temp2 = new Status(base_url, notifyIconScanda, config.user, config.password);
+                    Status temp2 = new Status(base_url, notifyIconScanda, syncNowToolStripMenuItem, config.user, config.password);
                     FileInfo info = new FileInfo(file);
                     var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
                     if (!x)
@@ -508,7 +512,9 @@ namespace Scanda.AppTray
                         Logger.sendLog("archivo subido correctamente: " +  file);
                     }
                 }
-                // Realizamos el movimiento de los archivos que se suben a la carpeta historicos
+                // Realizamos la limpieza en Cloud
+                await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
+                #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
                 if (config.type_storage != "3")
                 {
                     List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
@@ -575,6 +581,8 @@ namespace Scanda.AppTray
                         }
                     }
                 }
+                #endregion
+                await sync_updateAccount();
                 // Termino de hacer todos los respaldos
                 syncNowToolStripMenuItem.Text = "Sincronizar ahora";
                 syncNowToolStripMenuItem.Enabled = true;
@@ -593,7 +601,29 @@ namespace Scanda.AppTray
             }
 
         }
-
+        private async Task sync_updateAccount()
+        {
+            // Obtenemos los datos de dropbox
+            var x = await ScandaConector.getUsedSpace(config.id_customer);
+            string url = ConfigurationManager.AppSettings["api_url"];
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(url);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage response = await client.GetAsync(string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, x));
+                if (response.IsSuccessStatusCode)
+                {
+                    var resp = await response.Content.ReadAsStringAsync();
+                    Account r = JsonConvert.DeserializeObject<Account>(resp);
+                    config.time = r.UploadFrecuency.ToString();
+                    config.time_type = "Horas";
+                    config.type_storage = r.FileTreatmen.ToString();
+                    config.file_historical = r.FileHistoricalNumber.ToString();
+                    File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                }
+            }
+        }
         private async Task sync_accountinfo()
         {
             string url = ConfigurationManager.AppSettings["api_url"];

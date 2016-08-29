@@ -157,6 +157,7 @@ namespace Scanda.AppTray
                 config.time_type = "Horas";
                 config.type_storage = "0";
                 config.file_historical = "0";
+                config.cloud_historical = "0";
                 config.path = "";
                 config.hist_path = "";
                 // Guardamos
@@ -166,10 +167,6 @@ namespace Scanda.AppTray
                 btnElegir.Enabled = false;
                 btnUserFolder.Enabled = false;
                 dataGridViewHistoricos.DataSource = new List<Historico>() { };
-
-               
-
-
             }
             catch (Exception ex)
             {
@@ -244,7 +241,7 @@ namespace Scanda.AppTray
                         config.time = r.UploadFrecuency.ToString();
                         config.time_type = "Horas";
                         config.type_storage = r.FileTreatmen.ToString();
-                       
+                        config.cloud_historical = r.FileHistoricalNumberCloud.ToString();
                         config.file_historical = r.FileHistoricalNumber.ToString();
                         File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
 

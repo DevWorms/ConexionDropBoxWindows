@@ -14,6 +14,7 @@ namespace Scanda.AppTray.Models
         public string token { get; set; }
         public string type_storage { get; set; }
         public string file_historical { get; set; }
+        public string cloud_historical { get; set; }
         public List<string> extensions { get; set; }
 
     }
