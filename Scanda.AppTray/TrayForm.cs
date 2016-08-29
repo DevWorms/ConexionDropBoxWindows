@@ -266,7 +266,7 @@ namespace Scanda.AppTray
             {
                 servicioToolStripMenuItem.Visible = false;
                 exitToolStripMenuItem.Visible = false;
-                if(string.IsNullOrEmpty(config.id_customer))
+                if(string.IsNullOrEmpty(config.id_customer) && string.IsNullOrEmpty(config.path))
                 {
                     syncNowToolStripMenuItem.Enabled = false;
                     descargarToolStripMenuItem.Enabled = false;

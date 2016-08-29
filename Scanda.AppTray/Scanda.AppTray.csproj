@@ -26,10 +26,10 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <InstallUrl>\\server\Scanda\</InstallUrl>
-    <ProductName>Scanda DB Protractor</ProductName>
-    <PublisherName>Scanda</PublisherName>
-    <SuiteName>ScandaSetup</SuiteName>
-    <ApplicationRevision>11</ApplicationRevision>
+    <ProductName>DB Protector</ProductName>
+    <PublisherName>DB Protector</PublisherName>
+    <SuiteName>DB Protector Setup</SuiteName>
+    <ApplicationRevision>15</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -89,6 +89,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\DB_Protector_32X32.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
@@ -240,6 +243,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="log.txt" />
     <Content Include="MetroFramework.txt" />
     <Content Include="Resources\111.ico" />
     <None Include="Resources\DB_Protector_32X32.ico" />
