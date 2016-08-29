@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Configuration;
 using System.Net.Http.Headers;
 using Scanda.AppTray.Models;
+using System.Reflection;
 
 namespace Scanda.AppTray
 {
@@ -99,12 +100,12 @@ namespace Scanda.AppTray
                     mtxt_folder.Text = selectedPath;
                     config.path = selectedPath;
                     // Historicos
-                    string historicosFolder = selectedPath + "\\historicos";
-                    config.hist_path = historicosFolder;
-                    mtxt_userfolder.Text = historicosFolder;
-                    // Respaldados
-                    string respaldadosFolder = selectedPath + "\\respaldados";
-                    config.user_path = respaldadosFolder;
+                    if (config.type_storage == "1") { 
+                        string historicosFolder = selectedPath + "\\historicos";
+                        config.hist_path = historicosFolder;
+                        mtxt_userfolder.Text = historicosFolder;
+                    }
+                  
                     // Guardamos la ruta
                     File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                 }
@@ -127,6 +128,11 @@ namespace Scanda.AppTray
         }
 
         private void btnDesvincular_Click(object sender, EventArgs e)
+        {
+            limpirarVariables();
+        }
+
+        private void limpirarVariables()
         {
             try
             {
@@ -151,7 +157,6 @@ namespace Scanda.AppTray
                 config.type_storage = "0";
                 config.file_historical = "0";
                 config.path = "";
-                config.user_path = "";
                 config.hist_path = "";
                 // Guardamos
                 File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
@@ -160,7 +165,17 @@ namespace Scanda.AppTray
                 btnElegir.Enabled = false;
                 btnUserFolder.Enabled = false;
                 dataGridViewHistoricos.DataSource = new List<Historico>() { };
-            } catch (Exception ex) {
+
+                string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+                string settingsFolder = appFolder;
+                string logFile = settingsFolder + "\\log.txt";
+
+                File.WriteAllText(logFile, JsonConvert.SerializeObject(config));
+
+
+            }
+            catch (Exception ex)
+            {
                 Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
@@ -202,7 +217,7 @@ namespace Scanda.AppTray
                         var resp = await response.Content.ReadAsStringAsync();
                         Account r = JsonConvert.DeserializeObject<Account>(resp);
                         mtxt_user.Text = config.user; // r.DBoxUser;
-                        mtxt_totalspace.Text = r.StorageLimit.ToString() + " MB";
+                        mtxt_totalspace.Text =  r.UsedStorage.ToString() + " MB" + " de "+ r.StorageLimit + " MB usados";
                         // mtxt_avalaiblespace.Text = (r.StorageLimit - r.UsedStorage).ToString();
                         metroPB_CloudSpace.Value = (r.UsedStorage * 100 / r.StorageLimit);
                         mtxt_time.Text = r.UploadFrecuency.ToString() + " Horas";
@@ -224,6 +239,7 @@ namespace Scanda.AppTray
                         config.time = r.UploadFrecuency.ToString();
                         config.time_type = "Horas";
                         config.type_storage = r.FileTreatmen.ToString();
+                       
                         config.file_historical = r.FileHistoricalNumber.ToString();
                         File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                     }
@@ -244,15 +260,18 @@ namespace Scanda.AppTray
             {
                 List<Historico> items = new List<Historico>() { };
                 var response = await ScandaConector.getLastUploads(config.id_customer);
-                foreach (string key in response.Keys)
+                if (response != null)
                 {
-                    string item = response[key];
-                    var strs = item.Split(' ');
-                    items.Add(new Historico() { RFC = key, Fecha = strs[0] + " " + strs[1] + " " + strs[2] });
+                    foreach (string key in response.Keys)
+                    {
+                        string item = response[key];
+                        var strs = item.Split(' ');
+                        items.Add(new Historico() { RFC = key, Fecha = strs[0] + " " + strs[1] + " " + strs[2] });
+                    }
+                    dataGridViewHistoricos.DataSource = items;
+                    dataGridViewHistoricos.Columns[0].Width = 140;
+                    dataGridViewHistoricos.Columns[1].Width = 170;
                 }
-                dataGridViewHistoricos.DataSource = items;
-                dataGridViewHistoricos.Columns[0].Width = 140;
-                dataGridViewHistoricos.Columns[1].Width = 170;
             }
             catch (Exception ex)
             {
@@ -320,6 +339,7 @@ namespace Scanda.AppTray
                     }
                     btnElegir.Enabled = true;
                     btnUserFolder.Enabled = true;
+                    
                 }
                 else
                 {
@@ -339,15 +359,18 @@ namespace Scanda.AppTray
         {
             try
             {
-                FolderBrowserDialog fbd = new FolderBrowserDialog();
-                if (fbd.ShowDialog() == DialogResult.OK)
+                if (config.type_storage == "2")
                 {
-                    selectedPath = fbd.SelectedPath;
-                    // txtRuta.Text = selectedPath;
-                    mtxt_userfolder.Text = selectedPath;
-                    config.hist_path = selectedPath;
-                    // Guardamos la ruta
-                    File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                    FolderBrowserDialog fbd = new FolderBrowserDialog();
+                    if (fbd.ShowDialog() == DialogResult.OK)
+                    {
+                        selectedPath = fbd.SelectedPath;
+                        // txtRuta.Text = selectedPath;
+                        mtxt_userfolder.Text = selectedPath;
+                        config.hist_path = selectedPath;
+                        // Guardamos la ruta
+                        File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                    }
                 }
             }
             catch (Exception ex)
@@ -364,6 +387,16 @@ namespace Scanda.AppTray
         {
             if (dataGridViewHistoricos.SelectedCells.Count > 0)
                 dataGridViewHistoricos.ClearSelection();
+        }
+
+        private void metroPB_CloudSpace_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void gpbHistorycal_Enter(object sender, EventArgs e)
+        {
+
         }
     }
 }

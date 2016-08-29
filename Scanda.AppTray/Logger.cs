@@ -25,9 +25,13 @@ namespace Scanda.AppTray
         {
             try
             {
+
+
+                Message = Message.Replace("<", "[");
+                Message = Message.Replace(">", "]");
                 string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
                 string settingsFolder = appFolder;
-                string logFile = settingsFolder + "\\log.txt";
+                string logFile = settingsFolder + "\\Settings\\configuration.json";
                 string json = File.ReadAllText(logFile);
                 Config config = JsonConvert.DeserializeObject<Config>(json);
                 string url = ConfigurationManager.AppSettings["api_url"];

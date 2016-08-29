@@ -261,6 +261,8 @@ namespace Scanda.AppTray
                 //delete zip
                 File.Delete(zip);
                 //Moverlo a la ruta
+                if (File.Exists(destino + "/" + archivo))
+                    File.Delete(destino + "/" + archivo);
                 File.Move(archivo, destino + "/" + archivo);
 
                 status.download.status = 1;
@@ -498,7 +500,10 @@ namespace Scanda.AppTray
                 using (ZipFile zip = ZipFile.Read(origen))
                 {
                     string pass = SHA256string(usrId);
-
+                    string file = origen.Replace(".zip","");
+                    if (File.Exists(file)) {
+                        File.Delete(file);
+                    }
                     ZipEntry entry = zip.First();
                     entry.ExtractWithPassword(info.DirectoryName, pass);
 

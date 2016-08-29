@@ -18,6 +18,7 @@ namespace Scanda.AppTray
 {
     public partial class RecuperarForm : MetroForm
     {
+        public bool btnCancelar = false;
         public List<Control> controls = new List<Control>() { };
         private Config config;
         private string json;
@@ -145,6 +146,11 @@ namespace Scanda.AppTray
                 metroTabPageRespaldos.Controls.Add(tile);
                 x += 160;
             }
+        }
+
+        private void mbtnCancel_Click(object sender, EventArgs e)
+        {
+            btnCancelar = true;
         }
     }
 }

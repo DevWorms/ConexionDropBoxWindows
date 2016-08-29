@@ -46,7 +46,7 @@ namespace Scanda.AppTray
             if(this.WindowState == FormWindowState.Minimized)
             {
                 this.Hide();
-                notifyIconScanda.ShowBalloonTip(1000, "Aviso importante", "DB Protector se está ejecutando", ToolTipIcon.Info);
+                notifyIconScanda.ShowBalloonTip(1000, "Aviso importante", "DBProtector se está ejecutando", ToolTipIcon.Info);
             }
         }
 
@@ -124,16 +124,15 @@ namespace Scanda.AppTray
                 {
                     Directory.CreateDirectory(config.path);
                 }
-                // Revisamos si existe el directorio de historicos
-                if (!Directory.Exists(config.hist_path))
+                if (!string.IsNullOrEmpty(config.hist_path))
                 {
-                    Directory.CreateDirectory(config.hist_path);
+                    // Revisamos si existe el directorio de historicos
+                    if (!Directory.Exists(config.hist_path))
+                    {
+                        Directory.CreateDirectory(config.hist_path);
+                    }
                 }
-                // Revisamos si existe el directorio de respaldados
-                if (!Directory.Exists(config.user_path))
-                {
-                    Directory.CreateDirectory(config.user_path);
-                }
+                
                 #endregion
                 if (form.controls.Count > 0)
                 {
@@ -314,11 +313,7 @@ namespace Scanda.AppTray
                 {
                     Directory.CreateDirectory(config.hist_path);
                 }
-                // Revisamos si existe el directorio de respaldados
-                if (!Directory.Exists(config.user_path))
-                {
-                    Directory.CreateDirectory(config.user_path);
-                }
+               
                 #endregion
                 // Obtenemos listado de archivos del directorio
                 string[] fileEntries = Directory.GetFiles(config.path);
@@ -377,10 +372,13 @@ namespace Scanda.AppTray
                 {
                     if (isValidFileName(file.Name))
                     {
-                        // Se copia a Historicos
-                        File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
+                        //cuando el filetreatment es 3 se borra localmente, en el caso 1 o 2 se mueve a una carpeta de respaldos 
+                        if (config.type_storage == "1" || config.type_storage == "2")
+                        {
+                            // Se copia a Historicos
+                            File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
+                        }
                         // Se copia a Respaldados
-                        File.Copy(config.path + "\\" + file.Name, config.user_path + "\\" + file.Name);
                         File.Delete(config.path + "\\" + file.Name);
                     }
                 }
@@ -478,16 +476,12 @@ namespace Scanda.AppTray
                 {
                     Directory.CreateDirectory(config.path);
                 }
-                // Revisamos si existe el directorio de historicos
-                if (!Directory.Exists(config.hist_path))
+                // Revisamos si existe el directorio de historicos, si esta en configuracion 3 significa que el archivo localmente se tiene que borrar, por tanto no es necesario crear una carpeta
+                if (!Directory.Exists(config.hist_path) && config.type_storage != "3")
                 {
                     Directory.CreateDirectory(config.hist_path);
                 }
-                // Revisamos si existe el directorio de respaldados
-                if (!Directory.Exists(config.user_path))
-                {
-                    Directory.CreateDirectory(config.user_path);
-                }
+                
                 #endregion
                 // Obtenemos listado de archivos del directorio
                 string[] fileEntries = Directory.GetFiles(config.path);
@@ -507,47 +501,65 @@ namespace Scanda.AppTray
                     }
                 }
                 // Realizamos el movimiento de los archivos que se suben a la carpeta historicos
-                List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                // verificamos el limite
-                bool canTransfer = false;
-                while (!canTransfer)
+                if (config.type_storage != "3")
                 {
-                    if (histFileEntries.Count() < int.Parse(config.file_historical))
+                    List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                    // verificamos el limite
+                    bool canTransfer = false;
+                    while (!canTransfer)
                     {
-                        if (histFileEntries.Count() == 0)
+                        if (histFileEntries.Count() < int.Parse(config.file_historical))
                         {
-                            canTransfer = true;
-                        }
-                        else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
-                        {
-                            canTransfer = true;
+                            if (histFileEntries.Count() == 0)
+                            {
+                                canTransfer = true;
+                            }
+                            else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                            {
+                                canTransfer = true;
+                            }
+                            else
+                            {
+                                FileInfo item = histFileEntries.FirstOrDefault();
+                                if (item != null)
+                                    histFileEntries.Remove(item);
+                            }
                         }
                         else
                         {
                             FileInfo item = histFileEntries.FirstOrDefault();
                             if (item != null)
-                                histFileEntries.Remove(item);
+                                File.Delete(config.hist_path + "\\" + item.Name);
+                            histFileEntries.Remove(item);
                         }
                     }
-                    else
+                    // Comenzamos a mover los archivos 
+                    List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                    foreach (FileInfo file in fileEntries2)
                     {
-                        FileInfo item = histFileEntries.FirstOrDefault();
-                        if (item != null)
-                            File.Delete(config.hist_path + "\\" + item.Name);
-                            histFileEntries.Remove(item);
+                        if (isValidFileName(file.Name))
+                        {
+                            //cuando vale 1 y 2 se mueve a una carpeta el respaldo, cuanfdo vale 3 se borra localmente
+                            if (config.type_storage == "1" || config.type_storage == "2")
+                            {
+                                // Se copia a Historicos
+                                File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
+                            }
+                            File.Delete(config.path + "\\" + file.Name);
+                        }
                     }
                 }
-                // Comenzamos a mover los archivos 
-                List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                foreach (FileInfo file in fileEntries2)
+                else if (config.type_storage == "3")
                 {
-                    if(isValidFileName(file.Name))
+                    // Comenzamos a mover los archivos 
+                    List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                    foreach (FileInfo file in fileEntries2)
                     {
-                        // Se copia a Historicos
-                        File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
-                        // Se copia a Respaldados
-                        File.Copy(config.path + "\\" + file.Name, config.user_path + "\\" + file.Name);
-                        File.Delete(config.path + "\\" + file.Name);
+                        if (isValidFileName(file.Name))
+                        {
+                            // Se borra el archivo localmente porque la configurcion es 3
+                            File.Delete(config.path + "\\" + file.Name);
+                        }
                     }
                 }
                 // Termino de hacer todos los respaldos
@@ -589,6 +601,11 @@ namespace Scanda.AppTray
                     File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                 }
             }
+        }
+
+        private void notifyIconScanda_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+
         }
     }
 }
