@@ -148,7 +148,6 @@ namespace Scanda.AppTray
                 mtxt_userfolder.Text = "";
                 mtxt_folder.Text = "";
                 gpbHistorycal.Visible = true;
-
                 config.user = "";
                 config.password = "";
                 config.id_customer = "";
@@ -166,11 +165,7 @@ namespace Scanda.AppTray
                 btnUserFolder.Enabled = false;
                 dataGridViewHistoricos.DataSource = new List<Historico>() { };
 
-                string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
-                string settingsFolder = appFolder;
-                string logFile = settingsFolder + "\\log.txt";
-
-                File.WriteAllText(logFile, JsonConvert.SerializeObject(config));
+               
 
 
             }
@@ -181,12 +176,16 @@ namespace Scanda.AppTray
                     + "\n" + ex.InnerException
                     + "\n" + ex.StackTrace
                     + "\n");
+                
             }
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)
         {
-            Close();
+            this.Hide();
+            this.Close();
+            this.Dispose();
+
         }
 
         private void btnAceptar_Click(object sender, EventArgs e)
@@ -199,7 +198,11 @@ namespace Scanda.AppTray
                 // Guardamos
                 // File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
             }
-            Close();
+
+            this.Hide();
+            this.Close();
+            this.Dispose();
+            
         }
 
         private async Task sync_accountinfo()
@@ -221,8 +224,8 @@ namespace Scanda.AppTray
                         // mtxt_avalaiblespace.Text = (r.StorageLimit - r.UsedStorage).ToString();
                         metroPB_CloudSpace.Value = (r.UsedStorage * 100 / r.StorageLimit);
                         mtxt_time.Text = r.UploadFrecuency.ToString() + " Horas";
-                        mtxt_localHist.Text = r.FileHistoricalNumber.ToString();
-                        mtxt_cloudHist.Text = r.FileHistoricalNumberCloud.ToString();
+                        mtxt_localHist.Text = "Hasta "+ r.FileHistoricalNumber.ToString()+ "archivos";
+                        mtxt_cloudHist.Text = "Hasta "+r.FileHistoricalNumberCloud.ToString()+" archivos";
                         if (metroPB_CloudSpace.Value < r.PBYellowPercentage)
                         {
                             metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
@@ -405,6 +408,11 @@ namespace Scanda.AppTray
         }
 
         private void gpbHistorycal_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void metroTabPageAccount_Click(object sender, EventArgs e)
         {
 
         }

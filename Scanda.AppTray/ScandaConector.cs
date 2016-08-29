@@ -386,7 +386,7 @@ namespace Scanda.AppTray
                             else
                             {
                                 var cursor = new UploadSessionCursor(sessionId, (ulong)(CHUNK_SIZE * idx));
-
+                                await status.uploadStatusFile(status.upload);
                                 if (idx == nChunks)
                                 {
                                     //var x = client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);

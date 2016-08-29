@@ -263,14 +263,20 @@ namespace Scanda.AppTray
                 }
             }else
             {
+
                 servicioToolStripMenuItem.Visible = false;
                 exitToolStripMenuItem.Visible = false;
-                if(string.IsNullOrEmpty(config.id_customer))
+                if (string.IsNullOrEmpty(config.id_customer))
                 {
                     syncNowToolStripMenuItem.Enabled = false;
                     descargarToolStripMenuItem.Enabled = false;
-                } else
+                }
+                else if (string.IsNullOrEmpty(config.path))
                 {
+                    syncNowToolStripMenuItem.Enabled = false;
+                    descargarToolStripMenuItem.Enabled = true;
+                }
+                else { 
                     syncNowToolStripMenuItem.Enabled = true;
                     descargarToolStripMenuItem.Enabled = true;
                 }
@@ -498,7 +504,7 @@ namespace Scanda.AppTray
                     else
                     {
                         notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
-                        Logger.sendLog("archivo subido correctamente" + file);
+                        Logger.sendLog("archivo subido correctamente" +  file);
                     }
                 }
                 // Realizamos el movimiento de los archivos que se suben a la carpeta historicos
@@ -506,6 +512,10 @@ namespace Scanda.AppTray
                 {
                     List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
                     // verificamos el limite
+
+                    //Borramos en la nube
+                    //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
+                    //Borramos local
                     bool canTransfer = false;
                     while (!canTransfer)
                     {
@@ -532,6 +542,7 @@ namespace Scanda.AppTray
                             if (item != null)
                                 File.Delete(config.hist_path + "\\" + item.Name);
                             histFileEntries.Remove(item);
+                            
                         }
                     }
                     // Comenzamos a mover los archivos 
