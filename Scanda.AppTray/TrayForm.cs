@@ -505,7 +505,7 @@ namespace Scanda.AppTray
                     else
                     {
                         notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
-                        Logger.sendLog("archivo subido correctamente" +  file);
+                        Logger.sendLog("archivo subido correctamente: " +  file);
                     }
                 }
                 // Realizamos el movimiento de los archivos que se suben a la carpeta historicos
