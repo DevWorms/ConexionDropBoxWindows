@@ -263,6 +263,8 @@ namespace Scanda.AppTray
                                 mtxt_localHist.Visible = true;
                                 break;
                             case 3:
+
+                                gpbHistorycal.Visible = false;
                                 mlbl_localHist.Text = "Este perfil no almacena respaldos localmente";
                                 mtxt_localHist.Visible = false;
                                 // mtxt_userfolder.Visible = false;
