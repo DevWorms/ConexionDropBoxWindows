@@ -142,7 +142,7 @@ namespace Scanda.AppTray
                 mtxt_totalspace.Text = "";
                 // mtxt_avalaiblespace.Text = "";
                 metroPB_CloudSpace.Value = 0;
-                metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Default;
+                metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
                 metroPB_CloudSpace.Refresh();
                 mtxt_time.Text = "0 Horas";
                 mtxt_localHist.Text = "0";
@@ -200,17 +200,11 @@ namespace Scanda.AppTray
                 // Guardamos
                 // File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
             }
-<<<<<<< HEAD
 
             this.Hide();
             this.Close();
             this.Dispose();
-            
-=======
-            this.Hide();
-            this.Close();
-            this.Dispose();
->>>>>>> origin/master
+
         }
 
         private async Task sync_accountinfo()
@@ -236,7 +230,7 @@ namespace Scanda.AppTray
                         mtxt_cloudHist.Text = "Hasta "+r.FileHistoricalNumberCloud.ToString()+" archivos";
                         if (metroPB_CloudSpace.Value < r.PBYellowPercentage)
                         {
-                            metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Default;
+                            metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
                         }
                         else if (metroPB_CloudSpace.Value >= r.PBYellowPercentage && metroPB_CloudSpace.Value < r.PBRedPercentage)
                         {
