@@ -147,7 +147,7 @@ namespace Scanda.AppTray
                 mtxt_cloudHist.Text = "0";
                 mtxt_userfolder.Text = "";
                 mtxt_folder.Text = "";
-                
+                gpbHistorycal.Visible = true;
 
                 config.user = "";
                 config.password = "";
