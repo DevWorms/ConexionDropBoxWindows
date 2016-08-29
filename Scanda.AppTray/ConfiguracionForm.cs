@@ -242,6 +242,28 @@ namespace Scanda.AppTray
                        
                         config.file_historical = r.FileHistoricalNumber.ToString();
                         File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+
+                        switch (int.Parse(config.type_storage))
+                        {
+                            case 1:
+                                // mtxt_userfolder.Visible = false;
+                                // btnUserFolder.Visible = false;
+                                gpbHistorycal.Visible = true;
+                                mlbl_localHist.Text = "Historicos local";
+                                mtxt_localHist.Visible = true;
+                                break;
+                            case 2:
+                                gpbHistorycal.Visible = true;
+                                mlbl_localHist.Text = "Historicos local";
+                                mtxt_localHist.Visible = true;
+                                break;
+                            case 3:
+                                mlbl_localHist.Text = "Este perfil no almacena respaldos localmente";
+                                mtxt_localHist.Visible = false;
+                                // mtxt_userfolder.Visible = false;
+                                // btnUserFolder.Visible = false;
+                                break;
+                        }
                     }
                 }
             } catch(Exception ex)
@@ -324,19 +346,7 @@ namespace Scanda.AppTray
                     await sync_extensions();
                     await sync_lastestUploads();
 
-                    switch (int.Parse(config.type_storage))
-                    {
-                        case 1:
-                            // mtxt_userfolder.Visible = false;
-                            // btnUserFolder.Visible = false;
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            // mtxt_userfolder.Visible = false;
-                            // btnUserFolder.Visible = false;
-                            break;
-                    }
+                   
                     btnElegir.Enabled = true;
                     btnUserFolder.Enabled = true;
                     
