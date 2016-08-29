@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using MetroFramework.Forms;
 using Scanda.AppTray.Models;
+using System.Reflection;
 
 namespace Scanda.AppTray
 {
@@ -102,6 +103,9 @@ namespace Scanda.AppTray
 
         private void LoginForm_Load(object sender, EventArgs e)
         {
+
+
+            limpirarVariables();
             txtUsername.Text = "alguien@example.com";
             txtUsername.ForeColor = Color.Gray;
             txtUsername.GotFocus += RemoveText;
@@ -117,6 +121,43 @@ namespace Scanda.AppTray
                 this.FormClosed += LoginForm_Close;
             }
         }
+
+        private void limpirarVariables()
+        {
+            try
+            {
+               
+                config.user = "";
+                config.password = "";
+                config.id_customer = "";
+                config.time = "0";
+                config.time_type = "Horas";
+                config.type_storage = "0";
+                config.file_historical = "0";
+                config.path = "";
+                config.hist_path = "";
+                // Guardamos
+                File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                // Habilitamos el Boton Add Acount
+                
+                string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+                string settingsFolder = appFolder;
+                string logFile = settingsFolder + "\\log.txt";
+
+                File.WriteAllText(logFile, JsonConvert.SerializeObject(config));
+
+
+            }
+            catch (Exception ex)
+            {
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
+            }
+        }
+
 
         void LoginForm_Close(object sender, EventArgs e)
         {

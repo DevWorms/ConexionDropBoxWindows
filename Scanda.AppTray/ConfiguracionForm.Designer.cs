@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.GroupBox gpbHistorycal;
+            
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfiguracionForm));
             this.btnUserFolder = new System.Windows.Forms.Button();
             this.mtxt_userfolder = new MetroFramework.Controls.MetroTextBox();
@@ -48,42 +48,29 @@
             this.mtxt_folder = new MetroFramework.Controls.MetroTextBox();
             this.lblCarpeta = new System.Windows.Forms.Label();
             this.btnElegir = new System.Windows.Forms.Button();
-            this.metroTabPageHistorico = new MetroFramework.Controls.MetroTabPage();
-            this.dataGridViewHistoricos = new System.Windows.Forms.DataGridView();
             this.metroTabPageAccount = new MetroFramework.Controls.MetroTabPage();
+            this.mtxt_totalspace = new MetroFramework.Controls.MetroLabel();
             this.mtxt_cloudHist = new MetroFramework.Controls.MetroTextBox();
             this.mlbl_cloudHist = new MetroFramework.Controls.MetroLabel();
             this.mtxt_localHist = new MetroFramework.Controls.MetroTextBox();
             this.mlbl_localHist = new MetroFramework.Controls.MetroLabel();
             this.mlbl_usespace = new MetroFramework.Controls.MetroLabel();
-            this.mtxt_totalspace = new MetroFramework.Controls.MetroTextBox();
-            this.mlbl_totalspace = new MetroFramework.Controls.MetroLabel();
             this.mtxt_user = new MetroFramework.Controls.MetroTextBox();
             this.mlbl_user = new MetroFramework.Controls.MetroLabel();
             this.metroPB_CloudSpace = new MetroFramework.Controls.MetroProgressBar();
+            this.metroTabPageHistorico = new MetroFramework.Controls.MetroTabPage();
+            this.dataGridViewHistoricos = new System.Windows.Forms.DataGridView();
             gpbHistorycal = new System.Windows.Forms.GroupBox();
-            gpbHistorycal.SuspendLayout();
             this.mTabControlConfiguracion.SuspendLayout();
             this.metroTabPageConfiguration.SuspendLayout();
+            gpbHistorycal.SuspendLayout();
             this.gpbCredenciales.SuspendLayout();
             this.gpbIntervalo.SuspendLayout();
             this.gpbConfRuta.SuspendLayout();
+            this.metroTabPageAccount.SuspendLayout();
             this.metroTabPageHistorico.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewHistoricos)).BeginInit();
-            this.metroTabPageAccount.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // gpbHistorycal
-            // 
-            gpbHistorycal.Controls.Add(this.btnUserFolder);
-            gpbHistorycal.Controls.Add(this.mtxt_userfolder);
-            gpbHistorycal.ForeColor = System.Drawing.SystemColors.ControlText;
-            gpbHistorycal.Location = new System.Drawing.Point(3, 122);
-            gpbHistorycal.Name = "gpbHistorycal";
-            gpbHistorycal.Size = new System.Drawing.Size(384, 94);
-            gpbHistorycal.TabIndex = 14;
-            gpbHistorycal.TabStop = false;
-            gpbHistorycal.Text = "Historicos";
             // 
             // btnUserFolder
             // 
@@ -93,6 +80,7 @@
             this.btnUserFolder.TabIndex = 15;
             this.btnUserFolder.Text = "Elegir Carpeta";
             this.btnUserFolder.UseVisualStyleBackColor = true;
+            this.btnUserFolder.Click += new System.EventHandler(this.btnUserFolder_Click);
             // 
             // mtxt_userfolder
             // 
@@ -130,7 +118,7 @@
             this.mTabControlConfiguracion.Controls.Add(this.metroTabPageHistorico);
             this.mTabControlConfiguracion.Location = new System.Drawing.Point(14, 64);
             this.mTabControlConfiguracion.Name = "mTabControlConfiguracion";
-            this.mTabControlConfiguracion.SelectedIndex = 2;
+            this.mTabControlConfiguracion.SelectedIndex = 1;
             this.mTabControlConfiguracion.Size = new System.Drawing.Size(395, 465);
             this.mTabControlConfiguracion.TabIndex = 10;
             // 
@@ -149,6 +137,20 @@
             this.metroTabPageConfiguration.Text = "Configuracion";
             this.metroTabPageConfiguration.Theme = MetroFramework.MetroThemeStyle.Light;
             this.metroTabPageConfiguration.VerticalScrollbarBarColor = true;
+            // 
+            // gpbHistorycal
+            // 
+            this.gpbHistorycal.Controls.Add(this.btnUserFolder);
+            this.gpbHistorycal.Controls.Add(this.mtxt_userfolder);
+            this.gpbHistorycal.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.gpbHistorycal.Location = new System.Drawing.Point(3, 122);
+            this.gpbHistorycal.Name = "gpbHistorycal";
+            this.gpbHistorycal.Size = new System.Drawing.Size(384, 94);
+            this.gpbHistorycal.TabIndex = 14;
+            this.gpbHistorycal.TabStop = false;
+            this.gpbHistorycal.Text = "Historicos";
+            this.gpbHistorycal.Visible = false;
+            this.gpbHistorycal.Enter += new System.EventHandler(this.gpbHistorycal_Enter);
             // 
             // gpbCredenciales
             // 
@@ -277,6 +279,109 @@
             this.btnElegir.UseVisualStyleBackColor = true;
             this.btnElegir.Click += new System.EventHandler(this.btnElegir_Click);
             // 
+            // metroTabPageAccount
+            // 
+            this.metroTabPageAccount.Controls.Add(this.mtxt_totalspace);
+            this.metroTabPageAccount.Controls.Add(this.mtxt_cloudHist);
+            this.metroTabPageAccount.Controls.Add(this.mlbl_cloudHist);
+            this.metroTabPageAccount.Controls.Add(this.mtxt_localHist);
+            this.metroTabPageAccount.Controls.Add(this.mlbl_localHist);
+            this.metroTabPageAccount.Controls.Add(this.mlbl_usespace);
+            this.metroTabPageAccount.Controls.Add(this.mtxt_user);
+            this.metroTabPageAccount.Controls.Add(this.mlbl_user);
+            this.metroTabPageAccount.Controls.Add(this.metroPB_CloudSpace);
+            this.metroTabPageAccount.HorizontalScrollbarBarColor = true;
+            this.metroTabPageAccount.Location = new System.Drawing.Point(4, 35);
+            this.metroTabPageAccount.Name = "metroTabPageAccount";
+            this.metroTabPageAccount.Size = new System.Drawing.Size(387, 426);
+            this.metroTabPageAccount.TabIndex = 1;
+            this.metroTabPageAccount.Text = "Mi Cuenta";
+            this.metroTabPageAccount.VerticalScrollbarBarColor = true;
+            // 
+            // mtxt_totalspace
+            // 
+            this.mtxt_totalspace.AutoSize = true;
+            this.mtxt_totalspace.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.mtxt_totalspace.Location = new System.Drawing.Point(19, 170);
+            this.mtxt_totalspace.Name = "mtxt_totalspace";
+            this.mtxt_totalspace.Size = new System.Drawing.Size(0, 0);
+            this.mtxt_totalspace.TabIndex = 15;
+            // 
+            // mtxt_cloudHist
+            // 
+            this.mtxt_cloudHist.Enabled = false;
+            this.mtxt_cloudHist.Location = new System.Drawing.Point(14, 311);
+            this.mtxt_cloudHist.Name = "mtxt_cloudHist";
+            this.mtxt_cloudHist.Size = new System.Drawing.Size(349, 23);
+            this.mtxt_cloudHist.TabIndex = 14;
+            // 
+            // mlbl_cloudHist
+            // 
+            this.mlbl_cloudHist.AutoSize = true;
+            this.mlbl_cloudHist.Location = new System.Drawing.Point(16, 279);
+            this.mlbl_cloudHist.Name = "mlbl_cloudHist";
+            this.mlbl_cloudHist.Size = new System.Drawing.Size(130, 19);
+            this.mlbl_cloudHist.TabIndex = 13;
+            this.mlbl_cloudHist.Text = "Historicos en la nube";
+            this.mlbl_cloudHist.UseMnemonic = false;
+            // 
+            // mtxt_localHist
+            // 
+            this.mtxt_localHist.Enabled = false;
+            this.mtxt_localHist.Location = new System.Drawing.Point(14, 238);
+            this.mtxt_localHist.Name = "mtxt_localHist";
+            this.mtxt_localHist.Size = new System.Drawing.Size(349, 23);
+            this.mtxt_localHist.TabIndex = 12;
+            // 
+            // mlbl_localHist
+            // 
+            this.mlbl_localHist.AutoSize = true;
+            this.mlbl_localHist.Location = new System.Drawing.Point(16, 208);
+            this.mlbl_localHist.Name = "mlbl_localHist";
+            this.mlbl_localHist.Size = new System.Drawing.Size(96, 19);
+            this.mlbl_localHist.TabIndex = 11;
+            this.mlbl_localHist.Text = "Historicos local";
+            // 
+            // mlbl_usespace
+            // 
+            this.mlbl_usespace.AutoSize = true;
+            this.mlbl_usespace.Location = new System.Drawing.Point(16, 106);
+            this.mlbl_usespace.Name = "mlbl_usespace";
+            this.mlbl_usespace.Size = new System.Drawing.Size(123, 19);
+            this.mlbl_usespace.TabIndex = 8;
+            this.mlbl_usespace.Text = "Espacio en mi nube";
+            // 
+            // mtxt_user
+            // 
+            this.mtxt_user.Enabled = false;
+            this.mtxt_user.Location = new System.Drawing.Point(16, 57);
+            this.mtxt_user.Name = "mtxt_user";
+            this.mtxt_user.Size = new System.Drawing.Size(349, 23);
+            this.mtxt_user.TabIndex = 3;
+            // 
+            // mlbl_user
+            // 
+            this.mlbl_user.AutoSize = true;
+            this.mlbl_user.Location = new System.Drawing.Point(16, 26);
+            this.mlbl_user.Name = "mlbl_user";
+            this.mlbl_user.Size = new System.Drawing.Size(53, 19);
+            this.mlbl_user.TabIndex = 2;
+            this.mlbl_user.Text = "Usuario";
+            // 
+            // metroPB_CloudSpace
+            // 
+            this.metroPB_CloudSpace.FontWeight = MetroFramework.MetroProgressBarWeight.Regular;
+            this.metroPB_CloudSpace.HideProgressText = false;
+            this.metroPB_CloudSpace.Location = new System.Drawing.Point(16, 128);
+            this.metroPB_CloudSpace.Name = "metroPB_CloudSpace";
+            this.metroPB_CloudSpace.RightToLeftLayout = true;
+            this.metroPB_CloudSpace.Size = new System.Drawing.Size(349, 29);
+            this.metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
+            this.metroPB_CloudSpace.TabIndex = 10;
+            this.metroPB_CloudSpace.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.metroPB_CloudSpace.Theme = MetroFramework.MetroThemeStyle.Light;
+            this.metroPB_CloudSpace.Click += new System.EventHandler(this.metroPB_CloudSpace_Click);
+            // 
             // metroTabPageHistorico
             // 
             this.metroTabPageHistorico.Controls.Add(this.dataGridViewHistoricos);
@@ -302,116 +407,6 @@
             this.dataGridViewHistoricos.TabIndex = 2;
             this.dataGridViewHistoricos.SelectionChanged += new System.EventHandler(this.dataGridViewHistoricos_SelectionChanged);
             // 
-            // metroTabPageAccount
-            // 
-            this.metroTabPageAccount.Controls.Add(this.mtxt_cloudHist);
-            this.metroTabPageAccount.Controls.Add(this.mlbl_cloudHist);
-            this.metroTabPageAccount.Controls.Add(this.mtxt_localHist);
-            this.metroTabPageAccount.Controls.Add(this.mlbl_localHist);
-            this.metroTabPageAccount.Controls.Add(this.mlbl_usespace);
-            this.metroTabPageAccount.Controls.Add(this.mtxt_totalspace);
-            this.metroTabPageAccount.Controls.Add(this.mlbl_totalspace);
-            this.metroTabPageAccount.Controls.Add(this.mtxt_user);
-            this.metroTabPageAccount.Controls.Add(this.mlbl_user);
-            this.metroTabPageAccount.Controls.Add(this.metroPB_CloudSpace);
-            this.metroTabPageAccount.HorizontalScrollbarBarColor = true;
-            this.metroTabPageAccount.Location = new System.Drawing.Point(4, 35);
-            this.metroTabPageAccount.Name = "metroTabPageAccount";
-            this.metroTabPageAccount.Size = new System.Drawing.Size(387, 426);
-            this.metroTabPageAccount.TabIndex = 1;
-            this.metroTabPageAccount.Text = "Mi Cuenta";
-            this.metroTabPageAccount.VerticalScrollbarBarColor = true;
-            // 
-            // mtxt_cloudHist
-            // 
-            this.mtxt_cloudHist.Enabled = false;
-            this.mtxt_cloudHist.Location = new System.Drawing.Point(16, 356);
-            this.mtxt_cloudHist.Name = "mtxt_cloudHist";
-            this.mtxt_cloudHist.Size = new System.Drawing.Size(349, 23);
-            this.mtxt_cloudHist.TabIndex = 14;
-            // 
-            // mlbl_cloudHist
-            // 
-            this.mlbl_cloudHist.AutoSize = true;
-            this.mlbl_cloudHist.Location = new System.Drawing.Point(18, 324);
-            this.mlbl_cloudHist.Name = "mlbl_cloudHist";
-            this.mlbl_cloudHist.Size = new System.Drawing.Size(130, 19);
-            this.mlbl_cloudHist.TabIndex = 13;
-            this.mlbl_cloudHist.Text = "Historicos en la nube";
-            this.mlbl_cloudHist.UseMnemonic = false;
-            // 
-            // mtxt_localHist
-            // 
-            this.mtxt_localHist.Enabled = false;
-            this.mtxt_localHist.Location = new System.Drawing.Point(16, 283);
-            this.mtxt_localHist.Name = "mtxt_localHist";
-            this.mtxt_localHist.Size = new System.Drawing.Size(349, 23);
-            this.mtxt_localHist.TabIndex = 12;
-            // 
-            // mlbl_localHist
-            // 
-            this.mlbl_localHist.AutoSize = true;
-            this.mlbl_localHist.Location = new System.Drawing.Point(18, 253);
-            this.mlbl_localHist.Name = "mlbl_localHist";
-            this.mlbl_localHist.Size = new System.Drawing.Size(96, 19);
-            this.mlbl_localHist.TabIndex = 11;
-            this.mlbl_localHist.Text = "Historicos local";
-            // 
-            // mlbl_usespace
-            // 
-            this.mlbl_usespace.AutoSize = true;
-            this.mlbl_usespace.Location = new System.Drawing.Point(16, 177);
-            this.mlbl_usespace.Name = "mlbl_usespace";
-            this.mlbl_usespace.Size = new System.Drawing.Size(123, 19);
-            this.mlbl_usespace.TabIndex = 8;
-            this.mlbl_usespace.Text = "Espacio en mi nube";
-            // 
-            // mtxt_totalspace
-            // 
-            this.mtxt_totalspace.Enabled = false;
-            this.mtxt_totalspace.Location = new System.Drawing.Point(16, 132);
-            this.mtxt_totalspace.Name = "mtxt_totalspace";
-            this.mtxt_totalspace.Size = new System.Drawing.Size(349, 23);
-            this.mtxt_totalspace.TabIndex = 5;
-            // 
-            // mlbl_totalspace
-            // 
-            this.mlbl_totalspace.AutoSize = true;
-            this.mlbl_totalspace.Location = new System.Drawing.Point(16, 99);
-            this.mlbl_totalspace.Name = "mlbl_totalspace";
-            this.mlbl_totalspace.Size = new System.Drawing.Size(118, 19);
-            this.mlbl_totalspace.TabIndex = 4;
-            this.mlbl_totalspace.Text = "Espacio en la nube";
-            // 
-            // mtxt_user
-            // 
-            this.mtxt_user.Enabled = false;
-            this.mtxt_user.Location = new System.Drawing.Point(16, 57);
-            this.mtxt_user.Name = "mtxt_user";
-            this.mtxt_user.Size = new System.Drawing.Size(349, 23);
-            this.mtxt_user.TabIndex = 3;
-            // 
-            // mlbl_user
-            // 
-            this.mlbl_user.AutoSize = true;
-            this.mlbl_user.Location = new System.Drawing.Point(12, 25);
-            this.mlbl_user.Name = "mlbl_user";
-            this.mlbl_user.Size = new System.Drawing.Size(53, 19);
-            this.mlbl_user.TabIndex = 2;
-            this.mlbl_user.Text = "Usuario";
-            // 
-            // metroPB_CloudSpace
-            // 
-            this.metroPB_CloudSpace.FontWeight = MetroFramework.MetroProgressBarWeight.Regular;
-            this.metroPB_CloudSpace.HideProgressText = false;
-            this.metroPB_CloudSpace.Location = new System.Drawing.Point(16, 211);
-            this.metroPB_CloudSpace.Name = "metroPB_CloudSpace";
-            this.metroPB_CloudSpace.RightToLeftLayout = true;
-            this.metroPB_CloudSpace.Size = new System.Drawing.Size(349, 29);
-            this.metroPB_CloudSpace.TabIndex = 10;
-            this.metroPB_CloudSpace.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.metroPB_CloudSpace.Theme = MetroFramework.MetroThemeStyle.Light;
-            // 
             // ConfiguracionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -426,24 +421,25 @@
             this.Resizable = false;
             this.Text = "Configuracion";
             this.Load += new System.EventHandler(this.ConfiguracionForm_Load);
-            gpbHistorycal.ResumeLayout(false);
             this.mTabControlConfiguracion.ResumeLayout(false);
             this.metroTabPageConfiguration.ResumeLayout(false);
+            this.gpbHistorycal.ResumeLayout(false);
             this.gpbCredenciales.ResumeLayout(false);
             this.gpbCredenciales.PerformLayout();
             this.gpbIntervalo.ResumeLayout(false);
             this.gpbIntervalo.PerformLayout();
             this.gpbConfRuta.ResumeLayout(false);
             this.gpbConfRuta.PerformLayout();
-            this.metroTabPageHistorico.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewHistoricos)).EndInit();
             this.metroTabPageAccount.ResumeLayout(false);
             this.metroTabPageAccount.PerformLayout();
+            this.metroTabPageHistorico.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewHistoricos)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
+        private System.Windows.Forms.GroupBox gpbHistorycal;
         private System.Windows.Forms.Button btnCancelar;
         private System.Windows.Forms.Button btnAceptar;
         private MetroFramework.Controls.MetroTabControl mTabControlConfiguracion;
@@ -463,8 +459,6 @@
         private MetroFramework.Controls.MetroTextBox mtxt_user;
         private MetroFramework.Controls.MetroLabel mlbl_user;
         private MetroFramework.Controls.MetroLabel mlbl_usespace;
-        private MetroFramework.Controls.MetroTextBox mtxt_totalspace;
-        private MetroFramework.Controls.MetroLabel mlbl_totalspace;
         private MetroFramework.Controls.MetroTextBox mtxt_time;
         private MetroFramework.Controls.MetroProgressBar metroPB_CloudSpace;
         private MetroFramework.Controls.MetroLabel mlbl_cloudHist;
@@ -475,5 +469,6 @@
         private MetroFramework.Controls.MetroTabPage metroTabPageHistorico;
         private System.Windows.Forms.DataGridView dataGridViewHistoricos;
         private MetroFramework.Controls.MetroTextBox mtxt_cloudHist;
+        private MetroFramework.Controls.MetroLabel mtxt_totalspace;
     }
 }
