@@ -25,10 +25,7 @@ namespace Scanda.AppTray
         {
             try
             {
-
-
-                Message = Message.Replace("<", "[");
-                Message = Message.Replace(">", "]");
+                Message = Message.Replace("<", "[").Replace(">", "]");
                 string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
                 string settingsFolder = appFolder;
                 string logFile = settingsFolder + "\\Settings\\configuration.json";
