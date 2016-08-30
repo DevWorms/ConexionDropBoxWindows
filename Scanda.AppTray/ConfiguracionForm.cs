@@ -221,10 +221,11 @@ namespace Scanda.AppTray
                         mtxt_user.Text = config.user; // r.DBoxUser;
                         mtxt_totalspace.Text =  r.UsedStorage.ToString() + " MB" + " de "+ r.StorageLimit + " MB usados";
                         // mtxt_avalaiblespace.Text = (r.StorageLimit - r.UsedStorage).ToString();
-                        metroPB_CloudSpace.Value = (r.UsedStorage * 100 / r.StorageLimit);
+
+                        metroPB_CloudSpace.Value = ((r.UsedStorage * 100) / r.StorageLimit);
                         mtxt_time.Text = r.UploadFrecuency.ToString() + " Horas";
-                        mtxt_localHist.Text = "Hasta "+ r.FileHistoricalNumber.ToString()+ "archivos";
-                        mtxt_cloudHist.Text = "Hasta "+r.FileHistoricalNumberCloud.ToString()+" archivos";
+                        mtxt_localHist.Text = "Hasta "+ r.FileHistoricalNumber.ToString()+ (r.FileHistoricalNumber.ToString() == "1" ? " archivo":" archivos");
+                        mtxt_cloudHist.Text = "Hasta "+r.FileHistoricalNumberCloud.ToString()+(r.FileHistoricalNumberCloud.ToString() == "1" ? " archivo" : " archivos");
                         if (metroPB_CloudSpace.Value < r.PBYellowPercentage)
                         {
                             metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;

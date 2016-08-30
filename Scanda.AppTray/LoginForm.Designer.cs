@@ -38,6 +38,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.lblMessages = new System.Windows.Forms.Label();
             this.mlbl_info = new MetroFramework.Controls.MetroLabel();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbx_logo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -68,7 +69,7 @@
             this.txtUsername.Location = new System.Drawing.Point(117, 188);
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(261, 26);
-            this.txtUsername.TabIndex = 5;
+            this.txtUsername.TabIndex = 1;
             // 
             // txtPassword
             // 
@@ -78,7 +79,7 @@
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(261, 26);
-            this.txtPassword.TabIndex = 4;
+            this.txtPassword.TabIndex = 2;
             // 
             // lblAlert
             // 
@@ -131,7 +132,7 @@
             this.lblMessages.ImageAlign = System.Drawing.ContentAlignment.TopRight;
             this.lblMessages.Location = new System.Drawing.Point(114, 152);
             this.lblMessages.Name = "lblMessages";
-            this.lblMessages.Size = new System.Drawing.Size(0, 17);
+            this.lblMessages.Size = new System.Drawing.Size(0, 19);
             this.lblMessages.TabIndex = 9;
             // 
             // mlbl_info
@@ -146,11 +147,23 @@
             this.mlbl_info.Text = "Inicia sesión";
             this.mlbl_info.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Tai Le", 7.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.Gray;
+            this.label1.Location = new System.Drawing.Point(354, 349);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(24, 13);
+            this.label1.TabIndex = 11;
+            this.label1.Text = "v1.3";
+            // 
             // LoginForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(481, 395);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.mlbl_info);
             this.Controls.Add(this.lblMessages);
             this.Controls.Add(this.pictureBox1);
@@ -185,5 +198,6 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label lblMessages;
         private MetroFramework.Controls.MetroLabel mlbl_info;
+        private System.Windows.Forms.Label label1;
     }
 }
