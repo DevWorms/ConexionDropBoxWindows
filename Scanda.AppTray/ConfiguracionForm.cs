@@ -198,6 +198,18 @@ namespace Scanda.AppTray
                 // File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
             }
 
+            if (!string.IsNullOrEmpty(config.id_customer))
+            {
+
+                if (string.IsNullOrEmpty(config.path))
+                {
+                    MessageBox.Show("No se ha configurado la ruta de respaldos");
+                }
+                if (config.type_storage == "2")// carpeta externa
+                {
+                    MessageBox.Show("No se ha configurado la ruta de historicos");
+                }
+            }
             this.Hide();
             this.Close();
             this.Dispose();
