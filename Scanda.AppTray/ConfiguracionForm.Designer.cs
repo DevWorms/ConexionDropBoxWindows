@@ -87,7 +87,7 @@
             this.mtxt_userfolder.Name = "mtxt_userfolder";
             this.mtxt_userfolder.ReadOnly = true;
             this.mtxt_userfolder.Size = new System.Drawing.Size(358, 23);
-            this.mtxt_userfolder.TabIndex = 14;
+            this.mtxt_userfolder.TabIndex = 2;
             // 
             // btnAceptar
             // 
@@ -106,7 +106,7 @@
             this.mTabControlConfiguracion.Controls.Add(this.metroTabPageHistorico);
             this.mTabControlConfiguracion.Location = new System.Drawing.Point(14, 64);
             this.mTabControlConfiguracion.Name = "mTabControlConfiguracion";
-            this.mTabControlConfiguracion.SelectedIndex = 1;
+            this.mTabControlConfiguracion.SelectedIndex = 0;
             this.mTabControlConfiguracion.Size = new System.Drawing.Size(395, 465);
             this.mTabControlConfiguracion.TabIndex = 10;
             // 
@@ -134,7 +134,7 @@
             this.gpbHistorycal.Location = new System.Drawing.Point(3, 122);
             this.gpbHistorycal.Name = "gpbHistorycal";
             this.gpbHistorycal.Size = new System.Drawing.Size(384, 94);
-            this.gpbHistorycal.TabIndex = 14;
+            this.gpbHistorycal.TabIndex = 0;
             this.gpbHistorycal.TabStop = false;
             this.gpbHistorycal.Text = "Ruta de historicos";
             this.gpbHistorycal.Visible = false;
@@ -201,7 +201,7 @@
             this.gpbIntervalo.Location = new System.Drawing.Point(1, 222);
             this.gpbIntervalo.Name = "gpbIntervalo";
             this.gpbIntervalo.Size = new System.Drawing.Size(384, 80);
-            this.gpbIntervalo.TabIndex = 12;
+            this.gpbIntervalo.TabIndex = 0;
             this.gpbIntervalo.TabStop = false;
             this.gpbIntervalo.Text = "Frecuencia de respaldos";
             // 
@@ -212,7 +212,7 @@
             this.mtxt_time.Location = new System.Drawing.Point(226, 33);
             this.mtxt_time.Name = "mtxt_time";
             this.mtxt_time.Size = new System.Drawing.Size(141, 23);
-            this.mtxt_time.TabIndex = 13;
+            this.mtxt_time.TabIndex = 0;
             this.mtxt_time.Text = "0 Horas";
             this.mtxt_time.Theme = MetroFramework.MetroThemeStyle.Light;
             // 
@@ -245,7 +245,7 @@
             this.mtxt_folder.Name = "mtxt_folder";
             this.mtxt_folder.ReadOnly = true;
             this.mtxt_folder.Size = new System.Drawing.Size(358, 23);
-            this.mtxt_folder.TabIndex = 11;
+            this.mtxt_folder.TabIndex = 1;
             // 
             // lblCarpeta
             // 
@@ -299,7 +299,7 @@
             // mtxt_cloudHist
             // 
             this.mtxt_cloudHist.Enabled = false;
-            this.mtxt_cloudHist.Location = new System.Drawing.Point(14, 311);
+            this.mtxt_cloudHist.Location = new System.Drawing.Point(19, 311);
             this.mtxt_cloudHist.Name = "mtxt_cloudHist";
             this.mtxt_cloudHist.Size = new System.Drawing.Size(349, 23);
             this.mtxt_cloudHist.TabIndex = 14;
@@ -317,7 +317,7 @@
             // mtxt_localHist
             // 
             this.mtxt_localHist.Enabled = false;
-            this.mtxt_localHist.Location = new System.Drawing.Point(14, 238);
+            this.mtxt_localHist.Location = new System.Drawing.Point(19, 240);
             this.mtxt_localHist.Name = "mtxt_localHist";
             this.mtxt_localHist.Size = new System.Drawing.Size(349, 23);
             this.mtxt_localHist.TabIndex = 12;
@@ -361,7 +361,7 @@
             // 
             this.metroPB_CloudSpace.FontWeight = MetroFramework.MetroProgressBarWeight.Regular;
             this.metroPB_CloudSpace.HideProgressText = false;
-            this.metroPB_CloudSpace.Location = new System.Drawing.Point(16, 128);
+            this.metroPB_CloudSpace.Location = new System.Drawing.Point(19, 128);
             this.metroPB_CloudSpace.Name = "metroPB_CloudSpace";
             this.metroPB_CloudSpace.RightToLeftLayout = true;
             this.metroPB_CloudSpace.Size = new System.Drawing.Size(349, 29);
