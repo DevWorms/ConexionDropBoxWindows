@@ -75,6 +75,11 @@ namespace Scanda.AppTray
                 syncNowToolStripMenuItem.Enabled = false;
                 descargarToolStripMenuItem.Enabled = false;
             }
+            else if (string.IsNullOrEmpty(config.path))
+            {
+                syncNowToolStripMenuItem.Enabled = false;
+                descargarToolStripMenuItem.Enabled = true;
+            }
             else
             {
                 syncNowToolStripMenuItem.Enabled = true;
@@ -120,7 +125,7 @@ namespace Scanda.AppTray
                 //notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
                 #region Validacion de Directorios
                 // Revisamos si existe el directorio de respaldos
-                if (!Directory.Exists(config.path))
+                if (!string.IsNullOrEmpty(config.path) && !Directory.Exists(config.path))
                 {
                     Directory.CreateDirectory(config.path);
                 }
@@ -210,7 +215,11 @@ namespace Scanda.AppTray
 
                         }
                     }
-                    syncNowToolStripMenuItem.Enabled = true;
+
+                    if(string.IsNullOrEmpty(config.path))
+                        syncNowToolStripMenuItem.Enabled = false;
+                    else
+                        syncNowToolStripMenuItem.Enabled = true;
                     configuracionToolStripMenuItem.Enabled = true;
                     descargarToolStripMenuItem.Enabled = true;
                 }
@@ -476,113 +485,133 @@ namespace Scanda.AppTray
         {
             try
             {
-                string base_url = ConfigurationManager.AppSettings["api_url"];
-                syncNowToolStripMenuItem.Enabled = false;
-                configuracionToolStripMenuItem.Enabled = false;
-                descargarToolStripMenuItem.Enabled = false;
-                syncNowToolStripMenuItem.Text = "Sincronizando...";
+                json = File.ReadAllText(configuration_path);
+                config = JsonConvert.DeserializeObject<Config>(json);
+                string base_url = string.Empty;
+                if (!string.IsNullOrEmpty(config.path)) {
+                    base_url = ConfigurationManager.AppSettings["api_url"];
+                    syncNowToolStripMenuItem.Enabled = false;
+                    configuracionToolStripMenuItem.Enabled = false;
+                    descargarToolStripMenuItem.Enabled = false;
+                    syncNowToolStripMenuItem.Text = "Sincronizando...";
+                }
+                
                 #region Validacion de Directorios
                 // Revisamos si existe el directorio de respaldos
-                if (!Directory.Exists(config.path))
+                if (!string.IsNullOrEmpty(config.path)&&!Directory.Exists(config.path))
                 {
                     Directory.CreateDirectory(config.path);
                 }
                 // Revisamos si existe el directorio de historicos, si esta en configuracion 3 significa que el archivo localmente se tiene que borrar, por tanto no es necesario crear una carpeta
-                if (!Directory.Exists(config.hist_path) && config.type_storage != "3")
+                if (!string.IsNullOrEmpty(config.hist_path) && !Directory.Exists(config.hist_path) && config.type_storage != "3")
                 {
                     Directory.CreateDirectory(config.hist_path);
                 }
-                
+
                 #endregion
                 // Obtenemos listado de archivos del directorio
-                string[] fileEntries = Directory.GetFiles(config.path);
-                notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
-                foreach (string file in fileEntries)
+                if (!string.IsNullOrEmpty(config.path))
                 {
-                    Status temp2 = new Status(base_url, notifyIconScanda, syncNowToolStripMenuItem, config.user, config.password);
-                    FileInfo info = new FileInfo(file);
-                    var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
-                    if (!x)
+                    string[] fileEntries = Directory.GetFiles(config.path);
+                    if (fileEntries != null && fileEntries.Length>0)
                     {
-                        notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
+                        notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
+                        foreach (string file in fileEntries)
+                        {
+                            Status temp2 = new Status(base_url, notifyIconScanda, syncNowToolStripMenuItem, config.user, config.password);
+                            FileInfo info = new FileInfo(file);
+                            var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
+                            if (!x)
+                            {
+                                notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
+                            }
+                            else
+                            {
+                                notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
+                                Logger.sendLog("archivo subido correctamente: " + file);
+                            }
+                        }
                     }
                     else
                     {
-                        notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
-                        Logger.sendLog("archivo subido correctamente: " +  file);
-                    }
-                }
-                // Realizamos la limpieza en Cloud
-                await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
-                #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
-                if (config.type_storage != "3")
-                {
-                    List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                    // verificamos el limite
+                        notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "No hay respaldos pendientes por sincronizar", ToolTipIcon.Warning);
 
-                    //Borramos en la nube
-                    //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
-                    //Borramos local
-                    bool canTransfer = false;
-                    while (!canTransfer)
+                    }
+                
+                
+                    // Realizamos la limpieza en Cloud
+                    await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
+                    #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
+                    if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
                     {
-                        if (histFileEntries.Count() < int.Parse(config.file_historical))
+                        List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                        // verificamos el limite
+
+                        //Borramos en la nube
+                        //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
+                        //Borramos local
+                        bool canTransfer = false;
+                        while (!canTransfer)
                         {
-                            if (histFileEntries.Count() == 0)
+                            if (histFileEntries.Count() < int.Parse(config.file_historical))
                             {
-                                canTransfer = true;
-                            }
-                            else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
-                            {
-                                canTransfer = true;
+                                if (histFileEntries.Count() == 0)
+                                {
+                                    canTransfer = true;
+                                }
+                                else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                                {
+                                    canTransfer = true;
+                                }
+                                else
+                                {
+                                    FileInfo item = histFileEntries.FirstOrDefault();
+                                    if (item != null)
+                                        histFileEntries.Remove(item);
+                                }
                             }
                             else
                             {
                                 FileInfo item = histFileEntries.FirstOrDefault();
                                 if (item != null)
-                                    histFileEntries.Remove(item);
+                                    File.Delete(config.hist_path + "\\" + item.Name);
+                                histFileEntries.Remove(item);
+
                             }
                         }
-                        else
+                        // Comenzamos a mover los archivos 
+                        List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                        foreach (FileInfo file in fileEntries2)
                         {
-                            FileInfo item = histFileEntries.FirstOrDefault();
-                            if (item != null)
-                                File.Delete(config.hist_path + "\\" + item.Name);
-                            histFileEntries.Remove(item);
-                            
-                        }
-                    }
-                    // Comenzamos a mover los archivos 
-                    List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                    foreach (FileInfo file in fileEntries2)
-                    {
-                        if (isValidFileName(file.Name))
-                        {
-                            //cuando vale 1 y 2 se mueve a una carpeta el respaldo, cuanfdo vale 3 se borra localmente
-                            if (config.type_storage == "1" || config.type_storage == "2")
+                            if (isValidFileName(file.Name))
                             {
-                                // Se copia a Historicos
-                                File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
+                                //cuando vale 1 y 2 se mueve a una carpeta el respaldo, cuanfdo vale 3 se borra localmente
+                                if (config.type_storage == "1" || config.type_storage == "2")
+                                {
+                                    // Se copia a Historicos
+                                    File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
+                                }
+                                File.Delete(config.path + "\\" + file.Name);
                             }
-                            File.Delete(config.path + "\\" + file.Name);
                         }
                     }
-                }
-                else if (config.type_storage == "3")
-                {
-                    // Comenzamos a mover los archivos 
-                    List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                    foreach (FileInfo file in fileEntries2)
+                    else if (config.type_storage == "3")
                     {
-                        if (isValidFileName(file.Name))
+                        // Comenzamos a mover los archivos 
+                        List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                        foreach (FileInfo file in fileEntries2)
                         {
-                            // Se borra el archivo localmente porque la configurcion es 3
-                            File.Delete(config.path + "\\" + file.Name);
+                            if (isValidFileName(file.Name))
+                            {
+                                // Se borra el archivo localmente porque la configurcion es 3
+                                File.Delete(config.path + "\\" + file.Name);
+                            }
                         }
                     }
+                    #endregion
+                    await sync_updateAccount();
                 }
-                #endregion
-                await sync_updateAccount();
+
                 // Termino de hacer todos los respaldos
                 syncNowToolStripMenuItem.Text = "Sincronizar ahora";
                 syncNowToolStripMenuItem.Enabled = true;

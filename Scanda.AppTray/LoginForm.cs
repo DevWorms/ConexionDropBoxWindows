@@ -9,6 +9,9 @@ using Newtonsoft.Json;
 using MetroFramework.Forms;
 using Scanda.AppTray.Models;
 using System.Reflection;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Scanda.AppTray
 {
@@ -76,7 +79,14 @@ namespace Scanda.AppTray
                             config.id_customer = r.IdCustomer.ToString();
                             File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                             Close();
-                        } else
+
+                            await sync_accountinfo();
+                            await sync_extensions();
+                            await sync_lastestUploads();
+
+
+                        }
+                        else
                         {
                             lblMessages.Text = "Contraseña/Usuario incorrectos";
                             throw new Exception("Contraseña/Usuario incorrectos");
@@ -93,6 +103,102 @@ namespace Scanda.AppTray
             {
                 lblMessages.Text = ex.Message;
                 // Para los logs
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
+            }
+        }
+
+        private async Task sync_accountinfo()
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(url);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    HttpResponseMessage response = await client.GetAsync(string.Format("Account_GET?User={0}&Password={1}", config.user, config.password));
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var resp = await response.Content.ReadAsStringAsync();
+                        Account r = JsonConvert.DeserializeObject<Account>(resp);
+                        
+                        config.time = r.UploadFrecuency.ToString();
+                        config.time_type = "Horas";
+                        config.type_storage = r.FileTreatmen.ToString();
+                        config.cloud_historical = r.FileHistoricalNumberCloud.ToString();
+                        config.file_historical = r.FileHistoricalNumber.ToString();
+                        File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+
+                        
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
+            }
+        }
+
+        private async Task sync_lastestUploads()
+        {
+            try
+            {
+                List<Historico> items = new List<Historico>() { };
+                var response = await ScandaConector.getLastUploads(config.id_customer);
+                if (response != null)
+                {
+                    foreach (string key in response.Keys)
+                    {
+                        string item = response[key];
+                        var strs = item.Split(' ');
+                        items.Add(new Historico() { RFC = key, Fecha = strs[0] + " " + strs[1] + " " + strs[2] });
+                    }
+                   
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n");
+            }
+        }
+
+        public async Task sync_extensions()
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(url);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    HttpResponseMessage response = await client.GetAsync(string.Format("Extensions_GET?User={0}&Password={1}", config.user, config.password));
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var resp = await response.Content.ReadAsStringAsync();
+                        List<Ext> r = JsonConvert.DeserializeObject<List<Ext>>(resp);
+
+                        config.extensions = r.Select(ent => "." + ent.Extension.ToLower()).ToList();
+                        //config.time_type = "Horas";
+                        //config.type_storage = r.FileTreatmen.ToString();
+                        //config.file_historical = r.FileHistoricalNumber.ToString();
+                        File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
                 Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException

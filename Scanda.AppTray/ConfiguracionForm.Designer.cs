@@ -31,10 +31,10 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfiguracionForm));
             this.btnUserFolder = new System.Windows.Forms.Button();
             this.mtxt_userfolder = new MetroFramework.Controls.MetroTextBox();
-            this.btnCancelar = new System.Windows.Forms.Button();
             this.btnAceptar = new System.Windows.Forms.Button();
             this.mTabControlConfiguracion = new MetroFramework.Controls.MetroTabControl();
             this.metroTabPageConfiguration = new MetroFramework.Controls.MetroTabPage();
+            this.gpbHistorycal = new System.Windows.Forms.GroupBox();
             this.gpbCredenciales = new System.Windows.Forms.GroupBox();
             this.btnDesvincular = new System.Windows.Forms.Button();
             this.lblInfoCuenta = new System.Windows.Forms.Label();
@@ -59,10 +59,9 @@
             this.metroPB_CloudSpace = new MetroFramework.Controls.MetroProgressBar();
             this.metroTabPageHistorico = new MetroFramework.Controls.MetroTabPage();
             this.dataGridViewHistoricos = new System.Windows.Forms.DataGridView();
-            gpbHistorycal = new System.Windows.Forms.GroupBox();
             this.mTabControlConfiguracion.SuspendLayout();
             this.metroTabPageConfiguration.SuspendLayout();
-            gpbHistorycal.SuspendLayout();
+            this.gpbHistorycal.SuspendLayout();
             this.gpbCredenciales.SuspendLayout();
             this.gpbIntervalo.SuspendLayout();
             this.gpbConfRuta.SuspendLayout();
@@ -90,19 +89,9 @@
             this.mtxt_userfolder.Size = new System.Drawing.Size(358, 23);
             this.mtxt_userfolder.TabIndex = 14;
             // 
-            // btnCancelar
-            // 
-            this.btnCancelar.Location = new System.Drawing.Point(328, 535);
-            this.btnCancelar.Name = "btnCancelar";
-            this.btnCancelar.Size = new System.Drawing.Size(75, 23);
-            this.btnCancelar.TabIndex = 8;
-            this.btnCancelar.Text = "Cancelar";
-            this.btnCancelar.UseVisualStyleBackColor = true;
-            this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
-            // 
             // btnAceptar
             // 
-            this.btnAceptar.Location = new System.Drawing.Point(238, 535);
+            this.btnAceptar.Location = new System.Drawing.Point(327, 535);
             this.btnAceptar.Name = "btnAceptar";
             this.btnAceptar.Size = new System.Drawing.Size(75, 23);
             this.btnAceptar.TabIndex = 9;
@@ -124,7 +113,7 @@
             // metroTabPageConfiguration
             // 
             this.metroTabPageConfiguration.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.metroTabPageConfiguration.Controls.Add(gpbHistorycal);
+            this.metroTabPageConfiguration.Controls.Add(this.gpbHistorycal);
             this.metroTabPageConfiguration.Controls.Add(this.gpbCredenciales);
             this.metroTabPageConfiguration.Controls.Add(this.gpbIntervalo);
             this.metroTabPageConfiguration.Controls.Add(this.gpbConfRuta);
@@ -139,17 +128,17 @@
             // 
             // gpbHistorycal
             // 
-            gpbHistorycal.Controls.Add(this.btnUserFolder);
-            gpbHistorycal.Controls.Add(this.mtxt_userfolder);
-            gpbHistorycal.ForeColor = System.Drawing.SystemColors.ControlText;
-            gpbHistorycal.Location = new System.Drawing.Point(3, 122);
-            gpbHistorycal.Name = "gpbHistorycal";
-            gpbHistorycal.Size = new System.Drawing.Size(384, 94);
-            gpbHistorycal.TabIndex = 14;
-            gpbHistorycal.TabStop = false;
-            gpbHistorycal.Text = "Ruta de historicos";
-            gpbHistorycal.Visible = false;
-            gpbHistorycal.Enter += new System.EventHandler(this.gpbHistorycal_Enter);
+            this.gpbHistorycal.Controls.Add(this.btnUserFolder);
+            this.gpbHistorycal.Controls.Add(this.mtxt_userfolder);
+            this.gpbHistorycal.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.gpbHistorycal.Location = new System.Drawing.Point(3, 122);
+            this.gpbHistorycal.Name = "gpbHistorycal";
+            this.gpbHistorycal.Size = new System.Drawing.Size(384, 94);
+            this.gpbHistorycal.TabIndex = 14;
+            this.gpbHistorycal.TabStop = false;
+            this.gpbHistorycal.Text = "Ruta de historicos";
+            this.gpbHistorycal.Visible = false;
+            this.gpbHistorycal.Enter += new System.EventHandler(this.gpbHistorycal_Enter);
             // 
             // gpbCredenciales
             // 
@@ -414,7 +403,6 @@
             this.ClientSize = new System.Drawing.Size(425, 578);
             this.Controls.Add(this.mTabControlConfiguracion);
             this.Controls.Add(this.btnAceptar);
-            this.Controls.Add(this.btnCancelar);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "ConfiguracionForm";
@@ -423,7 +411,7 @@
             this.Load += new System.EventHandler(this.ConfiguracionForm_Load);
             this.mTabControlConfiguracion.ResumeLayout(false);
             this.metroTabPageConfiguration.ResumeLayout(false);
-            gpbHistorycal.ResumeLayout(false);
+            this.gpbHistorycal.ResumeLayout(false);
             this.gpbCredenciales.ResumeLayout(false);
             this.gpbCredenciales.PerformLayout();
             this.gpbIntervalo.ResumeLayout(false);
@@ -440,8 +428,6 @@
 
         #endregion
         private System.Windows.Forms.GroupBox gpbHistorycal;
-
-        private System.Windows.Forms.Button btnCancelar;
         private System.Windows.Forms.Button btnAceptar;
         private MetroFramework.Controls.MetroTabControl mTabControlConfiguracion;
         private MetroFramework.Controls.MetroTabPage metroTabPageConfiguration;
