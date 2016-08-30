@@ -493,7 +493,7 @@ namespace Scanda.AppTray
                     syncNowToolStripMenuItem.Enabled = false;
                     configuracionToolStripMenuItem.Enabled = false;
                     descargarToolStripMenuItem.Enabled = false;
-                    syncNowToolStripMenuItem.Text = "Comprimiendo...";
+                    syncNowToolStripMenuItem.Text = "Sincronizando...";
                 }
                 
                 #region Validacion de Directorios
