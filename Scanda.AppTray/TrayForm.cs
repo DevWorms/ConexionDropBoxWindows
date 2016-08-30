@@ -530,7 +530,7 @@ namespace Scanda.AppTray
                             else
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
-                                Logger.sendLog(string.Format("Archivo subido correctamente: {0}" + info.Name), "T");
+                                Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
                             }
                         }
                     }
@@ -648,13 +648,13 @@ namespace Scanda.AppTray
                     HttpResponseMessage response = await client.GetAsync(string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, x));
                     if (response.IsSuccessStatusCode)
                     {
-                        var resp = await response.Content.ReadAsStringAsync();
+                        /*var resp = await response.Content.ReadAsStringAsync();
                         Account r = JsonConvert.DeserializeObject<Account>(resp);
                         config.time = r.UploadFrecuency.ToString();
                         config.time_type = "Horas";
                         config.type_storage = r.FileTreatmen.ToString();
                         config.file_historical = r.FileHistoricalNumber.ToString();
-                        File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                        File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));*/
                     }
                 }
             }catch(Exception ex)
