@@ -154,10 +154,12 @@ namespace Scanda.AppTray
                             if (!res)
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
+                                Logger.sendLog(string.Format("Error al sincronizar {0}", file[2]), "T");
                             }
                             else
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
+                                Logger.sendLog(string.Format("Finalizo descarga de {0}", file[2]), "T");
                                 switch (int.Parse(config.type_storage))
                                 {
                                     case 1:
@@ -217,11 +219,12 @@ namespace Scanda.AppTray
                 // notifyIconScanda.Icon = Properties.Resources.AppIcon;
             } catch(Exception ex)
             {
-                Logger.sendLog(ex.Message
+                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
                     + "\n" + ex.StackTrace
-                    + "\n");
+                    + "\n");*/
             }
         }
 
@@ -336,10 +339,12 @@ namespace Scanda.AppTray
                     if (!x)
                     {
                         notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
+                        Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
                     }
                     else
                     {
                         notifyIconScanda.ShowBalloonTip(1000, "DBProtector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
+                        Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
                     }
                 }
                 // Realizamos la limpieza en Cloud
@@ -405,11 +410,7 @@ namespace Scanda.AppTray
                 // Fallo al realizar los respaldos
                 syncNowToolStripMenuItem.Text = "Sincronizar ahora";
                 syncNowToolStripMenuItem.Enabled = true;
-                Logger.sendLog(ex.Message
-                    + "\n" + ex.Source
-                    + "\n" + ex.InnerException
-                    + "\n" + ex.StackTrace
-                    + "\n");
+                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
             }
         }
 
@@ -505,11 +506,12 @@ namespace Scanda.AppTray
                     if (!x)
                     {
                         notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
+                        Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
                     }
                     else
                     {
                         notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
-                        Logger.sendLog("archivo subido correctamente: " +  file);
+                        Logger.sendLog(string.Format("Archivo subido correctamente: {0}" +  info.Name), "T");
                     }
                 }
                 // Realizamos la limpieza en Cloud
@@ -593,35 +595,46 @@ namespace Scanda.AppTray
                 // Termino de hacer todos los respaldos
                 syncNowToolStripMenuItem.Text = "Sincronizar ahora";
                 syncNowToolStripMenuItem.Enabled = true;
-                Logger.sendLog(ex.Message
+                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
                     + "\n" + ex.StackTrace
-                    + "\n");
+                    + "\n", "E");*/
             }
 
         }
         private async Task sync_updateAccount()
         {
-            // Obtenemos los datos de dropbox
-            var x = await ScandaConector.getUsedSpace(config.id_customer);
-            string url = ConfigurationManager.AppSettings["api_url"];
-            using (var client = new HttpClient())
+            try
             {
-                client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage response = await client.GetAsync(string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, x));
-                if (response.IsSuccessStatusCode)
+                // Obtenemos los datos de dropbox
+                var x = await ScandaConector.getUsedSpace(config.id_customer);
+                string url = ConfigurationManager.AppSettings["api_url"];
+                using (var client = new HttpClient())
                 {
-                    var resp = await response.Content.ReadAsStringAsync();
-                    Account r = JsonConvert.DeserializeObject<Account>(resp);
-                    config.time = r.UploadFrecuency.ToString();
-                    config.time_type = "Horas";
-                    config.type_storage = r.FileTreatmen.ToString();
-                    config.file_historical = r.FileHistoricalNumber.ToString();
-                    File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                    client.BaseAddress = new Uri(url);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    HttpResponseMessage response = await client.GetAsync(string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, x));
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var resp = await response.Content.ReadAsStringAsync();
+                        Account r = JsonConvert.DeserializeObject<Account>(resp);
+                        config.time = r.UploadFrecuency.ToString();
+                        config.time_type = "Horas";
+                        config.type_storage = r.FileTreatmen.ToString();
+                        config.file_historical = r.FileHistoricalNumber.ToString();
+                        File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                    }
                 }
+            }catch(Exception ex)
+            {
+                Logger.sendLog(ex.Message
+                    + "\n" + ex.Source
+                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
+                    + "\n", "E");
             }
         }
         private async Task sync_accountinfo()
@@ -641,6 +654,7 @@ namespace Scanda.AppTray
                     config.time_type = "Horas";
                     config.type_storage = r.FileTreatmen.ToString();
                     config.file_historical = r.FileHistoricalNumber.ToString();
+                    config.cloud_historical = r.FileHistoricalNumberCloud.ToString();
                     File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                 }
             }

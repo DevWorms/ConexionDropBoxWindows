@@ -93,11 +93,12 @@ namespace Scanda.AppTray
             {
                 lblMessages.Text = ex.Message;
                 // Para los logs
-                Logger.sendLog(ex.Message
+                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
                     + "\n" + ex.StackTrace
-                    + "\n");
+                    + "\n");*/
             }
         }
 
@@ -150,11 +151,12 @@ namespace Scanda.AppTray
             }
             catch (Exception ex)
             {
-                Logger.sendLog(ex.Message
+                /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
                     + "\n" + ex.StackTrace
-                    + "\n");
+                    + "\n");*/
+                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
             }
         }
 
