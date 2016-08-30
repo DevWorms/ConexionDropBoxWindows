@@ -68,7 +68,7 @@
             this.txtUsername.Location = new System.Drawing.Point(117, 188);
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(261, 26);
-            this.txtUsername.TabIndex = 5;
+            this.txtUsername.TabIndex = 1;
             // 
             // txtPassword
             // 
@@ -78,7 +78,7 @@
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(261, 26);
-            this.txtPassword.TabIndex = 4;
+            this.txtPassword.TabIndex = 2;
             // 
             // lblAlert
             // 
@@ -131,7 +131,7 @@
             this.lblMessages.ImageAlign = System.Drawing.ContentAlignment.TopRight;
             this.lblMessages.Location = new System.Drawing.Point(114, 152);
             this.lblMessages.Name = "lblMessages";
-            this.lblMessages.Size = new System.Drawing.Size(0, 17);
+            this.lblMessages.Size = new System.Drawing.Size(0, 19);
             this.lblMessages.TabIndex = 9;
             // 
             // mlbl_info
