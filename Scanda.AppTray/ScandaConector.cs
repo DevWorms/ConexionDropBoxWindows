@@ -29,7 +29,8 @@ namespace Scanda.AppTray
         static WriteMode OVERWRITE = WriteMode.Overwrite.Instance;
 
         static string REGEXP = "([A-Zz-z]{4}\\d{6})(---|\\w{3})?(\\d{14}).(\\w{3})";
-        static string RFCregexp = "([A-Zz-z]{4}\\d{6}(---|\\w{3})?)";
+        //static string RFCregexp = "([A-Zz-z]{4}\\d{6}(---|\\w{3})?)";
+        static string RFCregexp = "[A-Za-z]{3,4}[0-9]{6}[A-Za-z0-9]{3}";
 
         public static async Task<List<string>> getFiles(string usrID, string year, string month)
         {
