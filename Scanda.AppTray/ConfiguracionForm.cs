@@ -81,7 +81,7 @@ namespace Scanda.AppTray
                 this.Show();
             }
             catch(Exception ex) {
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
                 //    + "\n" + ex.InnerException
@@ -90,7 +90,7 @@ namespace Scanda.AppTray
             }
         }
 
-        private void btnElegir_Click(object sender, EventArgs e)
+        private async void btnElegir_Click(object sender, EventArgs e)
         {
             try
             {
@@ -111,8 +111,8 @@ namespace Scanda.AppTray
                     // Guardamos la ruta
                     File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                 }
-            }catch(Exception ex) {
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+            } catch(Exception ex) {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
                 //    + "\n" + ex.InnerException
@@ -134,7 +134,7 @@ namespace Scanda.AppTray
             limpirarVariables();
         }
 
-        private void limpirarVariables()
+        private async void limpirarVariables()
         {
             try
             {
@@ -175,7 +175,7 @@ namespace Scanda.AppTray
                     + "\n" + ex.InnerException
                     + "\n" + ex.StackTrace
                     + "\n");*/
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
             }
         }
 
@@ -249,7 +249,7 @@ namespace Scanda.AppTray
                         else if (metroPB_CloudSpace.Value >= r.PBRedPercentage)
                         {
                             metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Red;
-                            Logger.sendLog("Cuenta llegando al limite de almacenamiento", "W");
+                            await Logger.sendLog("Cuenta llegando al limite de almacenamiento", "W");
                         }
 
                         config.time = r.UploadFrecuency.ToString();
@@ -284,9 +284,8 @@ namespace Scanda.AppTray
                         }
                     }
                 }
-            } catch(Exception ex)
-            {
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+            } catch(Exception ex) {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
@@ -316,7 +315,7 @@ namespace Scanda.AppTray
             }
             catch (Exception ex)
             {
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
@@ -348,7 +347,7 @@ namespace Scanda.AppTray
                     }
                 }
             } catch (Exception ex) {
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
                 //    + "\n" + ex.InnerException
@@ -378,7 +377,7 @@ namespace Scanda.AppTray
                     btnUserFolder.Enabled = false;
                 }
             } catch (Exception ex) {
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
                 //    + "\n" + ex.InnerException
@@ -387,7 +386,7 @@ namespace Scanda.AppTray
             }
         }
 
-        private void btnUserFolder_Click(object sender, EventArgs e)
+        private async void btnUserFolder_Click(object sender, EventArgs e)
         {
             try
             {
@@ -406,7 +405,7 @@ namespace Scanda.AppTray
                 }
             }
             catch (Exception ex) {
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
                 //    + "\n" + ex.InnerException

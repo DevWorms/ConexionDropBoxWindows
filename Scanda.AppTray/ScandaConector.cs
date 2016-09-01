@@ -256,6 +256,9 @@ namespace Scanda.AppTray
                 fileN = fileN + ".zip";
 
                 string pathRemoto = usrId + "/" + year + "/" + month + "/" + fileN;
+                status.download.status = 1;
+                status.download.path = destino + "/" + fileN;
+                await status.downloadStatusFile(status.download);
                 string zip = await downloadZipFile(pathRemoto, destino);
                 //extraemos el archivo
                 string archivo = decifrar(zip, usrId);
@@ -266,7 +269,7 @@ namespace Scanda.AppTray
                     File.Delete(destino + "/" + archivo);
                 File.Move(archivo, destino + "/" + archivo);
 
-                status.download.status = 1;
+                status.download.status = 3;
                 status.download.path = destino + "/" + archivo;
                 await status.downloadStatusFile(status.download);
                 return true;
@@ -412,24 +415,27 @@ namespace Scanda.AppTray
                 }
                 return true;
             }
-            catch (OutOfMemoryException)
+            catch (OutOfMemoryException ex)
             {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 Console.WriteLine("Se acabo la memoria");
                 return false;
             }
-            catch (FileNotFoundException)
+            catch (FileNotFoundException ex)
             {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 Console.WriteLine("No existe el archivo");
                 return false;
             }
             catch (AggregateException ex) //Excepciones al vuelo
             {
-
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 Console.WriteLine("Tarea Cancelada");
                 return false;
             }
             catch (Exception ex)
             {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 Console.WriteLine(ex);
                 return false;
             }
@@ -454,19 +460,21 @@ namespace Scanda.AppTray
                 archivo.Close();
                 return metadata.Name;
             }
-            catch (OutOfMemoryException)
+            catch (OutOfMemoryException ex)
             {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 Console.WriteLine("Se acabo la memoria");
                 return null;
             }
-            catch (FileNotFoundException)
+            catch (FileNotFoundException ex)
             {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 Console.WriteLine("No existe el archivo");
                 return null;
             }
             catch (AggregateException ex) //Excepciones al vuelo
             {
-
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 Console.WriteLine("Tarea Cancelada");
                 return null;
             }

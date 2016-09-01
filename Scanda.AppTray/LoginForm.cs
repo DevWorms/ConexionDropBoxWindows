@@ -103,7 +103,7 @@ namespace Scanda.AppTray
             {
                 lblMessages.Text = ex.Message;
                 // Para los logs
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
@@ -133,18 +133,16 @@ namespace Scanda.AppTray
                         config.cloud_historical = r.FileHistoricalNumberCloud.ToString();
                         config.file_historical = r.FileHistoricalNumber.ToString();
                         File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
-
-                        
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Logger.sendLog(ex.Message
+            catch (Exception ex) {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
                     + "\n" + ex.StackTrace
-                    + "\n");
+                    + "\n");*/
             }
         }
 
@@ -165,13 +163,13 @@ namespace Scanda.AppTray
                    
                 }
             }
-            catch (Exception ex)
-            {
-                Logger.sendLog(ex.Message
+            catch (Exception ex) {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
                     + "\n" + ex.StackTrace
-                    + "\n");
+                    + "\n");*/
             }
         }
 
@@ -198,13 +196,13 @@ namespace Scanda.AppTray
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Logger.sendLog(ex.Message
+            catch (Exception ex) {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
                     + "\n" + ex.StackTrace
-                    + "\n");
+                    + "\n");*/
             }
         }
 
@@ -229,7 +227,7 @@ namespace Scanda.AppTray
             }
         }
 
-        private void limpirarVariables()
+        private async void limpirarVariables()
         {
             try
             {
@@ -255,14 +253,13 @@ namespace Scanda.AppTray
 
 
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
                     + "\n" + ex.StackTrace
                     + "\n");*/
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
             }
         }
 

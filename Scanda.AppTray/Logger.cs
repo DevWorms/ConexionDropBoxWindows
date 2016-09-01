@@ -6,6 +6,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Scanda.AppTray
 {
@@ -21,7 +22,7 @@ namespace Scanda.AppTray
             twError.Close();
         }
 
-        public static async void sendLog(string Message, string Type = "E")
+        public static async Task sendLog(string Message, string Type = "E")
         {
             try
             {

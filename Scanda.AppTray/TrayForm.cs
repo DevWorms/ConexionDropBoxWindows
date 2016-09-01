@@ -70,6 +70,10 @@ namespace Scanda.AppTray
         }
         private void ConfigurationForm_Close(object sender, EventArgs e)
         {
+            if (int.Parse(config.time) != 0)
+            {
+                timerUpload.Stop();
+            }
             // abrimos de nuevo el json
             json = File.ReadAllText(configuration_path);
             config = JsonConvert.DeserializeObject<Config>(json);
@@ -147,7 +151,7 @@ namespace Scanda.AppTray
                     syncNowToolStripMenuItem.Enabled = false;
                     configuracionToolStripMenuItem.Enabled = false;
                     descargarToolStripMenuItem.Enabled = false;
-                    notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo", ToolTipIcon.Info);
+                    
                     foreach (Control ctrl in form.controls)
                     {
                         string[] file = ctrl.Name.Split('_');
@@ -158,16 +162,17 @@ namespace Scanda.AppTray
                         if (fbd.ShowDialog() == DialogResult.OK)
                         {
                             var selectedPath = fbd.SelectedPath;
+                            notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo", ToolTipIcon.Info);
                             var res = await ScandaConector.downloadFile(config.id_customer, file[0], file[1], file[2], temp, config.path);
                             if (!res)
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
-                                Logger.sendLog(string.Format("Error al sincronizar {0}", file[2]), "T");
+                                await Logger.sendLog(string.Format("Error al sincronizar {0}", file[2]), "T");
                             }
                             else
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
-                                Logger.sendLog(string.Format("Finalizo descarga de {0}", file[2]), "T");
+                                await Logger.sendLog(string.Format("Finalizo descarga de {0}", file[2]), "T");
                                 switch (int.Parse(config.type_storage))
                                 {
                                     case 1:
@@ -229,9 +234,8 @@ namespace Scanda.AppTray
                     descargarToolStripMenuItem.Enabled = true;
                 }
                 // notifyIconScanda.Icon = Properties.Resources.AppIcon;
-            } catch(Exception ex)
-            {
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+            } catch(Exception ex) {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
@@ -351,12 +355,12 @@ namespace Scanda.AppTray
                     if (!x)
                     {
                         notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
-                        Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
+                        await Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
                     }
                     else
                     {
                         notifyIconScanda.ShowBalloonTip(1000, "DBProtector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
-                        Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
+                        await Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
                     }
                 }
                 // Realizamos la limpieza en Cloud
@@ -422,7 +426,9 @@ namespace Scanda.AppTray
                 // Fallo al realizar los respaldos
                 syncNowToolStripMenuItem.Text = "Sincronizar ahora";
                 syncNowToolStripMenuItem.Enabled = true;
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                configuracionToolStripMenuItem.Enabled = true;
+                descargarToolStripMenuItem.Enabled = true;
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
             }
         }
 
@@ -469,7 +475,7 @@ namespace Scanda.AppTray
 
         private void OnChanged(object source, FileSystemEventArgs e)
         {
-            var x = 1 + 1;
+            // var x = 1 + 1;
             MessageBox.Show("Nuevo Archivo creado ->" + e.Name);
         }
         private static bool isValidFileName(string fileName)
@@ -528,12 +534,12 @@ namespace Scanda.AppTray
                             if (!x)
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
-                                Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
+                                await Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
                             }
                             else
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
-                                Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
+                                await Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
                             }
                         }
                     }
@@ -627,7 +633,9 @@ namespace Scanda.AppTray
                 // Termino de hacer todos los respaldos
                 syncNowToolStripMenuItem.Text = "Sincronizar ahora";
                 syncNowToolStripMenuItem.Enabled = true;
-                Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                configuracionToolStripMenuItem.Enabled = true;
+                descargarToolStripMenuItem.Enabled = true;
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
@@ -660,13 +668,13 @@ namespace Scanda.AppTray
                         File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));*/
                     }
                 }
-            }catch(Exception ex)
-            {
-                Logger.sendLog(ex.Message
+            }catch(Exception ex) {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.InnerException
                     + "\n" + ex.StackTrace
-                    + "\n", "E");
+                    + "\n", "E");*/
             }
         }
         private async Task sync_accountinfo()
