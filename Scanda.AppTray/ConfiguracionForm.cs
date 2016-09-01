@@ -187,7 +187,7 @@ namespace Scanda.AppTray
 
         }
 
-        private void btnAceptar_Click(object sender, EventArgs e)
+        private async void btnAceptar_Click(object sender, EventArgs e)
         {
             if (mtxt_time.Text != "0")
             {
@@ -204,10 +204,12 @@ namespace Scanda.AppTray
                 if (string.IsNullOrEmpty(config.path))
                 {
                     MessageBox.Show("No se ha configurado la ruta de respaldos");
+                    await Logger.sendLog("No se ha configurado la ruta de respaldos", "E");
                 }
                 if (config.type_storage == "2")// carpeta externa
                 {
                     MessageBox.Show("No se ha configurado la ruta de historicos");
+                    await Logger.sendLog("No se ha configurado la ruta de historicos", "E");
                 }
             }
             this.Hide();
