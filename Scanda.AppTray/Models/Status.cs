@@ -53,7 +53,8 @@ namespace Scanda.AppTray.Models
         {
             // No se implementa :P
             // this.icon.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
-            int unixTimestamp = (int)(DateTime.UtcNow.Subtract(DateTime.Now)).TotalSeconds;
+            //int unixTimestamp = (int)(DateTime.UtcNow.Subtract(DateTime.Now)).TotalSeconds;
+            string unixTimestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(this.base_url);
