@@ -23,7 +23,8 @@ namespace Scanda.AppTray
         private bool flag;
         private string configuration_path;
         //static string REGEXP = "([A-Zz-z]{4}\\d{6})(---|\\w{3})?(\\d{14}).(\\w{3})";
-        static string REGEXP = "[A-Za-z]{3,4}[0-9]{6}[A-Za-z0-9]{3}";
+        //static string REGEXP = "[A-Za-z]{3,4}[0-9]{6}[A-Za-z0-9]{3}";
+        static string ARCHIVO = "([A-Za-z]{3,4}[0-9]{6}[A-Za-z0-9]{3})([0-9]{14})";
 
 
         // Configuraciones
@@ -484,7 +485,7 @@ namespace Scanda.AppTray
                 return false;
             try
             {
-                return Regex.IsMatch(fileName, REGEXP);
+                return Regex.IsMatch(fileName, ARCHIVO);
             }
             catch (RegexMatchTimeoutException)
             {
