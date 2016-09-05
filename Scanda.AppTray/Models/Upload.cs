@@ -8,9 +8,13 @@ namespace Scanda.AppTray.Models
 {
     public class Upload
     {
+        //Status int
         public int status;
+        //file name
         public string file;
+        //total Chunk
         public string total;
+        //Actual Chunk
         public string chunk;
 
         public Upload()

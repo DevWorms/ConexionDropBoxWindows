@@ -198,7 +198,7 @@ namespace Scanda.AppTray
         public static async Task<bool> uploadFile(string archivo, string usrId, Status status, List<string> extensions = null, double remmainingSpace = -1)
         {
             status.upload.file = archivo;
-            status.upload.status = 0;
+            status.upload.status = 1;
             try
             {
                 FileInfo info = new FileInfo(archivo);
@@ -252,12 +252,12 @@ namespace Scanda.AppTray
             try
             {
                 status.download.file = fileN;
-                status.download.status = 0;
 
                 fileN = fileN + ".zip";
 
                 string pathRemoto = usrId + "/" + year + "/" + month + "/" + fileN;
                 status.download.status = 1;
+                
                 status.download.path = destino + "/" + fileN;
                 await status.downloadStatusFile(status.download);
                 string zip = await downloadZipFile(pathRemoto, destino);
@@ -270,6 +270,9 @@ namespace Scanda.AppTray
                     File.Delete(destino + "/" + archivo);
                 File.Move(archivo, destino + "/" + archivo);
 
+                FileInfo info = new FileInfo(destino + "/" + archivo);
+
+                status.download.chunk = info.Length+"";
                 status.download.status = 3;
                 status.download.path = destino + "/" + archivo;
                 await status.downloadStatusFile(status.download);
@@ -362,6 +365,7 @@ namespace Scanda.AppTray
                     //subidaS.Wait();
                     //Console.WriteLine(subidaS.Result.AsFile.Size);
                     //stream.Close();
+                    status.upload.chunk = (CHUNK_SIZE) + "";
                     await status.uploadStatusFile(status.upload);
                 }
                 else
@@ -369,14 +373,13 @@ namespace Scanda.AppTray
                     byte[] buffer = new byte[CHUNK_SIZE];
                     string sessionId = null;
 
-
-
+                    
                     for (var idx = 0; idx <= nChunks; idx++)
                     {
                         status.upload.status = 2;
                         var byteRead = stream.Read(buffer, 0, CHUNK_SIZE);
 
-                        status.upload.chunk = (idx * CHUNK_SIZE * 1)+ "";
+                        status.upload.chunk = ( idx * CHUNK_SIZE)+ "";
                         //status.upload.chunk = idx.ToString();
                         //status.upload.total = nChunks.ToString();
                         using (var memSream = new MemoryStream(buffer, 0, byteRead))

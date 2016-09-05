@@ -8,7 +8,13 @@ namespace Scanda.AppTray.Models
 {
     public class Download
     {
-        public int status;
+        //Status en entero
+        public int  status;
+        //total Chunk
+        public string total;
+        //Actual Chunk
+        public string chunk;
+        //File Name
         public string file;
         public string path;
 
