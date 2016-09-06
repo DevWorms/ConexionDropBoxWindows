@@ -28,7 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.evnLogger = new System.Diagnostics.EventLog();
+            this.timerUpload = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.evnLogger)).BeginInit();
             // 
             // ScandaService
@@ -41,5 +43,6 @@
         #endregion
 
         private System.Diagnostics.EventLog evnLogger;
+        private System.Windows.Forms.Timer timerUpload;
     }
 }
