@@ -250,9 +250,9 @@ namespace Scanda.AppTray
             // ServiceBase service = new ServiceBase();
             // Scanda.Service.ScandaService.Run(service);
             
-            if (DoesServiceExist("ServiceScanda", "."))
+            if (DoesServiceExist("DBProtector Services", ".")) // le coloque una S de mas XD
             {
-                ServiceController sc = new ServiceController("ServiceScanda");
+                ServiceController sc = new ServiceController("DBProtector Service"); //con esto controlamos el servicio :o
                 
                 switch (sc.Status)
                 {

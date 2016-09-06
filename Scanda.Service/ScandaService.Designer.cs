@@ -35,7 +35,8 @@
             // 
             // ScandaService
             // 
-            this.ServiceName = "Service1";
+            this.CanShutdown = true;
+            this.ServiceName = "DBProtector Service";
             ((System.ComponentModel.ISupportInitialize)(this.evnLogger)).EndInit();
 
         }

@@ -1,10 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -73,7 +69,7 @@ namespace Scanda.AppTray.Models
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 string status = upload.status == 3 ? "Finalizado" : "EnProgreso";
-                string requestUrl;
+                string requestUrl = "";
 
                 switch(download.status)
                 {

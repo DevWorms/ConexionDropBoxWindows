@@ -16,13 +16,13 @@
         "Entry"
         {
         "MsmKey" = "8:_302C15D86A54C5C1C73F9A23300700D2"
-        "OwnerKey" = "8:_90316814F595299F9E5F20E32C377E16"
+        "OwnerKey" = "8:_E8B99131C410E8EF5C14FBE4D7A6B997"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_302C15D86A54C5C1C73F9A23300700D2"
-        "OwnerKey" = "8:_C3BF2B5662774889B869D56E3C4F986E"
+        "OwnerKey" = "8:_A2CCE70448B6442597B10CEEB94FD565"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -34,7 +34,7 @@
         "Entry"
         {
         "MsmKey" = "8:_6B0C41867A18AF89145F2431140CB30B"
-        "OwnerKey" = "8:_C3BF2B5662774889B869D56E3C4F986E"
+        "OwnerKey" = "8:_E8B99131C410E8EF5C14FBE4D7A6B997"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -46,55 +46,55 @@
         "Entry"
         {
         "MsmKey" = "8:_6B0C41867A18AF89145F2431140CB30B"
-        "OwnerKey" = "8:_90316814F595299F9E5F20E32C377E16"
+        "OwnerKey" = "8:_A2CCE70448B6442597B10CEEB94FD565"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_86B63181D243DCBC6E2AA797ADA0BC19"
-        "OwnerKey" = "8:_C3BF2B5662774889B869D56E3C4F986E"
+        "OwnerKey" = "8:_A2CCE70448B6442597B10CEEB94FD565"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_8F0804895C743A4BE0980066B48B7AEB"
-        "OwnerKey" = "8:_C3BF2B5662774889B869D56E3C4F986E"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8F0804895C743A4BE0980066B48B7AEB"
-        "OwnerKey" = "8:_86B63181D243DCBC6E2AA797ADA0BC19"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_90316814F595299F9E5F20E32C377E16"
-        "OwnerKey" = "8:_C3BF2B5662774889B869D56E3C4F986E"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_90316814F595299F9E5F20E32C377E16"
-        "OwnerKey" = "8:_86B63181D243DCBC6E2AA797ADA0BC19"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_C3BF2B5662774889B869D56E3C4F986E"
+        "MsmKey" = "8:_A2CCE70448B6442597B10CEEB94FD565"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_6B0C41867A18AF89145F2431140CB30B"
+        "MsmKey" = "8:_E8B99131C410E8EF5C14FBE4D7A6B997"
+        "OwnerKey" = "8:_A2CCE70448B6442597B10CEEB94FD565"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E8B99131C410E8EF5C14FBE4D7A6B997"
+        "OwnerKey" = "8:_86B63181D243DCBC6E2AA797ADA0BC19"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FE922BDAE138044C6FE03FEB292EAA05"
+        "OwnerKey" = "8:_A2CCE70448B6442597B10CEEB94FD565"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FE922BDAE138044C6FE03FEB292EAA05"
+        "OwnerKey" = "8:_86B63181D243DCBC6E2AA797ADA0BC19"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_C3BF2B5662774889B869D56E3C4F986E"
+        "OwnerKey" = "8:_FE922BDAE138044C6FE03FEB292EAA05"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_A2CCE70448B6442597B10CEEB94FD565"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -106,7 +106,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_90316814F595299F9E5F20E32C377E16"
+        "OwnerKey" = "8:_E8B99131C410E8EF5C14FBE4D7A6B997"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -118,7 +118,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_8F0804895C743A4BE0980066B48B7AEB"
+        "OwnerKey" = "8:_6B0C41867A18AF89145F2431140CB30B"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -139,6 +139,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -155,12 +163,84 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.5"
+                    }
+                }
+            }
         }
     }
     "Deployable"
     {
         "CustomAction"
         {
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_21D972D2DE9A4B44B9C6A61A5F0A5474"
+            {
+            "Name" = "8:Primary output from Scanda.Service (Active)"
+            "Condition" = "8:"
+            "Object" = "8:_A2CCE70448B6442597B10CEEB94FD565"
+            "FileType" = "3:2"
+            "InstallAction" = "3:4"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_93F5EEFD_ACD5_49A4_BF04_398FA4388906"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_499B62C9939045E9811BE205E2C8752C"
+            {
+            "Name" = "8:Primary output from Scanda.Service (Active)"
+            "Condition" = "8:"
+            "Object" = "8:_A2CCE70448B6442597B10CEEB94FD565"
+            "FileType" = "3:2"
+            "InstallAction" = "3:3"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_E7FED659_0F21_4B06_8F02_1A6376ECB688"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_7F0B72F639EE4BAAA620AB1B89351AC4"
+            {
+            "Name" = "8:Primary output from Scanda.Service (Active)"
+            "Condition" = "8:"
+            "Object" = "8:_A2CCE70448B6442597B10CEEB94FD565"
+            "FileType" = "3:2"
+            "InstallAction" = "3:2"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_FF5F95FF_84B6_4698_98AF_E47F8FCAA62A"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_8903917343844C83B5686A16AD0DA9F1"
+            {
+            "Name" = "8:Primary output from Scanda.Service (Active)"
+            "Condition" = "8:"
+            "Object" = "8:_A2CCE70448B6442597B10CEEB94FD565"
+            "FileType" = "3:2"
+            "InstallAction" = "3:1"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_C6724901_5EC8_4284_A8E8_411E1683F1F6"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
         }
         "DefaultFeature"
         {
@@ -277,20 +357,20 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8F0804895C743A4BE0980066B48B7AEB"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E8B99131C410E8EF5C14FBE4D7A6B997"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Dropbox.Api, Version=0.1.6058.19706, Culture=neutral, PublicKeyToken=310f0e82fbb45d01, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_8F0804895C743A4BE0980066B48B7AEB"
+                    "_E8B99131C410E8EF5C14FBE4D7A6B997"
                     {
-                    "Name" = "8:DotNetZip.dll"
+                    "Name" = "8:Dropbox.Api.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:DotNetZip.dll"
+            "SourcePath" = "8:Dropbox.Api.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_82B7CD8FA474494D8EDF0027BED637DF"
@@ -308,20 +388,20 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_90316814F595299F9E5F20E32C377E16"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_FE922BDAE138044C6FE03FEB292EAA05"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Dropbox.Api, Version=0.1.6058.19706, Culture=neutral, PublicKeyToken=310f0e82fbb45d01, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_90316814F595299F9E5F20E32C377E16"
+                    "_FE922BDAE138044C6FE03FEB292EAA05"
                     {
-                    "Name" = "8:Dropbox.Api.dll"
+                    "Name" = "8:DotNetZip.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:Dropbox.Api.dll"
+            "SourcePath" = "8:DotNetZip.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_82B7CD8FA474494D8EDF0027BED637DF"
@@ -915,7 +995,7 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_C3BF2B5662774889B869D56E3C4F986E"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_A2CCE70448B6442597B10CEEB94FD565"
             {
             "SourcePath" = "8:..\\Scanda.Service\\obj\\Release\\Scanda.Service.exe"
             "TargetName" = "8:"

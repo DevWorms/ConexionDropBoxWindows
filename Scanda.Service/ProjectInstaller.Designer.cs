@@ -28,33 +28,33 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.serviceScandaProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
-            this.serviceScandaInstaller = new System.ServiceProcess.ServiceInstaller();
+            this.serviceDBProtectorProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
+            this.serviceDBProtectorInstaller = new System.ServiceProcess.ServiceInstaller();
             // 
-            // serviceScandaProcessInstaller
+            // serviceDBProtectorProcessInstaller
             // 
-            this.serviceScandaProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
-            this.serviceScandaProcessInstaller.Password = null;
-            this.serviceScandaProcessInstaller.Username = null;
+            this.serviceDBProtectorProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
+            this.serviceDBProtectorProcessInstaller.Password = null;
+            this.serviceDBProtectorProcessInstaller.Username = null;
             // 
-            // serviceScandaInstaller
+            // serviceDBProtectorInstaller
             // 
-            this.serviceScandaInstaller.Description = "Scanda Service";
-            this.serviceScandaInstaller.DisplayName = "Scanda";
-            this.serviceScandaInstaller.ServiceName = "ServiceScanda";
-            this.serviceScandaInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            this.serviceDBProtectorInstaller.Description = "DBProtector Service";
+            this.serviceDBProtectorInstaller.DisplayName = "DBProtector Service";
+            this.serviceDBProtectorInstaller.ServiceName = "DBProtector Service";
+            this.serviceDBProtectorInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ProjectInstaller
             // 
             this.Installers.AddRange(new System.Configuration.Install.Installer[] {
-            this.serviceScandaProcessInstaller,
-            this.serviceScandaInstaller});
+            this.serviceDBProtectorProcessInstaller,
+            this.serviceDBProtectorInstaller});
 
         }
 
         #endregion
 
-        private System.ServiceProcess.ServiceProcessInstaller serviceScandaProcessInstaller;
-        private System.ServiceProcess.ServiceInstaller serviceScandaInstaller;
+        private System.ServiceProcess.ServiceProcessInstaller serviceDBProtectorProcessInstaller;
+        private System.ServiceProcess.ServiceInstaller serviceDBProtectorInstaller;
     }
 }
