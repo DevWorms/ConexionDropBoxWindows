@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceProcess;
 
 namespace Scanda.AppTray
 {
@@ -38,6 +39,13 @@ namespace Scanda.AppTray
             url = ConfigurationManager.AppSettings["api_url"];
             flag = isNuevaInstancia;
             configuration_path = configPath;
+        }
+
+        bool DoesServiceExist(string serviceName, string machineName)
+        {
+            ServiceController[] services = ServiceController.GetServices(machineName);
+            var service = services.FirstOrDefault(s => s.ServiceName == serviceName);
+            return service != null;
         }
 
         private async void btnLogin_Click(object sender, EventArgs e)
@@ -84,7 +92,13 @@ namespace Scanda.AppTray
                             await sync_extensions();
                             await sync_lastestUploads();
 
-
+                            ServiceController sc = null;
+                            if (DoesServiceExist("DBProtector Service", "."))
+                            {
+                                sc = new ServiceController("DBProtector Service");
+                                sc.Stop();
+                                sc.Start();
+                            }
                         }
                         else
                         {

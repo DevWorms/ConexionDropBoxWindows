@@ -21,7 +21,8 @@ namespace Scanda.AppTray
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             // Obtenemos el Folder donde se aloja nuestra aplicacion
-            string appFolder = new FileInfo(Application.ExecutablePath.ToString()).Directory.FullName;
+            // string appFolder = new FileInfo(Application.ExecutablePath.ToString()).Directory.FullName;
+            string appFolder = @"C:\DBProtector";
             string settingsFolder = appFolder + "\\Settings";
             string baseFolder = @"C:\Backups";
             string historicosFolder = baseFolder + "\\historicos";
@@ -39,6 +40,12 @@ namespace Scanda.AppTray
                 }
 
                 GC.Collect();
+                // Creating Application Folder
+                if (!Directory.Exists(appFolder))
+                {
+                    DirectoryInfo di = Directory.CreateDirectory(appFolder);
+                    di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+                }
                 if (!Directory.Exists(settingsFolder))
                 {
                     // No existe lo creamos el Directorio

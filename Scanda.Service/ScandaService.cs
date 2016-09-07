@@ -33,7 +33,7 @@ namespace Scanda.Service
         /// <summary>
         /// Application Directory
         /// </summary>
-        private string app_dirpath;
+        private string app_settingsPath = @"C:\DBProtector\Settings\";
         #endregion
         public ScandaService(string[] args)
         {
@@ -63,10 +63,10 @@ namespace Scanda.Service
             evnLogger.Log = logName;
 
             // Read configuration file
-            string json = File.ReadAllText(this.configuration_file);
+            string json = File.ReadAllText(string.Format("{0}{1}", this.app_settingsPath,this.configuration_file));
             this.config = JsonConvert.DeserializeObject<Config>(json);
 
-            dbProtector = new DBProtector(this.base_url, this.app_dirpath, this.configuration_file, evnLogger);
+            dbProtector = new DBProtector(this.base_url, this.app_settingsPath, this.configuration_file, evnLogger);
         }
 
         private async void TimerHandler(object sender, EventArgs e)

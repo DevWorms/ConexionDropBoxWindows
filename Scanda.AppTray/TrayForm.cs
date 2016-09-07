@@ -71,9 +71,18 @@ namespace Scanda.AppTray
         }
         private void ConfigurationForm_Close(object sender, EventArgs e)
         {
+            ServiceController sc = null;
+            if (DoesServiceExist("DBProtector Service", "."))
+            {
+                sc = new ServiceController("DBProtector Service");
+            }
             if (int.Parse(config.time) != 0)
             {
-                timerUpload.Stop();
+                // timerUpload.Stop();
+                if (DoesServiceExist("DBProtector Service", "."))
+                {
+                    sc.Stop();
+                }
             }
             // abrimos de nuevo el json
             json = File.ReadAllText(configuration_path);
@@ -92,7 +101,11 @@ namespace Scanda.AppTray
             {
                 syncNowToolStripMenuItem.Enabled = true;
                 descargarToolStripMenuItem.Enabled = true;
-                Start();
+                // Start();
+                if (DoesServiceExist("DBProtector Service", "."))
+                {
+                    sc.Start();
+                }
             }
         }
         private void configuracionToolStripMenuItem_Click(object sender, EventArgs e)
@@ -302,7 +315,7 @@ namespace Scanda.AppTray
                     descargarToolStripMenuItem.Enabled = true;
                 }
             }
-            Start();
+            // Start();
         }
         
         private void Start()

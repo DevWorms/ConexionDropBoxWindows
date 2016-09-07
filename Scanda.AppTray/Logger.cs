@@ -14,7 +14,8 @@ namespace Scanda.AppTray
     {
         public static void writeErrors(string strMensajeError)
         {
-            string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+            // string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+            string appFolder = @"C:\DBProtector";
             string settingsFolder = appFolder;
             string logFile = settingsFolder + "\\log.txt";
             TextWriter twError = new StreamWriter(logFile, true);
@@ -27,7 +28,8 @@ namespace Scanda.AppTray
             try
             {
                 Message = Message.Replace("<", "[").Replace(">", "]");
-                string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+                // string appFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+                string appFolder = @"C:\DBProtector";
                 string settingsFolder = appFolder;
                 string logFile = settingsFolder + "\\Settings\\configuration.json";
                 string json = File.ReadAllText(logFile);

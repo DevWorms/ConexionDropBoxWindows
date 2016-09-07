@@ -12,6 +12,7 @@ using System.Configuration;
 using System.Net.Http.Headers;
 using Scanda.AppTray.Models;
 using System.Reflection;
+using System.ServiceProcess;
 
 namespace Scanda.AppTray
 {
@@ -134,10 +135,23 @@ namespace Scanda.AppTray
             limpirarVariables();
         }
 
+        bool DoesServiceExist(string serviceName, string machineName)
+        {
+            ServiceController[] services = ServiceController.GetServices(machineName);
+            var service = services.FirstOrDefault(s => s.ServiceName == serviceName);
+            return service != null;
+        }
+
         private async void limpirarVariables()
         {
             try
             {
+                ServiceController sc = null;
+                if (DoesServiceExist("DBProtector Service", "."))
+                {
+                    sc = new ServiceController("DBProtector Service");
+                    sc.Stop();
+                }
                 mtxt_user.Text = "";
                 mtxt_totalspace.Text = "";
                 // mtxt_avalaiblespace.Text = "";
