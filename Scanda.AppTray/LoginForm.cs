@@ -96,7 +96,8 @@ namespace Scanda.AppTray
                             if (DoesServiceExist("DBProtector Service", "."))
                             {
                                 sc = new ServiceController("DBProtector Service");
-                                sc.Stop();
+                                if(!(sc.Status == ServiceControllerStatus.Stopped))
+                                    sc.Stop();
                                 sc.Start();
                             }
                         }
