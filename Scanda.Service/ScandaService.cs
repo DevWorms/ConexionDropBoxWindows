@@ -38,6 +38,7 @@ namespace Scanda.Service
         #endregion
         public ScandaService(string[] args)
         {
+            AutoLog = false;
             InitializeComponent();
             // Setup Base API URL
             this.base_url = ConfigurationManager.AppSettings["api_url"];

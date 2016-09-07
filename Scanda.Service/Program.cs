@@ -14,6 +14,7 @@ namespace Scanda.Service
         /// </summary>
         static void Main(string[] args)
         {
+            
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
