@@ -31,6 +31,31 @@ namespace Scanda.AppTray
 
         public ConfiguracionForm(bool isNuevaInstancia, string configPath)
         {
+
+            if (!File.Exists(configPath))
+            {
+                // Si no existe lo creamos
+                // Creamos el archivo de configuracion
+                JObject configSettings = new JObject(
+                    new JProperty("path", ""),
+                    new JProperty("user_path", ""),
+                    new JProperty("hist_path", ""),
+                    new JProperty("time_type", "Horas"),
+                    new JProperty("time", "0"),
+                    new JProperty("id_customer", ""),
+                    new JProperty("user", ""),
+                    new JProperty("password", ""),
+                    new JProperty("token", ""),
+                    new JProperty("type_storage", ""),
+                    new JProperty("file_historical", ""),
+                    new JProperty("cloud_historical", ""),
+                    new JProperty("extensions", "")
+                );
+                // escribimos el archivo
+                File.WriteAllText(configPath, configSettings.ToString());
+
+            }
+
             InitializeComponent();
             // leemos el archivo de configuracion
             json = File.ReadAllText(configPath);
