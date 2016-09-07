@@ -35,12 +35,10 @@
             this.lblAlert = new System.Windows.Forms.Label();
             this.pbx_logo = new System.Windows.Forms.PictureBox();
             this.lblCompany = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.lblMessages = new System.Windows.Forms.Label();
             this.mlbl_info = new MetroFramework.Controls.MetroLabel();
             this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbx_logo)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // btnLogin
@@ -113,17 +111,6 @@
             this.lblCompany.Text = "@ 2016 Scanda";
             this.lblCompany.Visible = false;
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::Scanda.AppTray.Properties.Resources.devworms;
-            this.pictureBox1.Location = new System.Drawing.Point(297, 331);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(81, 31);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 8;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.Visible = false;
-            // 
             // lblMessages
             // 
             this.lblMessages.AutoSize = true;
@@ -156,7 +143,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(24, 13);
             this.label1.TabIndex = 11;
-            this.label1.Text = "v1.3";
+            this.label1.Text = "v1.5";
             // 
             // LoginForm
             // 
@@ -166,7 +153,6 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.mlbl_info);
             this.Controls.Add(this.lblMessages);
-            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.lblCompany);
             this.Controls.Add(this.pbx_logo);
             this.Controls.Add(this.lblAlert);
@@ -181,7 +167,6 @@
             this.Theme = MetroFramework.MetroThemeStyle.Light;
             this.Load += new System.EventHandler(this.LoginForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pbx_logo)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -195,7 +180,6 @@
         private System.Windows.Forms.Label lblAlert;
         private System.Windows.Forms.PictureBox pbx_logo;
         private System.Windows.Forms.Label lblCompany;
-        private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label lblMessages;
         private MetroFramework.Controls.MetroLabel mlbl_info;
         private System.Windows.Forms.Label label1;

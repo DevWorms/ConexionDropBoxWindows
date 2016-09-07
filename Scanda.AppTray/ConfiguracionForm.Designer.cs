@@ -236,7 +236,7 @@
             this.gpbConfRuta.Size = new System.Drawing.Size(384, 107);
             this.gpbConfRuta.TabIndex = 6;
             this.gpbConfRuta.TabStop = false;
-            this.gpbConfRuta.Text = "Configuración de Ruta de respaldos";
+            this.gpbConfRuta.Text = "Configuración de ruta de respaldos";
             // 
             // mtxt_folder
             // 

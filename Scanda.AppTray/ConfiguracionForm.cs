@@ -13,6 +13,7 @@ using System.Net.Http.Headers;
 using Scanda.AppTray.Models;
 using System.Reflection;
 using System.ServiceProcess;
+using Newtonsoft.Json.Linq;
 
 namespace Scanda.AppTray
 {

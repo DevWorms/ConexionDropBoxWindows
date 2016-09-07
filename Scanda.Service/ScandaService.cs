@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace Scanda.Service
 {
@@ -61,9 +62,34 @@ namespace Scanda.Service
             }
             evnLogger.Source = eventSourceName;
             evnLogger.Log = logName;
+            this.configuration_file = "C:\\DBProtector\\Settings\\configuration.json";
+
+            if (!File.Exists(configuration_file))
+            {
+                // Si no existe lo creamos
+                // Creamos el archivo de configuracion
+                JObject configSettings = new JObject(
+                    new JProperty("path", ""),
+                    new JProperty("user_path", ""),
+                    new JProperty("hist_path", ""),
+                    new JProperty("time_type", "Horas"),
+                    new JProperty("time", "0"),
+                    new JProperty("id_customer", ""),
+                    new JProperty("user", ""),
+                    new JProperty("password", ""),
+                    new JProperty("token", ""),
+                    new JProperty("type_storage", ""),
+                    new JProperty("file_historical", ""),
+                    new JProperty("cloud_historical", ""),
+                    new JProperty("extensions", "")
+                );
+                // escribimos el archivo
+                File.WriteAllText(configuration_file, configSettings.ToString());
+                
+            }
 
             // Read configuration file
-            string json = File.ReadAllText(string.Format("{0}{1}", this.app_settingsPath,this.configuration_file));
+            string json = File.ReadAllText(this.configuration_file);
             this.config = JsonConvert.DeserializeObject<Config>(json);
 
             dbProtector = new DBProtector(this.base_url, this.app_settingsPath, this.configuration_file, evnLogger);

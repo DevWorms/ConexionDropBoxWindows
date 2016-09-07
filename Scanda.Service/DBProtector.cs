@@ -59,95 +59,99 @@ namespace Scanda.Service
 
         public async Task StartUpload()
         {
-            #region Validacion de Directorios
-            // Revisamos si existe el directorio de respaldos
-            if (!Directory.Exists(config.path))
+            if (!string.IsNullOrEmpty(config.path))
             {
-                Directory.CreateDirectory(config.path);
-            }
-            // Revisamos si existe el directorio de historicos
-            if (!Directory.Exists(config.hist_path))
-            {
-                Directory.CreateDirectory(config.hist_path);
-            }
-            #endregion
-
-            #region Subida de archivos
-            // Obtenemos listado de archivos del directorio
-            string[] fileEntries = Directory.GetFiles(config.path);
-            foreach (string file in fileEntries)
-            {
-                Status temp2 = new Status(base_url, null, null, config.user, config.password);
-                FileInfo info = new FileInfo(file);
-                var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
-                if (!x)
+                #region Validacion de Directorios
+                // Revisamos si existe el directorio de respaldos
+                if (!Directory.Exists(config.path))
                 {
-                    this.svLogger.WriteEntry(string.Format("Error al sincronizar {0}", info.Name), EventLogEntryType.Error);
-                    await Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
+                    Directory.CreateDirectory(config.path);
                 }
-                else
+                // Revisamos si existe el directorio de historicos
+                if (!Directory.Exists(config.hist_path))
                 {
-                    this.svLogger.WriteEntry(string.Format("Finalizo subida de {0}", info.Name), EventLogEntryType.Information);
-                    this.svLogger.WriteEntry(string.Format("Archivo subido correctamente: {0}", info.Name), EventLogEntryType.SuccessAudit);
-                    await Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
+                    Directory.CreateDirectory(config.hist_path);
                 }
-            }
-            #endregion
-            // Realizamos la limpieza en Cloud
-            await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
+                #endregion
 
-            #region Revisamos los requerimientos del FileTreatment
-            List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-            // verificamos el limite
-            bool canTransfer = false;
-            while (!canTransfer)
-            {
-                if (histFileEntries.Count() < int.Parse(config.file_historical))
+                #region Subida de archivos
+                // Obtenemos listado de archivos del directorio
+
+                string[] fileEntries = Directory.GetFiles(config.path);
+                foreach (string file in fileEntries)
                 {
-                    if (histFileEntries.Count() == 0)
+                    Status temp2 = new Status(base_url, null, null, config.user, config.password);
+                    FileInfo info = new FileInfo(file);
+                    var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
+                    if (!x)
                     {
-                        canTransfer = true;
+                        this.svLogger.WriteEntry(string.Format("Error al sincronizar {0}", info.Name), EventLogEntryType.Error);
+                        await Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
                     }
-                    else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                    else
                     {
-                        canTransfer = true;
+                        this.svLogger.WriteEntry(string.Format("Finalizo subida de {0}", info.Name), EventLogEntryType.Information);
+                        this.svLogger.WriteEntry(string.Format("Archivo subido correctamente: {0}", info.Name), EventLogEntryType.SuccessAudit);
+                        await Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
+                    }
+                }
+                #endregion
+                // Realizamos la limpieza en Cloud
+                await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
+
+                #region Revisamos los requerimientos del FileTreatment
+                List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                // verificamos el limite
+                bool canTransfer = false;
+                while (!canTransfer)
+                {
+                    if (histFileEntries.Count() < int.Parse(config.file_historical))
+                    {
+                        if (histFileEntries.Count() == 0)
+                        {
+                            canTransfer = true;
+                        }
+                        else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                        {
+                            canTransfer = true;
+                        }
+                        else
+                        {
+                            FileInfo item = histFileEntries.FirstOrDefault();
+                            if (item != null)
+                                histFileEntries.Remove(item);
+                        }
                     }
                     else
                     {
                         FileInfo item = histFileEntries.FirstOrDefault();
                         if (item != null)
-                            histFileEntries.Remove(item);
+                            File.Delete(config.hist_path + "\\" + item.Name);
+                        histFileEntries.Remove(item);
                     }
                 }
-                else
-                {
-                    FileInfo item = histFileEntries.FirstOrDefault();
-                    if (item != null)
-                        File.Delete(config.hist_path + "\\" + item.Name);
-                    histFileEntries.Remove(item);
-                }
-            }
-            #endregion
+                #endregion
 
-            #region  Realizamos el movimiento de los archivos que se suben a la carpeta historicos. Comenzamos a mover los archivos 
-            List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-            foreach (FileInfo file in fileEntries2)
-            {
-                if (isValidFileName(file.Name))
+                #region  Realizamos el movimiento de los archivos que se suben a la carpeta historicos. Comenzamos a mover los archivos 
+                List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                foreach (FileInfo file in fileEntries2)
                 {
-                    //cuando el filetreatment es 3 se borra localmente, en el caso 1 o 2 se mueve a una carpeta de respaldos 
-                    if (config.type_storage == "1" || config.type_storage == "2")
+                    if (isValidFileName(file.Name))
                     {
-                        // Se copia a Historicos
-                        File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
+                        //cuando el filetreatment es 3 se borra localmente, en el caso 1 o 2 se mueve a una carpeta de respaldos 
+                        if (config.type_storage == "1" || config.type_storage == "2")
+                        {
+                            // Se copia a Historicos
+                            File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
+                        }
+                        // Se copia a Respaldados
+                        File.Delete(config.path + "\\" + file.Name);
                     }
-                    // Se copia a Respaldados
-                    File.Delete(config.path + "\\" + file.Name);
                 }
-            }
-            #endregion
+                #endregion
 
-            await SyncUpdateAccount();
+                await SyncUpdateAccount();
+            }
         }
 
         private async Task SyncUpdateAccount()
