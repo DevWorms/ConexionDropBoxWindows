@@ -60,7 +60,7 @@ namespace Scanda.Service
         public async Task StartUpload()
         {
             await Logger.sendLog(string.Format("servicio ejecutandose {0}", DateTime.Now), "W");
-            if (config!= null && !string.IsNullOrEmpty(config.path) && string.IsNullOrEmpty(config.id_customer))
+            if (config!= null && !string.IsNullOrEmpty(config.path) && !string.IsNullOrEmpty(config.id_customer))
             {
                 #region Validacion de Directorios
                 // Revisamos si existe el directorio de respaldos
@@ -97,7 +97,9 @@ namespace Scanda.Service
                 // Realizamos la limpieza en Cloud
                 await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
 
-                #region Revisamos los requerimientos del FileTreatment
+         
+
+                #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
                 List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
                 // verificamos el limite
                 bool canTransfer = false;
@@ -128,9 +130,8 @@ namespace Scanda.Service
                         histFileEntries.Remove(item);
                     }
                 }
-                #endregion
 
-                #region  Realizamos el movimiento de los archivos que se suben a la carpeta historicos. Comenzamos a mover los archivos 
+                // Comenzamos a mover los archivos 
                 List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
                 foreach (FileInfo file in fileEntries2)
                 {

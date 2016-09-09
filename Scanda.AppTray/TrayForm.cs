@@ -390,6 +390,7 @@ namespace Scanda.AppTray
                 }
                 // Realizamos la limpieza en Cloud
                 await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
+
                 #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
                 List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
                 // verificamos el limite
@@ -421,6 +422,7 @@ namespace Scanda.AppTray
                             histFileEntries.Remove(item);
                     }
                 }
+
                 // Comenzamos a mover los archivos 
                 List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
                 foreach (FileInfo file in fileEntries2)
