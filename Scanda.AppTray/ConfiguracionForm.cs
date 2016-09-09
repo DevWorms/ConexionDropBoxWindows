@@ -247,7 +247,7 @@ namespace Scanda.AppTray
                     MessageBox.Show("No se ha configurado la ruta de respaldos");
                     await Logger.sendLog("No se ha configurado la ruta de respaldos", "E");
                 }
-                if (config.type_storage == "2")// carpeta externa
+                if (string.IsNullOrEmpty(config.hist_path) && config.type_storage == "2")// carpeta externa
                 {
                     MessageBox.Show("No se ha configurado la ruta de historicos");
                     await Logger.sendLog("No se ha configurado la ruta de historicos", "E");

@@ -76,12 +76,14 @@ namespace Scanda.AppTray
             {
                 sc = new ServiceController("DBProtector Service");
             }
-            if (int.Parse(config.time) != 0)
+
+            if (int.Parse(config.time) == 0)
             {
                 // timerUpload.Stop();
                 if (DoesServiceExist("DBProtector Service", "."))
                 {
-                    sc.Stop();
+                    if(!(sc.Status == ServiceControllerStatus.Stopped))
+                        sc.Stop();
                 }
             }
             // abrimos de nuevo el json
