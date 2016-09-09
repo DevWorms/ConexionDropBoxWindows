@@ -86,6 +86,14 @@ namespace Scanda.AppTray
                         sc.Stop();
                 }
             }
+            else
+            {
+                if (DoesServiceExist("DBProtector Service", "."))
+                {
+                    if ((sc.Status == ServiceControllerStatus.Stopped))
+                        sc.Start();
+                }
+            }
             // abrimos de nuevo el json
             json = File.ReadAllText(configuration_path);
             config = JsonConvert.DeserializeObject<Config>(json);
@@ -106,7 +114,8 @@ namespace Scanda.AppTray
                 // Start();
                 if (DoesServiceExist("DBProtector Service", "."))
                 {
-                    sc.Start();
+                    if ((sc.Status == ServiceControllerStatus.Stopped))
+                        sc.Start();
                 }
             }
         }
