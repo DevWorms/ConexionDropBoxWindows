@@ -1,6 +1,6 @@
-﻿namespace Scanda.Service
+﻿namespace WindowsService1
 {
-    partial class ScandaService
+    partial class servicio
     {
         /// <summary> 
         /// Required designer variable.
@@ -28,12 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            // 
-            // ScandaService
-            // 
-            this.CanShutdown = true;
-            this.ServiceName = "DBProtector Service";
-
+            components = new System.ComponentModel.Container();
+            this.ServiceName = "servicio";
         }
 
         #endregion

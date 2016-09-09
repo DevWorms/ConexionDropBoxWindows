@@ -20,13 +20,13 @@ namespace Scanda.Service
         private string appDir;
         private string config_file;
         private Config config;
-        private EventLog svLogger;
-        public DBProtector(string base_url, string appDir, string config_file = "configuration.json", EventLog svLogger = null)
+        
+        public DBProtector(string base_url, string appDir, string config_file = "configuration.json")
         {
             this.base_url = base_url;
             this.appDir = appDir;
             this.config_file = config_file;
-            this.svLogger = svLogger;
+            
             this.Init();
         }
         /// <summary>
@@ -59,7 +59,8 @@ namespace Scanda.Service
 
         public async Task StartUpload()
         {
-            if (!string.IsNullOrEmpty(config.path))
+            await Logger.sendLog(string.Format("servicio ejecutandose {0}", DateTime.Now), "W");
+            if (config!= null && !string.IsNullOrEmpty(config.path) && string.IsNullOrEmpty(config.id_customer))
             {
                 #region Validacion de Directorios
                 // Revisamos si existe el directorio de respaldos
@@ -85,13 +86,10 @@ namespace Scanda.Service
                     var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
                     if (!x)
                     {
-                        this.svLogger.WriteEntry(string.Format("Error al sincronizar {0}", info.Name), EventLogEntryType.Error);
                         await Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
                     }
                     else
                     {
-                        this.svLogger.WriteEntry(string.Format("Finalizo subida de {0}", info.Name), EventLogEntryType.Information);
-                        this.svLogger.WriteEntry(string.Format("Archivo subido correctamente: {0}", info.Name), EventLogEntryType.SuccessAudit);
                         await Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
                     }
                 }

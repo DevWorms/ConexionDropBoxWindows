@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using System.Timers;
 
 namespace Scanda.Service
 {
@@ -34,100 +35,121 @@ namespace Scanda.Service
         /// <summary>
         /// Application Directory
         /// </summary>
+        /// 
+        private System.Timers.Timer aTimer;
+        /// <summary>
+        /// relog
+        /// </summary>
+        /// 
+
         private string app_settingsPath = @"C:\DBProtector\Settings\";
         #endregion
         public ScandaService(string[] args)
         {
-            AutoLog = false;
             InitializeComponent();
-            // Setup Base API URL
-            this.base_url = ConfigurationManager.AppSettings["api_url"];
-            // When user pass extra args
-            string eventSourceName = "DBProtector Service";
-            string logName = "DBProtector Service";
-            #region Extra params
-            if (args.Count() > 0)
-            {
-                eventSourceName = args[0];
-            }
-            if (args.Count() > 1)
-            {
-                logName = args[1];
-            }
-            #endregion
-            // Logger Setup
-            evnLogger = new EventLog();
-            if (!EventLog.SourceExists(eventSourceName))
-            {
-                EventLog.CreateEventSource(eventSourceName, logName);
-            }
-            evnLogger.Source = eventSourceName;
-            evnLogger.Log = logName;
-            this.configuration_file = "C:\\DBProtector\\Settings\\configuration.json";
 
-            if (!File.Exists(configuration_file))
+            try
             {
-                // Si no existe lo creamos
-                // Creamos el archivo de configuracion
-                JObject configSettings = new JObject(
-                    new JProperty("path", ""),
-                    new JProperty("user_path", ""),
-                    new JProperty("hist_path", ""),
-                    new JProperty("time_type", "Horas"),
-                    new JProperty("time", "0"),
-                    new JProperty("id_customer", ""),
-                    new JProperty("user", ""),
-                    new JProperty("password", ""),
-                    new JProperty("token", ""),
-                    new JProperty("type_storage", ""),
-                    new JProperty("file_historical", ""),
-                    new JProperty("cloud_historical", ""),
-                    new JProperty("extensions", "")
-                );
-                // escribimos el archivo
-                File.WriteAllText(configuration_file, configSettings.ToString());
-                
+                // // Setup Base API URL
+                this.base_url = ConfigurationManager.AppSettings["api_url"];
+                // When user pass extra args
+
+                this.configuration_file = "C:\\DBProtector\\Settings\\configuration.json";
+
+                if (!File.Exists(configuration_file))
+                {
+                    // Si no existe lo creamos
+                    // Creamos el archivo de configuracion
+                    JObject configSettings = new JObject(
+                        new JProperty("path", ""),
+                        new JProperty("user_path", ""),
+                        new JProperty("hist_path", ""),
+                        new JProperty("time_type", "Horas"),
+                        new JProperty("time", "0"),
+                        new JProperty("id_customer", ""),
+                        new JProperty("user", ""),
+                        new JProperty("password", ""),
+                        new JProperty("token", ""),
+                        new JProperty("type_storage", ""),
+                        new JProperty("file_historical", ""),
+                        new JProperty("cloud_historical", ""),
+                        new JProperty("extensions", "")
+                    );
+                    // escribimos el archivo
+                    File.WriteAllText(configuration_file, configSettings.ToString());
+
+                }
+
+                // Read configuration file
+                string json = File.ReadAllText(this.configuration_file);
+                this.config = JsonConvert.DeserializeObject<Config>(json);
+
+                dbProtector = new DBProtector(this.base_url, this.app_settingsPath, this.configuration_file);
             }
+            catch(Exception ex)
+            {
 
-            // Read configuration file
-            string json = File.ReadAllText(this.configuration_file);
-            this.config = JsonConvert.DeserializeObject<Config>(json);
-
-            dbProtector = new DBProtector(this.base_url, this.app_settingsPath, this.configuration_file, evnLogger);
+            }
         }
 
-        private async void TimerHandler(object sender, EventArgs e)
+        private async void TimerHandler(object sender, ElapsedEventArgs e)
         {
             await this.dbProtector.StartUpload();
         }
+        
 
         protected override void OnStart(string[] args)
         {
-            evnLogger.WriteEntry("Configuring onStart", EventLogEntryType.Information);
-            int xTime = int.Parse(config.time);
-            if (xTime != 0)
+
+            if (config != null && !string.IsNullOrEmpty(config.time))
             {
-                int timestamp = xTime * 3600 * 1000; // horas * 60 * 1000
-                timerUpload = new Timer();
-                timerUpload.Tick += this.TimerHandler;
-                timerUpload.Interval = timestamp;
-                timerUpload.Start();
+                try
+                {
+                    int xTime = int.Parse(config.time);
+                    if (xTime != 0)
+                    {
+                        int timestamp = 1000;//xTime * 3600 * 1000; // horas * 60 * 1000
+                                             // Create a timer with a ten second interval.
+                        aTimer = new System.Timers.Timer(timestamp);
+
+                        // Hook up the Elapsed event for the timer.
+                        aTimer.Elapsed += new ElapsedEventHandler(TimerHandler);
+
+                        // Set the Interval to 2 seconds (2000 milliseconds).
+                        aTimer.Interval = timestamp;
+                        aTimer.Enabled = true;
+
+                    }
+                }
+                catch(Exception ex)
+                {
+
+                }
             }
-            MessageBox.Show("Service Start papu");
+           
         }
 
         protected override void OnStop()
         {
-            evnLogger.WriteEntry("Configuring onStop", EventLogEntryType.Information);
-            if (int.Parse(config.time) != 0)
+            if (config != null && !string.IsNullOrEmpty(config.time))
             {
-                timerUpload.Stop();
+                try
+                {
+                    if (int.Parse(config.time) != 0)
+                    {
+                        aTimer.Enabled = false;
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
             }
         }
 
         protected override void OnPause()
         {
-            evnLogger.WriteEntry("Configuring onPause", EventLogEntryType.Information);
+            aTimer.Enabled = false;
         }
     }
 }

@@ -33,7 +33,7 @@
             // 
             // serviceDBProtectorProcessInstaller
             // 
-            this.serviceDBProtectorProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
+            this.serviceDBProtectorProcessInstaller.Account = System.ServiceProcess.ServiceAccount.NetworkService;
             this.serviceDBProtectorProcessInstaller.Password = null;
             this.serviceDBProtectorProcessInstaller.Username = null;
             // 
