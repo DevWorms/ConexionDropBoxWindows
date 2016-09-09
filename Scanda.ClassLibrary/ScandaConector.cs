@@ -240,9 +240,11 @@ namespace Scanda.ClassLibrary
                 return true;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                await Logger.sendLog(string.Format("error de subida: {0}", ex.Message), "E");
                 return false;
+                
 
             }
         }

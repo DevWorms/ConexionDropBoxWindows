@@ -192,7 +192,7 @@ namespace Scanda.AppTray
                             if (!res)
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
-                                await Logger.sendLog(string.Format("Error al sincronizar {0}", file[2]), "T");
+                                await Logger.sendLog(string.Format("Error al sincronizar {0}", file[2]), "E");
                             }
                             else
                             {
