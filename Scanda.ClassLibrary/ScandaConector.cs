@@ -261,7 +261,9 @@ namespace Scanda.ClassLibrary
                 
                 status.download.path = destino + "/" + fileN;
                 await status.downloadStatusFile(status.download);
-                string zip = await downloadZipFile(pathRemoto, destino);
+                //Bajo el zip a la carpeta del programa
+                string zip = await downloadZipFile(pathRemoto, "C:\\DBProtector");
+                ////string zip = await downloadZipFile(pathRemoto, destino);
                 //extraemos el archivo
                 string archivo = decifrar(zip, usrId);
                 //delete zip
@@ -511,7 +513,8 @@ namespace Scanda.ClassLibrary
                 zip.UseZip64WhenSaving = Zip64Option.Always;
                 zip.AddFile(origen, ".");
                 zip.Name = info.Name + ".zip";
-                zip.Save();
+                //zip.Save();
+                zip.Save("C:\\DBProtector");
 
             }
 
