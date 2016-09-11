@@ -198,6 +198,7 @@ namespace Scanda.ClassLibrary
         {
             status.upload.file = archivo;
             status.upload.status = 1;
+            string ruta = string.Empty;
             try
             {
                 FileInfo info = new FileInfo(archivo);
@@ -232,17 +233,29 @@ namespace Scanda.ClassLibrary
                     month = "" + date.Month;
 
                 //Zipeamos l archivo
-                string zip = cifrar(archivo, usrId);
-                string ruta = usrId + "/" + year + "/" + month;
-                status.upload.status = 1;
-                var res = await uploadZipFile(zip, ruta, status);
-
-                return true;
+                await Logger.sendLog(string.Format("cifrando, por favor espere...: {0} - {1} ", archivo, string.IsNullOrEmpty(usrId) ? "no hay id usuario":usrId), "T");
+                string zip = await cifrar(archivo, usrId);
+                if (zip != "bloqueado")
+                {
+                    await Logger.sendLog(string.Format("zip...: {0}", zip), "T");
+                    ruta = usrId + "/" + year + "/" + month;
+                    status.upload.status = 1;
+                    await Logger.sendLog(string.Format("subiendo...: {0} ", ruta), "T");
+                    var res = await uploadZipFile(zip, ruta, status);
+                    await Logger.sendLog(string.Format("subido : {0} ", ruta), "T");
+                    return true;
+                }
+                else
+                {
+                    await Logger.sendLog(string.Format("El archivo {0} esta siendo usado por otro proceso", name), "E");
+                    return false;
+                }
+                
 
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("error de subida: {0}", ex.Message), "E");
+                await Logger.sendLog(string.Format("error de subida: {0} - ruta: {1}", ex.Message, ruta), "E");
                 return false;
                 
 
@@ -355,24 +368,33 @@ namespace Scanda.ClassLibrary
                 FileInfo info = new FileInfo(origen);
 
                 status.upload.total = ((info.Length * 1)) + ""; //Lo convierte a MB y a string
-
+                await Logger.sendLog(string.Format("subiendo un total de {0}", status.upload.total), "T");
                 string extension = info.Extension;
                 float size = info.Length / (B_TO_MB * 1.0f);
                 long nChunks = info.Length / CHUNK_SIZE;
                 FileStream stream = new FileStream(origen, FileMode.Open);
                 string nombre = info.Name;
 
+
+                await Logger.sendLog(string.Format("numero chunks {0}", nChunks), "T");
+
                 if (nChunks == 0)
                 {
+
+
+                    await Logger.sendLog(string.Format("subidas {0} ", "/" + folder + "/" + nombre), "T");
                     var subidaS = await client.Files.UploadAsync("/" + folder + "/" + nombre, OVERWRITE, false, body: stream);
                     //subidaS.Wait();
                     //Console.WriteLine(subidaS.Result.AsFile.Size);
                     //stream.Close();
                     status.upload.chunk = (CHUNK_SIZE) + "";
+
                     await status.uploadStatusFile(status.upload);
                 }
                 else
                 {
+                    await Logger.sendLog(string.Format("chunk size {0} ", CHUNK_SIZE), "T");
+
                     byte[] buffer = new byte[CHUNK_SIZE];
                     string sessionId = null;
 
@@ -430,19 +452,19 @@ namespace Scanda.ClassLibrary
             }
             catch (FileNotFoundException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
                 Console.WriteLine("No existe el archivo");
                 return false;
             }
             catch (AggregateException ex) //Excepciones al vuelo
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
                 Console.WriteLine("Tarea Cancelada");
                 return false;
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
                 Console.WriteLine(ex);
                 return false;
             }
@@ -502,23 +524,67 @@ namespace Scanda.ClassLibrary
 
             return tam / B_TO_MB;
         }
-        private static string cifrar(string origen, string usrId)
+
+        protected static bool IsFileLocked(FileInfo file)
         {
-            FileInfo info = new FileInfo(origen);
-            using (ZipFile zip = new ZipFile())
+            FileStream stream = null;
+
+            try
             {
-                //Crifrar Password
-                zip.Password = SHA256string(usrId);
-
-                zip.UseZip64WhenSaving = Zip64Option.Always;
-                zip.AddFile(origen, ".");
-                zip.Name = info.Name + ".zip";
-                //zip.Save();
-                zip.Save("C:\\DBProtector");
-
+                stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None);
+            }
+            catch (IOException)
+            {
+                //the file is unavailable because it is:
+                //still being written to
+                //or being processed by another thread
+                //or does not exist (has already been processed)
+                return true;
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Close();
             }
 
-            return info.Name + ".zip";
+            //file is not locked
+            return false;
+        }
+
+        private static async Task<string> cifrar(string origen, string usrId)
+        {
+            try
+            {
+                FileInfo info = new FileInfo(origen);
+                if (!IsFileLocked(info))
+                {
+
+
+                    using (ZipFile zip = new ZipFile())
+                    {
+                        //Crifrar Password
+                        zip.Password = SHA256string(usrId);
+
+                        zip.UseZip64WhenSaving = Zip64Option.Always;
+                        zip.AddFile(origen, ".");
+                        zip.Name = info.Name + ".zip";
+                        //zip.Save();
+                        zip.Save("C:\\DBProtector\\" + zip.Name);
+                        
+
+                    }
+
+                    return "C:\\DBProtector\\" + info.Name + ".zip";
+                }
+                else
+                    return "bloqueado";
+            }
+            catch (Exception ex)
+            {
+
+                return ex.Message;
+            }
+
         }
         private static string decifrar(string origen, string usrId)
         {

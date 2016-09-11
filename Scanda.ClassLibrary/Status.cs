@@ -31,6 +31,7 @@ namespace Scanda.ClassLibrary
 
         public async Task uploadStatusFile(Upload upload)
         {
+            await Logger.sendLog(string.Format("Sincronizando {0} de {1}", upload.chunk, upload.total), "T");
             this.menuItem.Text = string.Format("Sincronizando {0} de {1}", upload.chunk, upload.total);
             // notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
             string unixTimestamp = DateTime.Now.ToString("yyyyMMddHHmmss");//(int)(DateTime.UtcNow.Subtract(DateTime.Now)).TotalSeconds;
