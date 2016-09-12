@@ -69,44 +69,34 @@ namespace Scanda.AppTray
             //MessageBox.Show(exeFolder);
             this.Close();
         }
+
+        public static void RestartService(string serviceName, int timeoutMilliseconds)
+        {
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                int millisec1 = Environment.TickCount;
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+
+                // count the rest of the timeout
+                int millisec2 = Environment.TickCount;
+                timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds - (millisec2 - millisec1));
+
+                service.Start();
+                service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+            }
+            catch
+            {
+                // ...
+            }
+        }
+
         private void ConfigurationForm_Close(object sender, EventArgs e)
         {
-            ServiceController sc = null;
-            if (DoesServiceExist("DBProtector Service", "."))
-            {
-                sc = new ServiceController("DBProtector Service");
-            }
-
-            if (int.Parse(config.time) == 0)
-            {
-                try
-                {
-                    if (DoesServiceExist("DBProtector Service", "."))
-                    {
-                        if (!(sc.Status == ServiceControllerStatus.Stopped))
-                            sc.Stop();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            else
-            {
-                try
-                {
-                    if (DoesServiceExist("DBProtector Service", "."))
-                    {
-                        if ((sc.Status == ServiceControllerStatus.Stopped))
-                            sc.Start();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
+       
             // abrimos de nuevo el json
             json = File.ReadAllText(configuration_path);
             config = JsonConvert.DeserializeObject<Config>(json);
@@ -114,43 +104,21 @@ namespace Scanda.AppTray
             {
                 syncNowToolStripMenuItem.Enabled = false;
                 descargarToolStripMenuItem.Enabled = false;
-
-                try
-                {
-                    if (DoesServiceExist("DBProtector Service", "."))
-                    {
-                        if (!(sc.Status == ServiceControllerStatus.Stopped))
-                            sc.Stop();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
                 
+                StopService("DBProtector Service", 60*1000);
+            
             }
             else if (string.IsNullOrEmpty(config.path))
             {
                 syncNowToolStripMenuItem.Enabled = false;
                 descargarToolStripMenuItem.Enabled = true;
+                StopService("DBProtector Service", 60 * 1000);
             }
             else
             {
                 syncNowToolStripMenuItem.Enabled = true;
                 descargarToolStripMenuItem.Enabled = true;
-                // Start();
-                try
-                {
-                    if (DoesServiceExist("DBProtector Service", "."))
-                    {
-                        if ((sc.Status == ServiceControllerStatus.Stopped))
-                            sc.Start();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
+                StartService("DBProtector Service", 60 * 1000);
             }
         }
         private void configuracionToolStripMenuItem_Click(object sender, EventArgs e)
@@ -308,7 +276,7 @@ namespace Scanda.AppTray
             // ServiceBase service = new ServiceBase();
             // Scanda.Service.ScandaService.Run(service);
             
-            if (DoesServiceExist("DBProtector Services", ".")) // le coloque una S de mas XD
+            /*if (DoesServiceExist("DBProtector Services", ".")) // le coloque una S de mas XD
             {
                 ServiceController sc = new ServiceController("DBProtector Service"); //con esto controlamos el servicio :o
                 
@@ -340,7 +308,7 @@ namespace Scanda.AppTray
                         break;
                 }
             }else
-            {
+            {*/
 
                 servicioToolStripMenuItem.Visible = false;
                 exitToolStripMenuItem.Visible = false;
@@ -359,7 +327,7 @@ namespace Scanda.AppTray
                     syncNowToolStripMenuItem.Enabled = true;
                     descargarToolStripMenuItem.Enabled = true;
                 }
-            }
+            //}
             // Start();
         }
         
@@ -516,11 +484,54 @@ namespace Scanda.AppTray
             }
         }
 
-        bool DoesServiceExist(string serviceName, string machineName)
+/*
+         bool DoesServiceExist(string serviceName, string machineName)
+         {
+            bool existe = false;
+            try
+            {
+                ServiceController[] services = ServiceController.GetServices(machineName);
+                var service = services.FirstOrDefault(s => s.ServiceName == serviceName);
+                existe = service != null;
+            }
+            catch { }
+
+            return existe;
+             
+         }
+         */
+        public void StartService(string serviceName, int timeoutMilliseconds)
         {
-            ServiceController[] services = ServiceController.GetServices(machineName);
-            var service = services.FirstOrDefault(s => s.ServiceName == serviceName);
-            return service != null;
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                service.Start();
+                service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+            }
+            catch
+            {
+                // ...
+            }
+        }
+
+
+
+        public static void StopService(string serviceName, int timeoutMilliseconds)
+        {
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+            }
+            catch
+            {
+                // ...
+            }
         }
 
         private void startToolStripMenuItem_Click(object sender, EventArgs e)
