@@ -549,8 +549,10 @@ namespace Scanda.AppTray
                 // Obtenemos listado de archivos del directorio
                 if (!string.IsNullOrEmpty(config.path))
                 {
-                    string[] fileEntries = Directory.GetFiles(config.path);
-                    if (fileEntries != null && fileEntries.Length>0)
+                    //string[] fileEntries = Directory.GetFiles(config.path);
+                    List<string> fileEntries = Directory.GetFiles(config.path).Where(ent => isValidFileName(ent)).ToList();
+                    //if (fileEntries != null && fileEntries.Length>0)
+                    if (fileEntries != null && fileEntries.Count > 0)
                     {
                         notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
                         foreach (string file in fileEntries)
@@ -597,7 +599,8 @@ namespace Scanda.AppTray
                                 {
                                     canTransfer = true;
                                 }
-                                else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                                else if (fileEntries.Count <= histFileEntries.Count() || fileEntries.Count < int.Parse(config.file_historical))
+                                //else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
                                 {
                                     canTransfer = true;
                                 }
@@ -618,7 +621,7 @@ namespace Scanda.AppTray
                             }
                         }
                         // Comenzamos a mover los archivos 
-                        List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                        List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name)).OrderBy(f => f.LastWriteTime).ToList();
                         foreach (FileInfo file in fileEntries2)
                         {
                             if (isValidFileName(file.Name))

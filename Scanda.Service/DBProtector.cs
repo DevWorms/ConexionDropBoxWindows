@@ -82,7 +82,8 @@ namespace Scanda.Service
                 if (!string.IsNullOrEmpty(config.path))
                 {
 
-                    string[] fileEntries = Directory.GetFiles(config.path);
+                    //string[] fileEntries = Directory.GetFiles(config.path);
+                    List<string> fileEntries = Directory.GetFiles(config.path).Where(ent => isValidFileName(ent)).ToList();
                     foreach (string file in fileEntries)
                     {
                         Status temp2 = new Status(base_url, null, null, config.user, config.password);
@@ -117,7 +118,7 @@ namespace Scanda.Service
                             //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
 
                             // Comenzamos a mover los archivos 
-                            List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                            List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name)).OrderBy(f => f.LastWriteTime).ToList();
                             foreach (FileInfo file in fileEntries2)
                             {
                                 if (isValidFileName(file.Name))
@@ -144,7 +145,8 @@ namespace Scanda.Service
                                     {
                                         canTransfer = true;
                                     }
-                                    else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                                    //else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                                    else if (fileEntries.Count <= histFileEntries.Count() || fileEntries.Count < int.Parse(config.file_historical))
                                     {
                                         canTransfer = true;
                                     }
