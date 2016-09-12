@@ -238,6 +238,8 @@ namespace Scanda.AppTray
                 status.upload.status = 1;
                 var res = await uploadZipFile(zip, ruta, status);
 
+                File.Delete(zip);
+
                 return true;
 
             }

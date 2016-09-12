@@ -239,6 +239,9 @@ namespace Scanda.ClassLibrary
                     ruta = usrId + "/" + year + "/" + month;
                     status.upload.status = 1;
                     var res = await uploadZipFile(zip, ruta, status);
+
+                    File.Delete(zip);
+
                     return true;
                 }
                 else

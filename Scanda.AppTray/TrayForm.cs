@@ -455,9 +455,6 @@ namespace Scanda.AppTray
                 {
                 // Comenzamos a mover los archivos 
                 List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-
-                
-
                 foreach (FileInfo file in fileEntries2)
                 {
                     if (isValidFileName(file.Name) )
