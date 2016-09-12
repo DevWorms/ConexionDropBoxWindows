@@ -233,16 +233,12 @@ namespace Scanda.ClassLibrary
                     month = "" + date.Month;
 
                 //Zipeamos l archivo
-                await Logger.sendLog(string.Format("cifrando, por favor espere...: {0} - {1} ", archivo, string.IsNullOrEmpty(usrId) ? "no hay id usuario":usrId), "T");
                 string zip = await cifrar(archivo, usrId);
                 if (zip != "bloqueado")
                 {
-                    await Logger.sendLog(string.Format("zip...: {0}", zip), "T");
                     ruta = usrId + "/" + year + "/" + month;
                     status.upload.status = 1;
-                    await Logger.sendLog(string.Format("subiendo...: {0} ", ruta), "T");
                     var res = await uploadZipFile(zip, ruta, status);
-                    await Logger.sendLog(string.Format("subido : {0} ", ruta), "T");
                     return true;
                 }
                 else

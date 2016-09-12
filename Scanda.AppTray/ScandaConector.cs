@@ -241,8 +241,9 @@ namespace Scanda.AppTray
                 return true;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                await Logger.sendLog(string.Format("{0}|Error al sincronizar {1}|{2}",ex.Source, ex.Message, ex.StackTrace), "T");
                 return false;
 
             }
@@ -512,11 +513,11 @@ namespace Scanda.AppTray
                 zip.UseZip64WhenSaving = Zip64Option.Always;
                 zip.AddFile(origen, ".");
                 zip.Name = info.Name + ".zip";
-                zip.Save("C:\\DBProtector");
+                zip.Save("C:\\DBProtector\\"+ info.Name + ".zip");
 
             }
 
-            return info.Name + ".zip";
+            return "C:\\DBProtector\\" + info.Name + ".zip";
         }
         private static string decifrar(string origen, string usrId)
         {

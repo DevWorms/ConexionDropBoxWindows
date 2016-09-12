@@ -107,16 +107,10 @@ namespace Scanda.Service
                     {
                         // Realizamos la limpieza en Cloud
                         await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
-                        
+
                         #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
                         if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
                         {
-                            List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                            // verificamos el limite
-
-                            //Borramos en la nube
-                            //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
-
                             // Comenzamos a mover los archivos 
                             List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name)).OrderBy(f => f.LastWriteTime).ToList();
                             foreach (FileInfo file in fileEntries2)
@@ -133,29 +127,33 @@ namespace Scanda.Service
                                 }
                             }
 
+                            List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                            // verificamos el limite
+
+                            //Borramos en la nube
+                            //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
                             //Borramos local
-
-
                             bool canTransfer = false;
                             while (!canTransfer)
                             {
-                                if (histFileEntries.Count() < int.Parse(config.file_historical))
+                                if (histFileEntries.Count() <= int.Parse(config.file_historical))
                                 {
-                                    if (histFileEntries.Count() == 0)
-                                    {
-                                        canTransfer = true;
-                                    }
-                                    //else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
-                                    else if (fileEntries.Count <= histFileEntries.Count() || fileEntries.Count < int.Parse(config.file_historical))
-                                    {
-                                        canTransfer = true;
-                                    }
-                                    else
-                                    {
-                                        FileInfo item = histFileEntries.FirstOrDefault();
-                                        if (item != null)
-                                            histFileEntries.Remove(item);
-                                    }
+                                    /* if (histFileEntries.Count() == 0)
+                                     {
+                                         canTransfer = true;
+                                     }
+                                     else if (fileEntries.Count <= histFileEntries.Count() || fileEntries.Count < int.Parse(config.file_historical))
+                                     //else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                                     {
+                                         canTransfer = true;
+                                     }
+                                     else
+                                     {
+                                         FileInfo item = histFileEntries.FirstOrDefault();
+                                         if (item != null)
+                                             histFileEntries.Remove(item);
+                                     }*/
+                                    canTransfer = true;
                                 }
                                 else
                                 {
@@ -182,6 +180,7 @@ namespace Scanda.Service
                             }
                         }
                         #endregion
+
                     }
                     await SyncUpdateAccount();
                 }

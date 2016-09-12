@@ -380,7 +380,7 @@ namespace Scanda.AppTray
                     if (!x)
                     {
                         notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
-                        await Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
+                        await Logger.sendLog(string.Format("!Error al sincronizar {0}!", info.Name), "E");
                     }
                     else
                     {
@@ -392,51 +392,74 @@ namespace Scanda.AppTray
                 await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
 
                 #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
-                List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                // verificamos el limite
-                bool canTransfer = false;
-                while (!canTransfer)
+                if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
                 {
-                    if (histFileEntries.Count() < int.Parse(config.file_historical))
+                    // Comenzamos a mover los archivos 
+                    List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name)).OrderBy(f => f.LastWriteTime).ToList();
+                    foreach (FileInfo file in fileEntries2)
                     {
-                        if (histFileEntries.Count() == 0)
+                        if (isValidFileName(file.Name))
                         {
-                            canTransfer = true;
+                            //cuando vale 1 y 2 se mueve a una carpeta el respaldo, cuanfdo vale 3 se borra localmente
+                            if (config.type_storage == "1" || config.type_storage == "2")
+                            {
+                                // Se copia a Historicos
+                                File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
+                            }
+                            File.Delete(config.path + "\\" + file.Name);
                         }
-                        else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                    }
+
+                    List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                    // verificamos el limite
+
+                    //Borramos en la nube
+                    //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
+                    //Borramos local
+                    bool canTransfer = false;
+                    while (!canTransfer)
+                    {
+                        if (histFileEntries.Count() <= int.Parse(config.file_historical))
                         {
+                            /* if (histFileEntries.Count() == 0)
+                             {
+                                 canTransfer = true;
+                             }
+                             else if (fileEntries.Count <= histFileEntries.Count() || fileEntries.Count < int.Parse(config.file_historical))
+                             //else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                             {
+                                 canTransfer = true;
+                             }
+                             else
+                             {
+                                 FileInfo item = histFileEntries.FirstOrDefault();
+                                 if (item != null)
+                                     histFileEntries.Remove(item);
+                             }*/
                             canTransfer = true;
                         }
                         else
                         {
                             FileInfo item = histFileEntries.FirstOrDefault();
                             if (item != null)
-                                histFileEntries.Remove(item);
-                        }
-                    }
-                    else
-                    {
-                        FileInfo item = histFileEntries.FirstOrDefault();
-                        if (item != null)
-                            File.Delete(config.hist_path + "\\" + item.Name);
+                                File.Delete(config.hist_path + "\\" + item.Name);
                             histFileEntries.Remove(item);
-                    }
-                }
 
-                // Comenzamos a mover los archivos 
-                List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                foreach (FileInfo file in fileEntries2)
-                {
-                    if (isValidFileName(file.Name))
-                    {
-                        //cuando el filetreatment es 3 se borra localmente, en el caso 1 o 2 se mueve a una carpeta de respaldos 
-                        if (config.type_storage == "1" || config.type_storage == "2")
-                        {
-                            // Se copia a Historicos
-                            File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
                         }
-                        // Se copia a Respaldados
-                        File.Delete(config.path + "\\" + file.Name);
+                    }
+
+                }
+                else if (config.type_storage == "3")
+                {
+                    // Comenzamos a mover los archivos 
+                    List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                    foreach (FileInfo file in fileEntries2)
+                    {
+                        if (isValidFileName(file.Name))
+                        {
+                            // Se borra el archivo localmente porque la configurcion es 3
+                            File.Delete(config.path + "\\" + file.Name);
+                        }
                     }
                 }
                 #endregion
@@ -584,42 +607,6 @@ namespace Scanda.AppTray
                     #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
                     if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
                     {
-                        List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                        // verificamos el limite
-
-                        //Borramos en la nube
-                        //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
-                        //Borramos local
-                        bool canTransfer = false;
-                        while (!canTransfer)
-                        {
-                            if (histFileEntries.Count() < int.Parse(config.file_historical))
-                            {
-                                if (histFileEntries.Count() == 0)
-                                {
-                                    canTransfer = true;
-                                }
-                                else if (fileEntries.Count <= histFileEntries.Count() || fileEntries.Count < int.Parse(config.file_historical))
-                                //else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
-                                {
-                                    canTransfer = true;
-                                }
-                                else
-                                {
-                                    FileInfo item = histFileEntries.FirstOrDefault();
-                                    if (item != null)
-                                        histFileEntries.Remove(item);
-                                }
-                            }
-                            else
-                            {
-                                FileInfo item = histFileEntries.FirstOrDefault();
-                                if (item != null)
-                                    File.Delete(config.hist_path + "\\" + item.Name);
-                                histFileEntries.Remove(item);
-
-                            }
-                        }
                         // Comenzamos a mover los archivos 
                         List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name)).OrderBy(f => f.LastWriteTime).ToList();
                         foreach (FileInfo file in fileEntries2)
@@ -635,6 +622,45 @@ namespace Scanda.AppTray
                                 File.Delete(config.path + "\\" + file.Name);
                             }
                         }
+
+                        List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                        // verificamos el limite
+
+                        //Borramos en la nube
+                        //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
+                        //Borramos local
+                        bool canTransfer = false;
+                        while (!canTransfer)
+                        {
+                            if (histFileEntries.Count() <= int.Parse(config.file_historical))
+                            {
+                                /* if (histFileEntries.Count() == 0)
+                                 {
+                                     canTransfer = true;
+                                 }
+                                 else if (fileEntries.Count <= histFileEntries.Count() || fileEntries.Count < int.Parse(config.file_historical))
+                                 //else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                                 {
+                                     canTransfer = true;
+                                 }
+                                 else
+                                 {
+                                     FileInfo item = histFileEntries.FirstOrDefault();
+                                     if (item != null)
+                                         histFileEntries.Remove(item);
+                                 }*/
+                                canTransfer = true;
+                            }
+                            else
+                            {
+                                FileInfo item = histFileEntries.FirstOrDefault();
+                                if (item != null)
+                                    File.Delete(config.hist_path + "\\" + item.Name);
+                                histFileEntries.Remove(item);
+
+                            }
+                        }
+                       
                     }
                     else if (config.type_storage == "3")
                     {
