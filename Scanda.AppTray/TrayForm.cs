@@ -616,17 +616,18 @@ namespace Scanda.AppTray
                 json = File.ReadAllText(configuration_path);
                 config = JsonConvert.DeserializeObject<Config>(json);
                 string base_url = string.Empty;
-                if (!string.IsNullOrEmpty(config.path)) {
+                if (!string.IsNullOrEmpty(config.path))
+                {
                     base_url = ConfigurationManager.AppSettings["api_url"];
                     syncNowToolStripMenuItem.Enabled = false;
                     configuracionToolStripMenuItem.Enabled = false;
                     descargarToolStripMenuItem.Enabled = false;
                     syncNowToolStripMenuItem.Text = "Sincronizando...";
                 }
-                
+
                 #region Validacion de Directorios
                 // Revisamos si existe el directorio de respaldos
-                if (!string.IsNullOrEmpty(config.path)&&!Directory.Exists(config.path))
+                if (!string.IsNullOrEmpty(config.path) && !Directory.Exists(config.path))
                 {
                     Directory.CreateDirectory(config.path);
                 }
@@ -641,7 +642,7 @@ namespace Scanda.AppTray
                 if (!string.IsNullOrEmpty(config.path))
                 {
                     //string[] fileEntries = Directory.GetFiles(config.path);
-                    List<string> fileEntries = Directory.GetFiles(config.path).Where(ent => isValidFileName(ent) && isValidExt(ent , config.extensions)).ToList();
+                    List<string> fileEntries = Directory.GetFiles(config.path).Where(ent => isValidFileName(ent) && isValidExt(ent, config.extensions)).ToList();
                     //if (fileEntries != null && fileEntries.Length>0)
                     if (fileEntries != null && fileEntries.Count > 0)
                     {
@@ -658,6 +659,7 @@ namespace Scanda.AppTray
                             }
                             else
                             {
+
                                 notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
                                 await Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
                             }
@@ -668,8 +670,8 @@ namespace Scanda.AppTray
                         notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "No hay respaldos pendientes por sincronizar", ToolTipIcon.Warning);
 
                     }
-                
-                
+
+
                     // Realizamos la limpieza en Cloud
                     await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
                     #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
@@ -685,6 +687,8 @@ namespace Scanda.AppTray
                                 if (config.type_storage == "1" || config.type_storage == "2")
                                 {
                                     // Se copia a Historicos
+                                    if (File.Exists(config.hist_path + "\\" + file.Name))
+                                        File.Delete(config.hist_path + "\\" + file.Name);
                                     File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
                                 }
                                 File.Delete(config.path + "\\" + file.Name);
@@ -702,21 +706,7 @@ namespace Scanda.AppTray
                         {
                             if (histFileEntries.Count() <= int.Parse(config.file_historical))
                             {
-                                /* if (histFileEntries.Count() == 0)
-                                {
-                                    canTransfer = true;
-                                }
-                                else if (fileEntries.Count <= histFileEntries.Count() || fileEntries.Count < int.Parse(config.file_historical))
-                                //else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
-                                {
-                                    canTransfer = true;
-                                }
-                                else
-                                {
-                                    FileInfo item = histFileEntries.FirstOrDefault();
-                                    if (item != null)
-                                        histFileEntries.Remove(item);
-                                 }*/
+                               
                                 canTransfer = true;
                             }
                             else
@@ -728,7 +718,7 @@ namespace Scanda.AppTray
 
                             }
                         }
-                       
+
                     }
                     else if (config.type_storage == "3")
                     {
@@ -747,12 +737,26 @@ namespace Scanda.AppTray
                     await sync_updateAccount();
                 }
 
+
+                //Se borran los archivos zip de la carpeta dbprotector
+
+                List<string> eliminables = Directory.GetFiles("C:\\DBProtector\\").Where(ent => { return ent.EndsWith(".zip"); }).ToList();
+
+                if (eliminables != null)
+                {
+                    foreach (string file in eliminables)
+                    {
+
+                        File.Delete(file); //Se borra el zip creado
+                    }
+                }
                 // Termino de hacer todos los respaldos
                 syncNowToolStripMenuItem.Text = "Sincronizar ahora";
                 syncNowToolStripMenuItem.Enabled = true;
                 configuracionToolStripMenuItem.Enabled = true;
                 descargarToolStripMenuItem.Enabled = true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 // Termino de hacer todos los respaldos
                 syncNowToolStripMenuItem.Text = "Sincronizar ahora";
@@ -766,6 +770,7 @@ namespace Scanda.AppTray
                     + "\n" + ex.StackTrace
                     + "\n", "E");*/
             }
+           
 
         }
         private async Task sync_updateAccount()

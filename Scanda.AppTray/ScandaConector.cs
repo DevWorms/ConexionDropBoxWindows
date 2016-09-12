@@ -238,14 +238,13 @@ namespace Scanda.AppTray
                 status.upload.status = 1;
                 var res = await uploadZipFile(zip, ruta, status);
 
-                File.Delete(zip);
-
+               
                 return true;
 
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0}|Error al sincronizar {1}|{2}",ex.Source, ex.Message, ex.StackTrace), "T");
+                await Logger.sendLog(string.Format("{0}|Error al sincronizar {1}|{2}",ex.Source, ex.Message, ex.StackTrace), "E");
                 return false;
 
             }
@@ -350,8 +349,10 @@ namespace Scanda.AppTray
         }
         private static async Task<bool> uploadZipFile(string origen, string folder, Status status)
         {
+            FileStream stream = null;
             try
             {
+                
                 clientConf = new DropboxClientConfig("ScandaV1");
                 client = new DropboxClient(APITOKEN);
                 FileInfo info = new FileInfo(origen);
@@ -361,62 +362,64 @@ namespace Scanda.AppTray
                 string extension = info.Extension;
                 float size = info.Length / (B_TO_MB * 1.0f);
                 long nChunks = info.Length / CHUNK_SIZE;
-                FileStream stream = new FileStream(origen, FileMode.Open);
-                string nombre = info.Name;
-
-                if (nChunks == 0)
+                stream = new FileStream(origen, FileMode.Open);
                 {
-                    var subidaS = await client.Files.UploadAsync("/" + folder + "/" + nombre, OVERWRITE, false, body: stream);
-                    //subidaS.Wait();
-                    //Console.WriteLine(subidaS.Result.AsFile.Size);
-                    //stream.Close();
-                    status.upload.chunk = (CHUNK_SIZE) + "";
-                    await status.uploadStatusFile(status.upload);
-                }
-                else
-                {
-                    byte[] buffer = new byte[CHUNK_SIZE];
-                    string sessionId = null;
+                    string nombre = info.Name;
 
-                    
-                    for (var idx = 0; idx <= nChunks; idx++)
+                    if (nChunks == 0)
                     {
-                        status.upload.status = 2;
-                        var byteRead = stream.Read(buffer, 0, CHUNK_SIZE);
+                        var subidaS = await client.Files.UploadAsync("/" + folder + "/" + nombre, OVERWRITE, false, body: stream);
+                        //subidaS.Wait();
+                        //Console.WriteLine(subidaS.Result.AsFile.Size);
+                        //stream.Close();
+                        status.upload.chunk = (CHUNK_SIZE) + "";
+                        await status.uploadStatusFile(status.upload);
+                    }
+                    else
+                    {
+                        byte[] buffer = new byte[CHUNK_SIZE];
+                        string sessionId = null;
 
-                        status.upload.chunk = ( idx * CHUNK_SIZE)+ "";
-                        //status.upload.chunk = idx.ToString();
-                        //status.upload.total = nChunks.ToString();
-                        using (var memSream = new MemoryStream(buffer, 0, byteRead))
+
+                        for (var idx = 0; idx <= nChunks; idx++)
                         {
-                            if (idx == 0)
+                            status.upload.status = 2;
+                            var byteRead = stream.Read(buffer, 0, CHUNK_SIZE);
+
+                            status.upload.chunk = (idx * CHUNK_SIZE) + "";
+                            //status.upload.chunk = idx.ToString();
+                            //status.upload.total = nChunks.ToString();
+                            using (var memSream = new MemoryStream(buffer, 0, byteRead))
                             {
-                                //var result = client.Files.UploadSessionStartAsync(body: memSream);
-                                //result.Wait();
-                                var result = await client.Files.UploadSessionStartAsync(body: memSream);
-                                sessionId = result.SessionId;
-                            }
-                            else
-                            {
-                                var cursor = new UploadSessionCursor(sessionId, (ulong)(CHUNK_SIZE * idx));
-                                await status.uploadStatusFile(status.upload);
-                                if (idx == nChunks)
+                                if (idx == 0)
                                 {
-                                    //var x = client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
-                                    //x.Wait();
-                                    var x = await client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
-                                    status.upload.status = 3;
-                                    await status.uploadStatusFile(status.upload);
+                                    //var result = client.Files.UploadSessionStartAsync(body: memSream);
+                                    //result.Wait();
+                                    var result = await client.Files.UploadSessionStartAsync(body: memSream);
+                                    sessionId = result.SessionId;
                                 }
                                 else
                                 {
-                                    //var x =  client.Files.UploadSessionAppendAsync(cursor, memSream);
-                                    //x.Wait();
-                                    //var x = await client.Files.UploadSessionAppendAsync(cursor, memSream);
-                                    await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
+                                    var cursor = new UploadSessionCursor(sessionId, (ulong)(CHUNK_SIZE * idx));
                                     await status.uploadStatusFile(status.upload);
-                                    // x.Wait();
-                                    //await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
+                                    if (idx == nChunks)
+                                    {
+                                        //var x = client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
+                                        //x.Wait();
+                                        var x = await client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
+                                        status.upload.status = 3;
+                                        await status.uploadStatusFile(status.upload);
+                                    }
+                                    else
+                                    {
+                                        //var x =  client.Files.UploadSessionAppendAsync(cursor, memSream);
+                                        //x.Wait();
+                                        //var x = await client.Files.UploadSessionAppendAsync(cursor, memSream);
+                                        await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
+                                        await status.uploadStatusFile(status.upload);
+                                        // x.Wait();
+                                        //await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
+                                    }
                                 }
                             }
                         }
@@ -447,6 +450,14 @@ namespace Scanda.AppTray
                 await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 Console.WriteLine(ex);
                 return false;
+            }
+            finally
+            {
+                if(stream != null)
+                {
+                    stream.Close();
+                    stream.Dispose();
+                }
             }
         }
         private static async Task<string> downloadZipFile(string path, string folderName)
@@ -515,8 +526,11 @@ namespace Scanda.AppTray
                 zip.UseZip64WhenSaving = Zip64Option.Always;
                 zip.AddFile(origen, ".");
                 zip.Name = info.Name + ".zip";
-                zip.Save("C:\\DBProtector\\"+ info.Name + ".zip");
+                if (File.Exists("C:\\DBProtector\\" + info.Name + ".zip"))
+                    File.Delete("C:\\DBProtector\\" + info.Name + ".zip");
 
+                zip.Save("C:\\DBProtector\\"+ info.Name + ".zip");
+                
             }
 
             return "C:\\DBProtector\\" + info.Name + ".zip";
@@ -577,11 +591,24 @@ namespace Scanda.AppTray
                 return false;
             }
         }
-        private static bool isValidExt(string ext, List<string> extensions)
+       
+            private static bool isValidExt(string ext, List<string> extensions)
         {
             if (extensions == null)
                 return true;
-            return extensions.Contains(ext);
+
+            bool valido = false;
+          
+            foreach (string extension in extensions)
+            {
+                if(ext.ToLower().Contains(extension.ToLower()))
+                {
+                    valido = true;
+                    break;
+                }
+            }
+            
+            return valido;
         }
         private static async Task<FolderMetadata> createFolder(string path, string folderName)
         {

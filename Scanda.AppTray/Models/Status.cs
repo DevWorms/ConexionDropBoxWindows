@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -47,6 +50,8 @@ namespace Scanda.AppTray.Models
                         break;
                     case 3:
                         requestUrl = string.Format("FileTransaction_UPDATE?User={0}&Password={1}&ActualChunk={2}&Status={3}&FileName={4}&TransactionType=1", this.username, this.password, upload.chunk, status, upload.file);
+
+                     
                         break;
                 }
                 HttpResponseMessage response = await client.GetAsync(requestUrl);
