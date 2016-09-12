@@ -331,7 +331,7 @@ namespace Scanda.AppTray
             // Start();
         }
         
-        private void Start()
+      /*  private void Start()
         {
             int xTime = int.Parse(config.time);
             // Es en milisegundos 48 * 60 * 1000
@@ -344,9 +344,9 @@ namespace Scanda.AppTray
                 timerUpload.Interval = timestamp;
                 timerUpload.Start();
             }
-        }
+        }^*/
 
-        private async void OnTimedEvent(object sender, EventArgs e)
+     /*   private async void OnTimedEvent(object sender, EventArgs e)
         {
             try
             {
@@ -397,7 +397,7 @@ namespace Scanda.AppTray
                 if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
                 {
                     // Comenzamos a mover los archivos 
-                    List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name)).OrderBy(f => f.LastWriteTime).ToList();
+                    List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name) && isValidExt(ent.Name, config.extensions)).OrderBy(f => f.LastWriteTime).ToList();
                     foreach (FileInfo file in fileEntries2)
                     {
                         if (isValidFileName(file.Name))
@@ -437,7 +437,7 @@ namespace Scanda.AppTray
                             FileInfo item = histFileEntries.FirstOrDefault();
                             if (item != null)
                                 histFileEntries.Remove(item);
-                             }*/
+                             }
                             canTransfer = true;
                         }
                     else
@@ -579,7 +579,10 @@ namespace Scanda.AppTray
                 return false;
             try
             {
-                return Regex.IsMatch(fileName, ARCHIVO);
+                
+                    bool valido = Regex.IsMatch(fileName, ARCHIVO);
+
+                return valido;
             }
             catch (RegexMatchTimeoutException)
             {
@@ -591,8 +594,21 @@ namespace Scanda.AppTray
         {
             if (extensions == null)
                 return true;
-            return extensions.Contains(ext);
+
+            bool valido = false;
+          
+            foreach (string extension in extensions)
+            {
+                if(ext.ToLower().Contains(extension.ToLower()))
+                {
+                    valido = true;
+                    break;
+                }
+            }
+            
+            return valido;
         }
+
         private async void syncNowToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -660,7 +676,7 @@ namespace Scanda.AppTray
                     if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
                     {
                         // Comenzamos a mover los archivos 
-                        List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name)).OrderBy(f => f.LastWriteTime).ToList();
+                        List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name) && isValidExt(ent.Name, config.extensions)).OrderBy(f => f.LastWriteTime).ToList();
                         foreach (FileInfo file in fileEntries2)
                         {
                             if (isValidFileName(file.Name))
