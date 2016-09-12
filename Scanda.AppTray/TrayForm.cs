@@ -79,19 +79,32 @@ namespace Scanda.AppTray
 
             if (int.Parse(config.time) == 0)
             {
-                // timerUpload.Stop();
-                if (DoesServiceExist("DBProtector Service", "."))
+                try
                 {
-                    if(!(sc.Status == ServiceControllerStatus.Stopped))
-                        sc.Stop();
+                    if (DoesServiceExist("DBProtector Service", "."))
+                    {
+                        if (!(sc.Status == ServiceControllerStatus.Stopped))
+                            sc.Stop();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
                 }
             }
             else
             {
-                if (DoesServiceExist("DBProtector Service", "."))
+                try
                 {
-                    if ((sc.Status == ServiceControllerStatus.Stopped))
-                        sc.Start();
+                    if (DoesServiceExist("DBProtector Service", "."))
+                    {
+                        if ((sc.Status == ServiceControllerStatus.Stopped))
+                            sc.Start();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
                 }
             }
             // abrimos de nuevo el json
@@ -101,6 +114,20 @@ namespace Scanda.AppTray
             {
                 syncNowToolStripMenuItem.Enabled = false;
                 descargarToolStripMenuItem.Enabled = false;
+
+                try
+                {
+                    if (DoesServiceExist("DBProtector Service", "."))
+                    {
+                        if (!(sc.Status == ServiceControllerStatus.Stopped))
+                            sc.Stop();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                
             }
             else if (string.IsNullOrEmpty(config.path))
             {
@@ -112,10 +139,17 @@ namespace Scanda.AppTray
                 syncNowToolStripMenuItem.Enabled = true;
                 descargarToolStripMenuItem.Enabled = true;
                 // Start();
-                if (DoesServiceExist("DBProtector Service", "."))
+                try
                 {
-                    if ((sc.Status == ServiceControllerStatus.Stopped))
-                        sc.Start();
+                    if (DoesServiceExist("DBProtector Service", "."))
+                    {
+                        if ((sc.Status == ServiceControllerStatus.Stopped))
+                            sc.Start();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
                 }
             }
         }

@@ -93,21 +93,54 @@ namespace Scanda.AppTray
                             await sync_lastestUploads();
 
                             ServiceController sc = null;
-                            if (DoesServiceExist("DBProtector Service", "."))
+                            try
                             {
-                                sc = new ServiceController("DBProtector Service");
-                                if(!(sc.Status == ServiceControllerStatus.Stopped))
-                                    sc.Stop();
-                                sc.Start();
+                                if (DoesServiceExist("DBProtector Service", "."))
+                                {
+                                    if ((sc.Status == ServiceControllerStatus.Stopped))
+                                        sc.Start();
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
                             }
                         }
                         else
                         {
+                            ServiceController sc = null;
+                            try
+                            {
+                                if (DoesServiceExist("DBProtector Service", "."))
+                                {
+                                    if (!(sc.Status == ServiceControllerStatus.Stopped))
+                                        sc.Stop();
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                            }
+
                             lblMessages.Text = "Contraseña/Usuario incorrectos";
                             throw new Exception("Contraseña/Usuario incorrectos");
                         }
                     } else
                     {
+                        ServiceController sc = null;
+                        try
+                        {
+                            if (DoesServiceExist("DBProtector Service", "."))
+                            {
+                                if (!(sc.Status == ServiceControllerStatus.Stopped))
+                                    sc.Stop();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+
                         lblMessages.Text = "Contraseña/Usuario incorrectos";
                         throw new Exception("No se pudo iniciar sesión, revise su conexión de internet");
                     }

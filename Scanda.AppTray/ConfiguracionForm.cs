@@ -173,11 +173,17 @@ namespace Scanda.AppTray
             try
             {
                 ServiceController sc = null;
-                if (DoesServiceExist("DBProtector Service", "."))
+                try
                 {
-                    sc = new ServiceController("DBProtector Service");
-                    if(!(sc.Status == ServiceControllerStatus.Stopped))
-                        sc.Stop();
+                    if (DoesServiceExist("DBProtector Service", "."))
+                    {
+                        if (!(sc.Status == ServiceControllerStatus.Stopped))
+                            sc.Stop();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
                 }
                 mtxt_user.Text = "";
                 mtxt_totalspace.Text = "";
