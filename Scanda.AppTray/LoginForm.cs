@@ -211,6 +211,7 @@ namespace Scanda.AppTray
                     }
                 }
             }
+
             catch (Exception ex) {
                 await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
                 /*Logger.sendLog(ex.Message

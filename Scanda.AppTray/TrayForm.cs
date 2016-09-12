@@ -425,9 +425,12 @@ namespace Scanda.AppTray
 
                 // Comenzamos a mover los archivos 
                 List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+
+                
+
                 foreach (FileInfo file in fileEntries2)
                 {
-                    if (isValidFileName(file.Name))
+                    if (isValidFileName(file.Name) )
                     {
                         //cuando el filetreatment es 3 se borra localmente, en el caso 1 o 2 se mueve a una carpeta de respaldos 
                         if (config.type_storage == "1" || config.type_storage == "2")
@@ -518,6 +521,13 @@ namespace Scanda.AppTray
                 return false;
             }
         }
+
+        private static bool isValidExt(string ext, List<string> extensions)
+        {
+            if (extensions == null)
+                return true;
+            return extensions.Contains(ext);
+        }
         private async void syncNowToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -550,7 +560,7 @@ namespace Scanda.AppTray
                 if (!string.IsNullOrEmpty(config.path))
                 {
                     //string[] fileEntries = Directory.GetFiles(config.path);
-                    List<string> fileEntries = Directory.GetFiles(config.path).Where(ent => isValidFileName(ent)).ToList();
+                    List<string> fileEntries = Directory.GetFiles(config.path).Where(ent => isValidFileName(ent) && isValidExt(ent , config.extensions)).ToList();
                     //if (fileEntries != null && fileEntries.Length>0)
                     if (fileEntries != null && fileEntries.Count > 0)
                     {
@@ -621,7 +631,7 @@ namespace Scanda.AppTray
                             }
                         }
                         // Comenzamos a mover los archivos 
-                        List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name)).OrderBy(f => f.LastWriteTime).ToList();
+                        List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name) && isValidExt(ent.Name,config.extensions) ).OrderBy(f => f.LastWriteTime).ToList();
                         foreach (FileInfo file in fileEntries2)
                         {
                             if (isValidFileName(file.Name))
