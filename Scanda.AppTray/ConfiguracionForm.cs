@@ -161,24 +161,55 @@ namespace Scanda.AppTray
             limpirarVariables();
         }
 
-        bool DoesServiceExist(string serviceName, string machineName)
+        /*bool DoesServiceExist(string serviceName, string machineName)
         {
             ServiceController[] services = ServiceController.GetServices(machineName);
             var service = services.FirstOrDefault(s => s.ServiceName == serviceName);
             return service != null;
+        }*/
+
+        public void StartService(string serviceName, int timeoutMilliseconds)
+        {
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                service.Start();
+                service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+            }
+            catch
+            {
+                // ...
+            }
+        }
+
+
+
+        public static void StopService(string serviceName, int timeoutMilliseconds)
+        {
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+            }
+            catch
+            {
+                // ...
+            }
         }
 
         private async void limpirarVariables()
         {
             try
             {
-                ServiceController sc = null;
-                if (DoesServiceExist("DBProtector Service", "."))
-                {
-                    sc = new ServiceController("DBProtector Service");
-                    if(!(sc.Status == ServiceControllerStatus.Stopped))
-                        sc.Stop();
-                }
+                
+                StopService("DBProtector Service", 60 * 1000);
+
+
                 mtxt_user.Text = "";
                 mtxt_totalspace.Text = "";
                 // mtxt_avalaiblespace.Text = "";

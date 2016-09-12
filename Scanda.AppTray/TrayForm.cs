@@ -69,31 +69,34 @@ namespace Scanda.AppTray
             //MessageBox.Show(exeFolder);
             this.Close();
         }
-        private void ConfigurationForm_Close(object sender, EventArgs e)
-        {
-            ServiceController sc = null;
-            if (DoesServiceExist("DBProtector Service", "."))
+
+        public static void RestartService(string serviceName, int timeoutMilliseconds)
             {
-                sc = new ServiceController("DBProtector Service");
+            ServiceController service = new ServiceController(serviceName);
+            try
+                {
+                int millisec1 = Environment.TickCount;
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+
+                // count the rest of the timeout
+                int millisec2 = Environment.TickCount;
+                timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds - (millisec2 - millisec1));
+
+                service.Start();
+                service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                }
+            catch
+            {
+                // ...
+                }
             }
 
-            if (int.Parse(config.time) == 0)
-            {
-                // timerUpload.Stop();
-                if (DoesServiceExist("DBProtector Service", "."))
-                {
-                    if(!(sc.Status == ServiceControllerStatus.Stopped))
-                        sc.Stop();
-                }
-            }
-            else
-            {
-                if (DoesServiceExist("DBProtector Service", "."))
-                {
-                    if ((sc.Status == ServiceControllerStatus.Stopped))
-                        sc.Start();
-                }
-            }
+        private void ConfigurationForm_Close(object sender, EventArgs e)
+        {
+       
             // abrimos de nuevo el json
             json = File.ReadAllText(configuration_path);
             config = JsonConvert.DeserializeObject<Config>(json);
@@ -101,24 +104,23 @@ namespace Scanda.AppTray
             {
                 syncNowToolStripMenuItem.Enabled = false;
                 descargarToolStripMenuItem.Enabled = false;
+                
+                StopService("DBProtector Service", 60*1000);
+            
             }
             else if (string.IsNullOrEmpty(config.path))
             {
                 syncNowToolStripMenuItem.Enabled = false;
                 descargarToolStripMenuItem.Enabled = true;
+                StopService("DBProtector Service", 60 * 1000);
             }
             else
             {
                 syncNowToolStripMenuItem.Enabled = true;
                 descargarToolStripMenuItem.Enabled = true;
-                // Start();
-                if (DoesServiceExist("DBProtector Service", "."))
-                {
-                    if ((sc.Status == ServiceControllerStatus.Stopped))
-                        sc.Start();
+                StartService("DBProtector Service", 60 * 1000);
                 }
             }
-        }
         private void configuracionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Activate();
@@ -274,7 +276,7 @@ namespace Scanda.AppTray
             // ServiceBase service = new ServiceBase();
             // Scanda.Service.ScandaService.Run(service);
             
-            if (DoesServiceExist("DBProtector Services", ".")) // le coloque una S de mas XD
+            /*if (DoesServiceExist("DBProtector Services", ".")) // le coloque una S de mas XD
             {
                 ServiceController sc = new ServiceController("DBProtector Service"); //con esto controlamos el servicio :o
                 
@@ -306,7 +308,7 @@ namespace Scanda.AppTray
                         break;
                 }
             }else
-            {
+            {*/
 
                 servicioToolStripMenuItem.Visible = false;
                 exitToolStripMenuItem.Visible = false;
@@ -325,7 +327,7 @@ namespace Scanda.AppTray
                     syncNowToolStripMenuItem.Enabled = true;
                     descargarToolStripMenuItem.Enabled = true;
                 }
-            }
+            //}
             // Start();
         }
         
@@ -380,7 +382,7 @@ namespace Scanda.AppTray
                     if (!x)
                     {
                         notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
-                        await Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
+                        await Logger.sendLog(string.Format("!Error al sincronizar {0}!", info.Name), "E");
                     }
                     else
                     {
@@ -392,18 +394,41 @@ namespace Scanda.AppTray
                 await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
 
                 #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
+                if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
+                {
+                    // Comenzamos a mover los archivos 
+                    List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name)).OrderBy(f => f.LastWriteTime).ToList();
+                    foreach (FileInfo file in fileEntries2)
+                    {
+                        if (isValidFileName(file.Name))
+                        {
+                            //cuando vale 1 y 2 se mueve a una carpeta el respaldo, cuanfdo vale 3 se borra localmente
+                            if (config.type_storage == "1" || config.type_storage == "2")
+                            {
+                                // Se copia a Historicos
+                                File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
+                            }
+                            File.Delete(config.path + "\\" + file.Name);
+                        }
+                    }
+
                 List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
                 // verificamos el limite
+
+                    //Borramos en la nube
+                    //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
+                    //Borramos local
                 bool canTransfer = false;
                 while (!canTransfer)
                 {
-                    if (histFileEntries.Count() < int.Parse(config.file_historical))
+                        if (histFileEntries.Count() <= int.Parse(config.file_historical))
                     {
-                        if (histFileEntries.Count() == 0)
+                            /* if (histFileEntries.Count() == 0)
                         {
                             canTransfer = true;
                         }
-                        else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                             else if (fileEntries.Count <= histFileEntries.Count() || fileEntries.Count < int.Parse(config.file_historical))
+                             //else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
                         {
                             canTransfer = true;
                         }
@@ -412,17 +437,22 @@ namespace Scanda.AppTray
                             FileInfo item = histFileEntries.FirstOrDefault();
                             if (item != null)
                                 histFileEntries.Remove(item);
+                             }*/
+                            canTransfer = true;
                         }
-                    }
                     else
                     {
                         FileInfo item = histFileEntries.FirstOrDefault();
                         if (item != null)
                             File.Delete(config.hist_path + "\\" + item.Name);
                             histFileEntries.Remove(item);
+
                     }
                 }
 
+                }
+                else if (config.type_storage == "3")
+                {
                 // Comenzamos a mover los archivos 
                 List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
 
@@ -432,14 +462,9 @@ namespace Scanda.AppTray
                 {
                     if (isValidFileName(file.Name) )
                     {
-                        //cuando el filetreatment es 3 se borra localmente, en el caso 1 o 2 se mueve a una carpeta de respaldos 
-                        if (config.type_storage == "1" || config.type_storage == "2")
-                        {
-                            // Se copia a Historicos
-                            File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
+                            // Se borra el archivo localmente porque la configurcion es 3
+                            File.Delete(config.path + "\\" + file.Name);
                         }
-                        // Se copia a Respaldados
-                        File.Delete(config.path + "\\" + file.Name);
                     }
                 }
                 #endregion
@@ -462,11 +487,54 @@ namespace Scanda.AppTray
             }
         }
 
+/*
         bool DoesServiceExist(string serviceName, string machineName)
         {
+            bool existe = false;
+            try
+            {
             ServiceController[] services = ServiceController.GetServices(machineName);
             var service = services.FirstOrDefault(s => s.ServiceName == serviceName);
-            return service != null;
+                existe = service != null;
+            }
+            catch { }
+
+            return existe;
+             
+         }
+         */
+        public void StartService(string serviceName, int timeoutMilliseconds)
+        {
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                service.Start();
+                service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+            }
+            catch
+            {
+                // ...
+            }
+        }
+
+
+
+        public static void StopService(string serviceName, int timeoutMilliseconds)
+        {
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+            }
+            catch
+            {
+                // ...
+            }
         }
 
         private void startToolStripMenuItem_Click(object sender, EventArgs e)
@@ -594,44 +662,8 @@ namespace Scanda.AppTray
                     #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
                     if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
                     {
-                        List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                        // verificamos el limite
-
-                        //Borramos en la nube
-                        //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
-                        //Borramos local
-                        bool canTransfer = false;
-                        while (!canTransfer)
-                        {
-                            if (histFileEntries.Count() < int.Parse(config.file_historical))
-                            {
-                                if (histFileEntries.Count() == 0)
-                                {
-                                    canTransfer = true;
-                                }
-                                else if (fileEntries.Count <= histFileEntries.Count() || fileEntries.Count < int.Parse(config.file_historical))
-                                //else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
-                                {
-                                    canTransfer = true;
-                                }
-                                else
-                                {
-                                    FileInfo item = histFileEntries.FirstOrDefault();
-                                    if (item != null)
-                                        histFileEntries.Remove(item);
-                                }
-                            }
-                            else
-                            {
-                                FileInfo item = histFileEntries.FirstOrDefault();
-                                if (item != null)
-                                    File.Delete(config.hist_path + "\\" + item.Name);
-                                histFileEntries.Remove(item);
-
-                            }
-                        }
                         // Comenzamos a mover los archivos 
-                        List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name) && isValidExt(ent.Name,config.extensions) ).OrderBy(f => f.LastWriteTime).ToList();
+                        List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name)).OrderBy(f => f.LastWriteTime).ToList();
                         foreach (FileInfo file in fileEntries2)
                         {
                             if (isValidFileName(file.Name))
@@ -645,6 +677,45 @@ namespace Scanda.AppTray
                                 File.Delete(config.path + "\\" + file.Name);
                             }
                         }
+
+                        List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                        // verificamos el limite
+
+                        //Borramos en la nube
+                        //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
+                        //Borramos local
+                        bool canTransfer = false;
+                        while (!canTransfer)
+                        {
+                            if (histFileEntries.Count() <= int.Parse(config.file_historical))
+                            {
+                                /* if (histFileEntries.Count() == 0)
+                                {
+                                    canTransfer = true;
+                                }
+                                else if (fileEntries.Count <= histFileEntries.Count() || fileEntries.Count < int.Parse(config.file_historical))
+                                //else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
+                                {
+                                    canTransfer = true;
+                                }
+                                else
+                                {
+                                    FileInfo item = histFileEntries.FirstOrDefault();
+                                    if (item != null)
+                                        histFileEntries.Remove(item);
+                                 }*/
+                                canTransfer = true;
+                            }
+                            else
+                            {
+                                FileInfo item = histFileEntries.FirstOrDefault();
+                                if (item != null)
+                                    File.Delete(config.hist_path + "\\" + item.Name);
+                                histFileEntries.Remove(item);
+
+                            }
+                        }
+                       
                     }
                     else if (config.type_storage == "3")
                     {

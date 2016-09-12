@@ -41,11 +41,45 @@ namespace Scanda.AppTray
             configuration_path = configPath;
         }
 
-        bool DoesServiceExist(string serviceName, string machineName)
+       /* bool DoesServiceExist(string serviceName, string machineName)
         {
             ServiceController[] services = ServiceController.GetServices(machineName);
             var service = services.FirstOrDefault(s => s.ServiceName == serviceName);
             return service != null;
+        }*/
+
+        public void StartService(string serviceName, int timeoutMilliseconds)
+        {
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                service.Start();
+                service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+            }
+            catch
+            {
+                // ...
+            }
+        }
+
+
+
+        public static void StopService(string serviceName, int timeoutMilliseconds)
+        {
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+            }
+            catch
+            {
+                // ...
+            }
         }
 
         private async void btnLogin_Click(object sender, EventArgs e)
@@ -92,22 +126,18 @@ namespace Scanda.AppTray
                             await sync_extensions();
                             await sync_lastestUploads();
 
-                            ServiceController sc = null;
-                            if (DoesServiceExist("DBProtector Service", "."))
-                            {
-                                sc = new ServiceController("DBProtector Service");
-                                if(!(sc.Status == ServiceControllerStatus.Stopped))
-                                    sc.Stop();
-                                sc.Start();
-                            }
+                            StartService("DBProtector Service", 60*1000);
+                            
                         }
                         else
                         {
+                            StopService("DBProtector Service", 60 * 1000);
                             lblMessages.Text = "Contraseña/Usuario incorrectos";
                             throw new Exception("Contraseña/Usuario incorrectos");
                         }
                     } else
                     {
+                        StopService("DBProtector Service", 60 * 1000);
                         lblMessages.Text = "Contraseña/Usuario incorrectos";
                         throw new Exception("No se pudo iniciar sesión, revise su conexión de internet");
                     }
