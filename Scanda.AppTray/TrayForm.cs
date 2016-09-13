@@ -198,7 +198,7 @@ namespace Scanda.AppTray
                             }
                             else
                             {
-                                notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
+                                notifyIconScanda.ShowBalloonTip(1000, "DBProtector", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
                                 await Logger.sendLog(string.Format("Finalizo descarga de {0}", file[2]), "T");
                                 switch (int.Parse(config.type_storage))
                                 {
@@ -227,47 +227,21 @@ namespace Scanda.AppTray
                                         break;
                                 }
                             }
-                            //switch (int.Parse(config.type_storage))
-                            //{
-                            //    case 1:
-                            //        // Se copia a respaldados
-                            //        if (File.Exists(config.path + "\\" + file[2]))
-                            //        {
-                            //            File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
-                            //        }
-                            //        break;
-                            //    case 2:
-                            //        if (File.Exists(config.path + "\\" + file[2]))
-                            //        {
-                            //            File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
-                            //        }
-                            //        break;
-                            //    case 3:
-                            //        if (File.Exists(config.path + "\\" + file[2]))
-                            //        {
-                            //            File.Delete(config.path + "\\" + file[2]);
-                            //        }
-                            //        break;
-                            //}
-
                         }
                     }
-
+                }
+                // notifyIconScanda.Icon = Properties.Resources.AppIcon;
+            } catch(Exception ex) {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+            }
+            finally
+            {
                     if(string.IsNullOrEmpty(config.path))
                         syncNowToolStripMenuItem.Enabled = false;
                     else
                         syncNowToolStripMenuItem.Enabled = true;
                     configuracionToolStripMenuItem.Enabled = true;
                     descargarToolStripMenuItem.Enabled = true;
-                }
-                // notifyIconScanda.Icon = Properties.Resources.AppIcon;
-            } catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
-                /*Logger.sendLog(ex.Message
-                    + "\n" + ex.Source
-                    + "\n" + ex.InnerException
-                    + "\n" + ex.StackTrace
-                    + "\n");*/
             }
         }
 
@@ -480,7 +454,7 @@ namespace Scanda.AppTray
                 syncNowToolStripMenuItem.Enabled = true;
                 configuracionToolStripMenuItem.Enabled = true;
                 descargarToolStripMenuItem.Enabled = true;
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
             }
         }
 
@@ -660,7 +634,7 @@ namespace Scanda.AppTray
                             else
                             {
 
-                                notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
+                                notifyIconScanda.ShowBalloonTip(1000, "DBProtector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
                                 await Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
                             }
                         }
@@ -763,10 +737,10 @@ namespace Scanda.AppTray
                 syncNowToolStripMenuItem.Enabled = true;
                 configuracionToolStripMenuItem.Enabled = true;
                 descargarToolStripMenuItem.Enabled = true;
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
-                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
                     + "\n" + ex.StackTrace
                     + "\n", "E");*/
             }
@@ -798,10 +772,10 @@ namespace Scanda.AppTray
                     }
                 }
             }catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
-                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
                     + "\n" + ex.StackTrace
                     + "\n", "E");*/
             }

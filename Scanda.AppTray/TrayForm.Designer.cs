@@ -135,7 +135,7 @@
             this.lblInfo.Name = "lblInfo";
             this.lblInfo.Size = new System.Drawing.Size(147, 13);
             this.lblInfo.TabIndex = 0;
-            this.lblInfo.Text = "DB Protector Tray Application";
+            this.lblInfo.Text = "DBProtector Tray Application";
             // 
             // ScandaServiceController
             // 
@@ -157,7 +157,7 @@
             this.Name = "FormTray";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "DB Protector";
+            this.Text = "DBProtector";
             this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
             this.Load += new System.EventHandler(this.FormTray_Load);
             this.Move += new System.EventHandler(this.FormTray_Move);

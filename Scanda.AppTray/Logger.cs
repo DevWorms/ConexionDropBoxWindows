@@ -54,7 +54,7 @@ namespace Scanda.AppTray
             {
                 writeErrors(ex.Message
                     + "\n" + ex.Source
-                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
                     + "\n" + ex.StackTrace
                     + "\n");
             }
