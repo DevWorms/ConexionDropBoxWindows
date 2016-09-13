@@ -655,7 +655,7 @@ namespace Scanda.AppTray
                             if (!x)
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
-                                await Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
+                                await Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "E");
                             }
                             else
                             {

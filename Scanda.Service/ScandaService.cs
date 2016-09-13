@@ -108,7 +108,7 @@ namespace Scanda.Service
                     int xTime = int.Parse(config.time);
                     if (xTime != 0)
                     {
-                        int timestamp = 5*60*1000;//xTime * 3600 * 1000; // horas * 60 * 1000
+                        int timestamp = xTime * 3600 * 1000; // horas * 60 * 1000
                                              // Create a timer with a ten second interval.
                         aTimer = new System.Timers.Timer(timestamp);
 

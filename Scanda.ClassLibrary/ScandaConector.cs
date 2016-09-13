@@ -360,6 +360,7 @@ namespace Scanda.ClassLibrary
         }
         private static async Task<bool> uploadZipFile(string origen, string folder, Status status)
         {
+            FileStream stream = null;
             try
             {
                 clientConf = new DropboxClientConfig("ScandaV1");
@@ -371,7 +372,7 @@ namespace Scanda.ClassLibrary
                 string extension = info.Extension;
                 float size = info.Length / (B_TO_MB * 1.0f);
                 long nChunks = info.Length / CHUNK_SIZE;
-                FileStream stream = new FileStream(origen, FileMode.Open);
+                stream = new FileStream(origen, FileMode.Open);
                 string nombre = info.Name;
 
 
@@ -466,6 +467,14 @@ namespace Scanda.ClassLibrary
                 await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
                 Console.WriteLine(ex);
                 return false;
+            }
+            finally
+            {
+                if(stream != null)
+                {
+                    stream.Close();
+                    stream.Dispose();
+                }
             }
         }
         private static async Task<string> downloadZipFile(string path, string folderName)
