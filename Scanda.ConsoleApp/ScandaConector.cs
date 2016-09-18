@@ -200,6 +200,7 @@ namespace Scanda.ConsoleApp
 
         private static void uploadZipFile(string origen, string folder)
         {
+            FileStream stream = null;
             try
             {
                 clientConf = new DropboxClientConfig("ScandaV1");
@@ -209,7 +210,7 @@ namespace Scanda.ConsoleApp
                 string extension = info.Extension;
                 float size = info.Length / (B_TO_MB * 1.0f);
                 long nChunks = info.Length / CHUNK_SIZE;
-                FileStream stream = new FileStream(origen, FileMode.Open);
+                stream = new FileStream(origen, FileMode.Open);
                 string nombre = info.Name;
 
                 if (nChunks == 0)
@@ -272,6 +273,11 @@ namespace Scanda.ConsoleApp
             {
                 Console.WriteLine(ex);
             }
+            if (stream != null)
+            {
+                stream.Close();
+                stream.Dispose();
+            }
         }
 
         private static async Task<FolderMetadata> createFolder(string path, string folderName)
@@ -315,6 +321,7 @@ namespace Scanda.ConsoleApp
 
         private static string downloadZipFile(string path, string folderName)
         {
+            FileStream archivo = null;
             try
             {
                 clientConf = new DropboxClientConfig("ScandaV1");
@@ -324,7 +331,7 @@ namespace Scanda.ConsoleApp
                 x.Wait();
 
                 FileMetadata metadata = x.Result.Response;
-                FileStream archivo = File.Create(metadata.Name);
+                archivo = File.Create(metadata.Name);
 
                 var y = x.Result.GetContentAsStreamAsync();
                 y.Wait();
@@ -355,6 +362,14 @@ namespace Scanda.ConsoleApp
             {
                 Console.WriteLine(ex);
                 return null;
+            }
+            finally
+            {
+                if (archivo != null)
+                {
+                    archivo.Close();
+                    archivo.Dispose();
+                }
             }
         }
 

@@ -141,9 +141,9 @@
             this.label1.ForeColor = System.Drawing.Color.Gray;
             this.label1.Location = new System.Drawing.Point(354, 349);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(29, 13);
+            this.label1.Size = new System.Drawing.Size(24, 13);
             this.label1.TabIndex = 11;
-            this.label1.Text = "v1.10";
+            this.label1.Text = "v1.7";
             // 
             // LoginForm
             // 

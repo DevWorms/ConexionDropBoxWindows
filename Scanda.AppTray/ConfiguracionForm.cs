@@ -110,7 +110,7 @@ namespace Scanda.AppTray
                 this.Show();
             }
             catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.ConfiguracionForm_Refresh", ex.Message, ex.StackTrace), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
                 //    + "\n" + ex.StackTrace
@@ -184,7 +184,7 @@ namespace Scanda.AppTray
                     File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                 }
             } catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "ConfigurationForm.btnElegir_click", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.Apptray.ConfiguracionForm.btnElegir_click", ex.Message, ex.StackTrace), "E");
                 
             }
         }
@@ -288,7 +288,7 @@ namespace Scanda.AppTray
                     + "\n" + ex.StackTrace
                     + "\n" + ex.StackTrace
                     + "\n");*/
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm_Refresh.limpiarVariables", ex.Message, ex.StackTrace), "E");
             }
         }
 
@@ -317,12 +317,13 @@ namespace Scanda.AppTray
                 if (string.IsNullOrEmpty(config.path))
                 {
                     MessageBox.Show("No se ha configurado la ruta de respaldos");
-                    await Logger.sendLog("No se ha configurado la ruta de respaldos", "E");
+                    await Logger.sendLog(string.Format("{0} | {1} | {2}","Scanda.AppTray.ConfiguracionForm.btnAceptar_Click", "No se ha configurado la ruta de respaldos",""), "W");
                 }
                 if (string.IsNullOrEmpty(config.hist_path) && config.type_storage == "2")// carpeta externa
                 {
                     MessageBox.Show("No se ha configurado la ruta de historicos");
-                    await Logger.sendLog("No se ha configurado la ruta de historicos", "E");
+                    await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.btnAceptar_Click", "No se ha configurado la ruta de historicos", ""), "W");
+                  
                 }
             }
             this.Hide();
@@ -349,7 +350,8 @@ namespace Scanda.AppTray
                         mtxt_totalspace.Text =  r.UsedStorage.ToString() + " MB" + " de "+ r.StorageLimit + " MB usados";
                         // mtxt_avalaiblespace.Text = (r.StorageLimit - r.UsedStorage).ToString();
 
-                        metroPB_CloudSpace.Value = ((r.UsedStorage * 100) / r.StorageLimit);
+                        double porcentaje = (((float)r.UsedStorage * 100) / (float)r.StorageLimit);
+                        metroPB_CloudSpace.Value = ((int)Math.Ceiling(porcentaje)>=100 ? 100:(int)Math.Ceiling(porcentaje));
                         mtxt_time.Text = r.UploadFrecuency.ToString() + " Horas";
                         mtxt_localHist.Text = "Hasta "+ r.FileHistoricalNumber.ToString()+ (r.FileHistoricalNumber.ToString() == "1" ? " archivo":" archivos");
                         mtxt_cloudHist.Text = "Hasta "+r.FileHistoricalNumberCloud.ToString()+(r.FileHistoricalNumberCloud.ToString() == "1" ? " archivo" : " archivos");
@@ -364,7 +366,9 @@ namespace Scanda.AppTray
                         else if (metroPB_CloudSpace.Value >= r.PBRedPercentage)
                         {
                             metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Red;
-                            await Logger.sendLog("Cuenta llegando al limite de almacenamiento", "W");
+                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.sync_accountinfo", "Cuenta llegando al limite de almacenamiento", ""), "W");
+
+                            
                         }
 
                         config.time = r.UploadFrecuency.ToString();
@@ -400,7 +404,8 @@ namespace Scanda.AppTray
                     }
                 }
             } catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+                
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.sync_accpuntinto", ex.Message, ex.StackTrace), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.StackTrace
@@ -430,7 +435,7 @@ namespace Scanda.AppTray
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.lastestUploads", ex.Message, ex.StackTrace), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.StackTrace
@@ -462,7 +467,7 @@ namespace Scanda.AppTray
                     }
                 }
             } catch (Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.sync_extensions", ex.Message, ex.StackTrace), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
                 //    + "\n" + ex.StackTrace
@@ -492,7 +497,7 @@ namespace Scanda.AppTray
                     btnUserFolder.Enabled = false;
                 }
             } catch (Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.ConfiguracionForm_load", ex.Message, ex.StackTrace), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
                 //    + "\n" + ex.StackTrace

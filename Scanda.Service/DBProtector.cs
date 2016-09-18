@@ -79,8 +79,7 @@ namespace Scanda.Service
 
         public async Task StartUpload()
         {
-            await Logger.sendLog(string.Format("servicio ejecutandose {0}", DateTime.Now), "W");
-
+           
             if (!string.IsNullOrEmpty(config.id_customer) && !string.IsNullOrEmpty(config.path)  )
             {
                 if (!((config.type_storage != "3") && string.IsNullOrEmpty(config.hist_path)))
@@ -116,8 +115,6 @@ namespace Scanda.Service
                             //if (fileEntries != null && fileEntries.Length>0)
                             if (fileEntries != null && fileEntries.Count > 0)
                             {
-                                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", "esperando"), "T");
-
                                 foreach (string file in fileEntries)
                                 {
                                     Status temp2 = new Status(base_url, null, null, config.user, config.password);
@@ -126,23 +123,23 @@ namespace Scanda.Service
                                     var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
                                     if (!x)
                                     {
-                                        await Logger.sendLog(string.Format("{0} | {1} | {2}", "DBProtector.UpdateAccount ", "Error al sincronizar: " + info.Name, "error"), "E");
+                                        await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.Service.DBProtector.StartUpload ", "Error al sincronizar: " + info.Name, "servicio de windows"), "E");
 
                                     }
                                     else
                                     {
-                                        await Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
+                                        await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.Service.DBProtector.StartUpload ", "Archivo subido correctamente: ", info.Name), "T");
                                     }
                                 }
                             }
                             else
                             {
-                                await Logger.sendLog(string.Format("Archivo subido correctamente: {0}", "No hay respaldos pendientes por sincronizar"), "W");
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.Service.DBProtector.StartUpload ", "No hay respaldos pendientes por sincronizar",""), "W");
                             }
 
 
                             // Realizamos la limpieza en Cloud
-                            await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
+                            await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical),config);
                             #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
                             if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
                             {
@@ -225,7 +222,7 @@ namespace Scanda.Service
                     catch (Exception ex)
                     {
                         // Termino de hacer todos los respaldos
-                        await Logger.sendLog(string.Format("{0} | {1} | {2}", "DBProtector.StartUpload", ex.Message, ex.StackTrace), "E");
+                        await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.Service.DBProtector.StartUpload", ex.Message, ex.StackTrace), "E");
                         Console.WriteLine(ex);
                         /*Logger.sendLog(ex.Message
                         + "\n" + ex.Source
@@ -264,7 +261,7 @@ namespace Scanda.Service
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}","DBProtector.UpdateAccount", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}","Scanda.Service.DBProtector.sync_updateAccount", ex.Message, ex.StackTrace), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.StackTrace

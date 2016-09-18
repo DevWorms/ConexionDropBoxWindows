@@ -31,7 +31,6 @@ namespace Scanda.ClassLibrary
 
         public async Task uploadStatusFile(Upload upload)
         {
-            await Logger.sendLog(string.Format("Sincronizando {0} de {1}", upload.chunk, upload.total), "T");
             if(menuItem != null)
                 this.menuItem.Text = string.Format("Sincronizando {0} de {1}", upload.chunk, upload.total);
             // notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);

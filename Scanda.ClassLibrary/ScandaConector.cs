@@ -9,6 +9,10 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Windows.Forms;
+using System.Configuration;
 
 namespace Scanda.ClassLibrary
 {
@@ -154,7 +158,7 @@ namespace Scanda.ClassLibrary
         }
 
         //si cantidad -1 no hay limite
-        public static async Task deleteHistory(string userID, int cant)
+        public static async Task deleteHistory(string userID, int cant, Config config)
         {
             if (cant == -1)
             {
@@ -181,9 +185,28 @@ namespace Scanda.ClassLibrary
                         try
                         {
                             await client.Files.DeleteAsync(fm.PathDisplay);
+                            var espacio_archivo_borrar = (long)fm.Size;
+                            var espacio_usado = await ScandaConector.getUsedSpace(config.id_customer) * B_TO_MB;
+                            var espacio_nuevo = Math.Abs(espacio_archivo_borrar - espacio_usado);
+                            string url = ConfigurationManager.AppSettings["api_url"];
+                            using (var client = new HttpClient())
+                            {
+                                client.BaseAddress = new Uri(url);
+                                client.DefaultRequestHeaders.Accept.Clear();
+                                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                                HttpResponseMessage response = await client.GetAsync(string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, espacio_nuevo));
+                                if (response.IsSuccessStatusCode)
+                                {
+
+                                }
+
+
+                            }
                         }
                         catch (BadInputException ex)
                         {
+
+                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ScandaConector.deleteHistory ", ex.Message, ex.StackTrace), "E");
                             Console.WriteLine("Error de Token");
                             Console.WriteLine(ex.Message);
                         }
@@ -245,7 +268,7 @@ namespace Scanda.ClassLibrary
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0}|Error al sincronizar {1}|{2}", "ScandaConector.UploadFile", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} |Error al sincronizar {1} | {2}", "ScandaConector.UploadFile", ex.Message, ex.StackTrace), "E");
                 Console.WriteLine(ex);
                 return false;
 
@@ -370,16 +393,16 @@ namespace Scanda.ClassLibrary
 
                     if (nChunks == 0)
                     {
-                        status.upload.status = 1;
+                        status.upload.chunk = "0";
                         await status.uploadStatusFile(status.upload);
-
                         var subidaS = await client.Files.UploadAsync("/" + folder + "/" + nombre, OVERWRITE, false, body: stream);
                         //subidaS.Wait();
                         //Console.WriteLine(subidaS.Result.AsFile.Size);
                         //stream.Close();
-                        status.upload.chunk = (CHUNK_SIZE) + "";
+
+                        status.upload.chunk = status.upload.total;
                         status.upload.status = 3;
-                        await status.uploadStatusFile(status.upload); ;
+                        await status.uploadStatusFile(status.upload);
                     }
                     else
                     {
@@ -468,6 +491,7 @@ namespace Scanda.ClassLibrary
         }
         private static async Task<string> downloadZipFile(string path, string folderName)
         {
+            FileStream archivo = null;
             try
             {
                 clientConf = new DropboxClientConfig("ScandaV1");
@@ -476,7 +500,7 @@ namespace Scanda.ClassLibrary
                 var x = await client.Files.DownloadAsync(path);
 
                 FileMetadata metadata = x.Response;
-                FileStream archivo = File.Create(metadata.Name);
+                archivo = File.Create(metadata.Name);
 
                 var y = await x.GetContentAsStreamAsync();
 
@@ -489,19 +513,19 @@ namespace Scanda.ClassLibrary
             }
             catch (OutOfMemoryException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.ClassLibrary.ScandaConector.downloadZipFile", ex.Message, ex.StackTrace), "E");
                 Console.WriteLine("Se acabo la memoria");
                 return null;
             }
             catch (FileNotFoundException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.ClassLibrary.ScandaConector.downloadZipFile", ex.Message, ex.StackTrace), "E");
                 Console.WriteLine("No existe el archivo");
                 return null;
             }
             catch (AggregateException ex) //Excepciones al vuelo
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.ClassLibrary.ScandaConector.downloadZipFile", ex.Message, ex.StackTrace), "E");
                 Console.WriteLine("Tarea Cancelada");
                 return null;
             }
@@ -509,6 +533,14 @@ namespace Scanda.ClassLibrary
             {
                 Console.WriteLine(ex);
                 return null;
+            }
+            finally
+            {
+                if (archivo!=null)
+                {
+                    archivo.Close();
+                    archivo.Dispose();
+                }
             }
         }
         public static async Task<long> getUsedSpace(string userID, int s = 1)
