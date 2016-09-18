@@ -37,7 +37,7 @@ namespace Scanda.ClassLibrary
 
                 using (var client = new HttpClient())
                 {
-                    var service_url = string.Format("Log_SET?Message={0}&MessageType={2}&Code=1&AppVersion=4.1&IdCustomer={1}", Message, string.IsNullOrEmpty(config.id_customer) ? "-1":config.id_customer, Type);
+                    var service_url = string.Format("Log_SET?Message={0}&MessageType={2}&Code=1&AppVersion=1.8.W&IdCustomer={1}", Message, string.IsNullOrEmpty(config.id_customer) ? "-1":config.id_customer, Type);
                     client.BaseAddress = new Uri(url);
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -53,7 +53,7 @@ namespace Scanda.ClassLibrary
             {
                 writeErrors(ex.Message
                     + "\n" + ex.Source
-                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
                     + "\n" + ex.StackTrace
                     + "\n");
             }

@@ -14,6 +14,8 @@ using Scanda.AppTray.Models;
 using System.Reflection;
 using System.ServiceProcess;
 using Newtonsoft.Json.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 namespace Scanda.AppTray
 {
@@ -108,10 +110,10 @@ namespace Scanda.AppTray
                 this.Show();
             }
             catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.ConfiguracionForm_Refresh", ex.Message, ex.StackTrace), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
-                //    + "\n" + ex.InnerException
+                //    + "\n" + ex.StackTrace
                 //    + "\n" + ex.StackTrace
                 //    + "\n");
             }
@@ -128,23 +130,62 @@ namespace Scanda.AppTray
                     // txtRuta.Text = selectedPath;
                     mtxt_folder.Text = selectedPath;
                     config.path = selectedPath;
+                   
                     // Historicos
                     if (config.type_storage == "1") { 
                         string historicosFolder = selectedPath + "\\historicos";
                         config.hist_path = historicosFolder;
                         mtxt_userfolder.Text = historicosFolder;
+
+                        if (!Directory.Exists(historicosFolder))
+                        {
+                            // No existe lo creamos el Directorio
+                            Directory.CreateDirectory(historicosFolder);
+
+                        }
+                            //Se asgnan los permisos para el servicio de windows - NetWork Service User
+
+
+                        DirectoryInfo di1 = Directory.CreateDirectory(config.hist_path);
+
+                        //Se asgnan los permisos para el servicio de windows - NetWork Service User
+                        DirectorySecurity dirSecurity1 = di1.GetAccessControl();
+
+                        SecurityIdentifier networkService1 = new SecurityIdentifier(
+                        WellKnownSidType.NetworkServiceSid, null);
+
+                        FileSystemAccessRule rule1 = new FileSystemAccessRule(
+                            networkService1, FileSystemRights.Modify | FileSystemRights.FullControl | FileSystemRights.Write | FileSystemRights.DeleteSubdirectoriesAndFiles, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.InheritOnly, AccessControlType.Allow);
+                        ;
+                        dirSecurity1.AddAccessRule(rule1);
+
+                        di1.SetAccessControl(dirSecurity1);
+
                     }
-                  
+
+
+
+                    DirectoryInfo di = Directory.CreateDirectory(config.path);
+
+                    //Se asgnan los permisos para el servicio de windows - NetWork Service User
+                    DirectorySecurity dirSecurity = di.GetAccessControl();
+
+                    SecurityIdentifier networkService = new SecurityIdentifier(
+                    WellKnownSidType.NetworkServiceSid, null);
+
+                    FileSystemAccessRule rule = new FileSystemAccessRule(
+                        networkService, FileSystemRights.Modify | FileSystemRights.FullControl | FileSystemRights.Write | FileSystemRights.DeleteSubdirectoriesAndFiles, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.InheritOnly, AccessControlType.Allow);
+                    ;
+                    dirSecurity.AddAccessRule(rule);
+
+                    di.SetAccessControl(dirSecurity);
+
                     // Guardamos la ruta
                     File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                 }
             } catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
-                //Logger.sendLog(ex.Message
-                //    + "\n" + ex.Source
-                //    + "\n" + ex.InnerException
-                //    + "\n" + ex.StackTrace
-                //    + "\n");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.Apptray.ConfiguracionForm.btnElegir_click", ex.Message, ex.StackTrace), "E");
+                
             }
         }
 
@@ -244,10 +285,10 @@ namespace Scanda.AppTray
             {
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
-                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
                     + "\n" + ex.StackTrace
                     + "\n");*/
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm_Refresh.limpiarVariables", ex.Message, ex.StackTrace), "E");
             }
         }
 
@@ -276,12 +317,13 @@ namespace Scanda.AppTray
                 if (string.IsNullOrEmpty(config.path))
                 {
                     MessageBox.Show("No se ha configurado la ruta de respaldos");
-                    await Logger.sendLog("No se ha configurado la ruta de respaldos", "E");
+                    await Logger.sendLog(string.Format("{0} | {1} | {2}","Scanda.AppTray.ConfiguracionForm.btnAceptar_Click", "No se ha configurado la ruta de respaldos",""), "W");
                 }
                 if (string.IsNullOrEmpty(config.hist_path) && config.type_storage == "2")// carpeta externa
                 {
                     MessageBox.Show("No se ha configurado la ruta de historicos");
-                    await Logger.sendLog("No se ha configurado la ruta de historicos", "E");
+                    await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.btnAceptar_Click", "No se ha configurado la ruta de historicos", ""), "W");
+                  
                 }
             }
             this.Hide();
@@ -308,7 +350,8 @@ namespace Scanda.AppTray
                         mtxt_totalspace.Text =  r.UsedStorage.ToString() + " MB" + " de "+ r.StorageLimit + " MB usados";
                         // mtxt_avalaiblespace.Text = (r.StorageLimit - r.UsedStorage).ToString();
 
-                        metroPB_CloudSpace.Value = ((r.UsedStorage * 100) / r.StorageLimit);
+                        double porcentaje = (((float)r.UsedStorage * 100) / (float)r.StorageLimit);
+                        metroPB_CloudSpace.Value = ((int)Math.Ceiling(porcentaje)>=100 ? 100:(int)Math.Ceiling(porcentaje));
                         mtxt_time.Text = r.UploadFrecuency.ToString() + " Horas";
                         mtxt_localHist.Text = "Hasta "+ r.FileHistoricalNumber.ToString()+ (r.FileHistoricalNumber.ToString() == "1" ? " archivo":" archivos");
                         mtxt_cloudHist.Text = "Hasta "+r.FileHistoricalNumberCloud.ToString()+(r.FileHistoricalNumberCloud.ToString() == "1" ? " archivo" : " archivos");
@@ -323,7 +366,9 @@ namespace Scanda.AppTray
                         else if (metroPB_CloudSpace.Value >= r.PBRedPercentage)
                         {
                             metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Red;
-                            await Logger.sendLog("Cuenta llegando al limite de almacenamiento", "W");
+                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.sync_accountinfo", "Cuenta llegando al limite de almacenamiento", ""), "W");
+
+                            
                         }
 
                         config.time = r.UploadFrecuency.ToString();
@@ -359,10 +404,11 @@ namespace Scanda.AppTray
                     }
                 }
             } catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.sync_accpuntinto", ex.Message, ex.StackTrace), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
-                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
                     + "\n" + ex.StackTrace
                     + "\n");*/
             }
@@ -389,10 +435,10 @@ namespace Scanda.AppTray
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.lastestUploads", ex.Message, ex.StackTrace), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
-                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
                     + "\n" + ex.StackTrace
                     + "\n");*/
             }
@@ -421,10 +467,10 @@ namespace Scanda.AppTray
                     }
                 }
             } catch (Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.sync_extensions", ex.Message, ex.StackTrace), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
-                //    + "\n" + ex.InnerException
+                //    + "\n" + ex.StackTrace
                 //    + "\n" + ex.StackTrace
                 //    + "\n");
             }
@@ -451,10 +497,10 @@ namespace Scanda.AppTray
                     btnUserFolder.Enabled = false;
                 }
             } catch (Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.ConfiguracionForm_load", ex.Message, ex.StackTrace), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
-                //    + "\n" + ex.InnerException
+                //    + "\n" + ex.StackTrace
                 //    + "\n" + ex.StackTrace
                 //    + "\n");
             }
@@ -473,18 +519,31 @@ namespace Scanda.AppTray
                         // txtRuta.Text = selectedPath;
                         mtxt_userfolder.Text = selectedPath;
                         config.hist_path = selectedPath;
+
+                        DirectoryInfo di = Directory.CreateDirectory(config.hist_path);
+
+                        //Se asgnan los permisos para el servicio de windows - NetWork Service User
+                        DirectorySecurity dirSecurity = di.GetAccessControl();
+
+                        SecurityIdentifier networkService = new SecurityIdentifier(
+                        WellKnownSidType.NetworkServiceSid, null);
+
+                        FileSystemAccessRule rule = new FileSystemAccessRule(
+                            networkService, FileSystemRights.Modify | FileSystemRights.FullControl | FileSystemRights.Write | FileSystemRights.DeleteSubdirectoriesAndFiles, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.InheritOnly, AccessControlType.Allow);
+
+                        dirSecurity.AddAccessRule(rule);
+
+                        di.SetAccessControl(dirSecurity);
+
+
+
                         // Guardamos la ruta
                         File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                     }
                 }
             }
             catch (Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
-                //Logger.sendLog(ex.Message
-                //    + "\n" + ex.Source
-                //    + "\n" + ex.InnerException
-                //    + "\n" + ex.StackTrace
-                //    + "\n");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "ConfigurationForm.btnUserFolder_Click", ex.Message, ex.StackTrace), "E");
             }
         }
 

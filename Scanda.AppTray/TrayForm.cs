@@ -194,12 +194,14 @@ namespace Scanda.AppTray
                             if (!res)
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
-                                await Logger.sendLog(string.Format("Error al sincronizar {0}", file[2]), "E");
+                                
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.FormTray.RecuperarForm_Close", "Error al sincronizar ", file[2]), "E");
                             }
                             else
                             {
-                                notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
-                                await Logger.sendLog(string.Format("Finalizo descarga de {0}", file[2]), "T");
+                                notifyIconScanda.ShowBalloonTip(1000, "DBProtector", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.FormTray.RecuperarForm_Close", "Finalizo descarga de ", file[2]), "T");
+                                
                                 switch (int.Parse(config.type_storage))
                                 {
                                     case 1:
@@ -227,47 +229,21 @@ namespace Scanda.AppTray
                                         break;
                                 }
                             }
-                            //switch (int.Parse(config.type_storage))
-                            //{
-                            //    case 1:
-                            //        // Se copia a respaldados
-                            //        if (File.Exists(config.path + "\\" + file[2]))
-                            //        {
-                            //            File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
-                            //        }
-                            //        break;
-                            //    case 2:
-                            //        if (File.Exists(config.path + "\\" + file[2]))
-                            //        {
-                            //            File.Move(config.path + "\\" + file[2], config.user_path + "\\" + file[2]);
-                            //        }
-                            //        break;
-                            //    case 3:
-                            //        if (File.Exists(config.path + "\\" + file[2]))
-                            //        {
-                            //            File.Delete(config.path + "\\" + file[2]);
-                            //        }
-                            //        break;
-                            //}
-
                         }
                     }
-
+                }
+                // notifyIconScanda.Icon = Properties.Resources.AppIcon;
+            } catch(Exception ex) {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.FormTray.RecuperarForm_Close", ex.Message, ex.StackTrace), "E");
+            }
+            finally
+            {
                     if(string.IsNullOrEmpty(config.path))
                         syncNowToolStripMenuItem.Enabled = false;
                     else
                         syncNowToolStripMenuItem.Enabled = true;
                     configuracionToolStripMenuItem.Enabled = true;
                     descargarToolStripMenuItem.Enabled = true;
-                }
-                // notifyIconScanda.Icon = Properties.Resources.AppIcon;
-            } catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
-                /*Logger.sendLog(ex.Message
-                    + "\n" + ex.Source
-                    + "\n" + ex.InnerException
-                    + "\n" + ex.StackTrace
-                    + "\n");*/
             }
         }
 
@@ -327,179 +303,9 @@ namespace Scanda.AppTray
                     syncNowToolStripMenuItem.Enabled = true;
                     descargarToolStripMenuItem.Enabled = true;
                 }
-            //}
-            // Start();
+           
         }
         
-      /*  private void Start()
-        {
-            int xTime = int.Parse(config.time);
-            // Es en milisegundos 48 * 60 * 1000
-            // convertimos a segundos nuestras horas
-            if (xTime != 0)
-            {
-                int timestamp = xTime * 3600 * 1000; // horas * 60 * 1000
-                timerUpload = new System.Windows.Forms.Timer();
-                timerUpload.Tick += OnTimedEvent;
-                timerUpload.Interval = timestamp;
-                timerUpload.Start();
-            }
-        }^*/
-
-     /*   private async void OnTimedEvent(object sender, EventArgs e)
-        {
-            try
-            {
-                syncNowToolStripMenuItem.Enabled = false;
-                configuracionToolStripMenuItem.Enabled = false;
-                descargarToolStripMenuItem.Enabled = false;
-                string base_url = ConfigurationManager.AppSettings["api_url"];
-                syncNowToolStripMenuItem.Text = "Sincronizando...";
-                #region Validacion de Directorios
-                // Revisamos si existe el directorio de respaldos
-                if (!Directory.Exists(config.path))
-                {
-                    Directory.CreateDirectory(config.path);
-                }
-                // Revisamos si existe el directorio de historicos
-                if (!Directory.Exists(config.hist_path))
-                {
-                    Directory.CreateDirectory(config.hist_path);
-                }
-               
-                #endregion
-                // Obtenemos listado de archivos del directorio
-                string[] fileEntries = Directory.GetFiles(config.path);
-                // Comienza a subir los archivos
-                //Bitmap bmp = Properties.Resources.QuotaNearing;
-                //notifyIconScanda.Icon = Icon.FromHandle(bmp.GetHicon());
-                notifyIconScanda.ShowBalloonTip(1000, "Sincronizando", "Se estan sicronizando los archivos a su dispositivo de la nube", ToolTipIcon.Info);
-                foreach (string file in fileEntries)
-                {
-                    Status temp2 = new Status(base_url, notifyIconScanda, syncNowToolStripMenuItem, config.user, config.password);
-                    FileInfo info = new FileInfo(file);
-                    var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
-                    if (!x)
-                    {
-                        notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
-                        await Logger.sendLog(string.Format("!Error al sincronizar {0}!", info.Name), "E");
-                    }
-                    else
-                    {
-                        notifyIconScanda.ShowBalloonTip(1000, "DBProtector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
-                        await Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
-                    }
-                }
-                // Realizamos la limpieza en Cloud
-                await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
-
-                #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
-                if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
-                {
-                    // Comenzamos a mover los archivos 
-                    List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name) && isValidExt(ent.Name, config.extensions)).OrderBy(f => f.LastWriteTime).ToList();
-                    foreach (FileInfo file in fileEntries2)
-                    {
-                        if (isValidFileName(file.Name))
-                        {
-                            //cuando vale 1 y 2 se mueve a una carpeta el respaldo, cuanfdo vale 3 se borra localmente
-                            if (config.type_storage == "1" || config.type_storage == "2")
-                            {
-                                // Se copia a Historicos
-                                File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
-                            }
-                            File.Delete(config.path + "\\" + file.Name);
-                        }
-                    }
-
-                List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                // verificamos el limite
-
-                    //Borramos en la nube
-                    //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
-                    //Borramos local
-                bool canTransfer = false;
-                while (!canTransfer)
-                {
-                        if (histFileEntries.Count() <= int.Parse(config.file_historical))
-                    {
-                            /* if (histFileEntries.Count() == 0)
-                        {
-                            canTransfer = true;
-                        }
-                             else if (fileEntries.Count <= histFileEntries.Count() || fileEntries.Count < int.Parse(config.file_historical))
-                             //else if (fileEntries.Length <= histFileEntries.Count() || fileEntries.Length < int.Parse(config.file_historical))
-                        {
-                            canTransfer = true;
-                        }
-                        else
-                        {
-                            FileInfo item = histFileEntries.FirstOrDefault();
-                            if (item != null)
-                                histFileEntries.Remove(item);
-                             }
-                            canTransfer = true;
-                        }
-                    else
-                    {
-                        FileInfo item = histFileEntries.FirstOrDefault();
-                        if (item != null)
-                            File.Delete(config.hist_path + "\\" + item.Name);
-                            histFileEntries.Remove(item);
-
-                    }
-                }
-
-                }
-                else if (config.type_storage == "3")
-                {
-                // Comenzamos a mover los archivos 
-                List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                foreach (FileInfo file in fileEntries2)
-                {
-                    if (isValidFileName(file.Name) )
-                    {
-                            // Se borra el archivo localmente porque la configurcion es 3
-                            File.Delete(config.path + "\\" + file.Name);
-                        }
-                    }
-                }
-                #endregion
-                await sync_updateAccount();
-                // Termino de hacer todos los respaldos
-                syncNowToolStripMenuItem.Text = "Sincronizar ahora";
-                syncNowToolStripMenuItem.Enabled = true;
-                configuracionToolStripMenuItem.Enabled = true;
-                descargarToolStripMenuItem.Enabled = true;
-                // Termino de hacer todos los respaldos
-                // notifyIconScanda.Icon = Properties.Resources.AppIcon;
-            } catch(Exception ex)
-            {
-                // Fallo al realizar los respaldos
-                syncNowToolStripMenuItem.Text = "Sincronizar ahora";
-                syncNowToolStripMenuItem.Enabled = true;
-                configuracionToolStripMenuItem.Enabled = true;
-                descargarToolStripMenuItem.Enabled = true;
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
-            }
-        }
-
-/*
-        bool DoesServiceExist(string serviceName, string machineName)
-        {
-            bool existe = false;
-            try
-            {
-            ServiceController[] services = ServiceController.GetServices(machineName);
-            var service = services.FirstOrDefault(s => s.ServiceName == serviceName);
-                existe = service != null;
-            }
-            catch { }
-
-            return existe;
-             
-         }
-         */
         public void StartService(string serviceName, int timeoutMilliseconds)
         {
             ServiceController service = new ServiceController(serviceName);
@@ -512,7 +318,7 @@ namespace Scanda.AppTray
             }
             catch
             {
-                // ...
+                
             }
         }
 
@@ -655,13 +461,15 @@ namespace Scanda.AppTray
                             if (!x)
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
-                                await Logger.sendLog(string.Format("Error al sincronizar {0}", info.Name), "T");
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click", "Error al sincronizar ", info.Name), "E");
+                                
                             }
                             else
                             {
 
-                                notifyIconScanda.ShowBalloonTip(1000, "DB Protector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
-                                await Logger.sendLog(string.Format("Archivo subido correctamente: {0}", info.Name), "T");
+                                notifyIconScanda.ShowBalloonTip(1000, "DBProtector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click", "Archivo subido correctamente: ", info.Name), "T");
+                                
                             }
                         }
                     }
@@ -673,7 +481,7 @@ namespace Scanda.AppTray
 
 
                     // Realizamos la limpieza en Cloud
-                    await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical));
+                    await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical), config);
                     #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
                     if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
                     {
@@ -763,10 +571,10 @@ namespace Scanda.AppTray
                 syncNowToolStripMenuItem.Enabled = true;
                 configuracionToolStripMenuItem.Enabled = true;
                 descargarToolStripMenuItem.Enabled = true;
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click", ex.Message, ex.StackTrace), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
-                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
                     + "\n" + ex.StackTrace
                     + "\n", "E");*/
             }
@@ -798,10 +606,10 @@ namespace Scanda.AppTray
                     }
                 }
             }catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scadna.AppTray.FormTray.sync_updateAccount", ex.Message, ex.StackTrace), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
-                    + "\n" + ex.InnerException
+                    + "\n" + ex.StackTrace
                     + "\n" + ex.StackTrace
                     + "\n", "E");*/
             }

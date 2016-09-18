@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DB Protector")]
-[assembly: AssemblyDescription("DB Protector Appplication")]
+[assembly: AssemblyTitle("DBProtector")]
+[assembly: AssemblyDescription("DBProtector Appplication")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("DB Protector")]
-[assembly: AssemblyProduct("DB Protector")]
-[assembly: AssemblyCopyright("Copyright ©DB Protector 2016")]
+[assembly: AssemblyCompany("DBProtector")]
+[assembly: AssemblyProduct("DBProtector")]
+[assembly: AssemblyCopyright("Copyright ©DBProtector 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

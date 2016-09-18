@@ -10,6 +10,8 @@ using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Timers;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 namespace Scanda.Service
 {
@@ -53,6 +55,25 @@ namespace Scanda.Service
                 // // Setup Base API URL
                 this.base_url = ConfigurationManager.AppSettings["api_url"];
                 // When user pass extra args
+                // Creating Application Folder
+                if (!Directory.Exists("C:\\DBProtector"))
+                {
+                    DirectoryInfo di = Directory.CreateDirectory("C:\\DBProtector");
+                    di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+
+                    //Se asgnan los permisos para el servicio de windows - NetWork Service User
+                    DirectorySecurity dirSecurity = di.GetAccessControl();
+
+                    SecurityIdentifier networkService = new SecurityIdentifier(
+                    WellKnownSidType.NetworkServiceSid, null);
+
+                    FileSystemAccessRule rule = new FileSystemAccessRule(
+                        networkService, FileSystemRights.Modify | FileSystemRights.FullControl | FileSystemRights.Write | FileSystemRights.DeleteSubdirectoriesAndFiles, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.InheritOnly, AccessControlType.Allow);
+
+                    dirSecurity.AddAccessRule(rule);
+
+                    di.SetAccessControl(dirSecurity);
+                }
 
                 this.configuration_file = "C:\\DBProtector\\Settings\\configuration.json";
 
@@ -108,7 +129,7 @@ namespace Scanda.Service
                     int xTime = int.Parse(config.time);
                     if (xTime != 0)
                     {
-                        int timestamp = 5*60*1000;//xTime * 3600 * 1000; // horas * 60 * 1000
+                        int timestamp = xTime * 3600 * 1000; // horas * 60 * 1000
                                              // Create a timer with a ten second interval.
                         aTimer = new System.Timers.Timer(timestamp);
 

@@ -30,7 +30,7 @@ namespace Scanda.AppTray.Models
 
         public async Task uploadStatusFile(Upload upload)
         {
-            this.menuItem.Text = string.Format("Sincronizando {0} de {1}", upload.chunk, upload.total);
+            this.menuItem.Text = string.Format("Sincronizando {0} de {1}", Math.Ceiling(double.Parse(upload.chunk)),Math.Ceiling(double.Parse(upload.total)));
             // notifyIconScanda.ShowBalloonTip(1000, "Scanda DB", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
             string unixTimestamp = DateTime.Now.ToString("yyyyMMddHHmmss");//(int)(DateTime.UtcNow.Subtract(DateTime.Now)).TotalSeconds;
             using (var client = new HttpClient())
@@ -43,13 +43,13 @@ namespace Scanda.AppTray.Models
                 switch(upload.status)
                 {
                     case 1:
-                        requestUrl = string.Format("FileTransaction_SET?User={0}&Password={1}&StartDate={2}&ActualChunk={3}&TotalChunk={4}&Status={5}&FileName={6}&TransactionType=1", this.username, this.password, unixTimestamp, upload.chunk, upload.total, status, upload.file);
+                        requestUrl = string.Format("FileTransaction_SET?User={0}&Password={1}&StartDate={2}&ActualChunk={3}&TotalChunk={4}&Status={5}&FileName={6}&TransactionType=1", this.username, this.password, unixTimestamp, Math.Ceiling(double.Parse(upload.chunk)), Math.Ceiling(double.Parse(upload.total)), status, upload.file);
                         break;
                     case 2:
-                        requestUrl = string.Format("FileTransaction_UPDATE?User={0}&Password={1}&ActualChunk={2}&Status={3}&FileName={4}&TransactionType=1", this.username, this.password, upload.chunk, status, upload.file);
+                        requestUrl = string.Format("FileTransaction_UPDATE?User={0}&Password={1}&ActualChunk={2}&Status={3}&FileName={4}&TransactionType=1", this.username, this.password,Math.Ceiling( double.Parse(upload.chunk)), status, upload.file);
                         break;
                     case 3:
-                        requestUrl = string.Format("FileTransaction_UPDATE?User={0}&Password={1}&ActualChunk={2}&Status={3}&FileName={4}&TransactionType=1", this.username, this.password, upload.chunk, status, upload.file);
+                        requestUrl = string.Format("FileTransaction_UPDATE?User={0}&Password={1}&ActualChunk={2}&Status={3}&FileName={4}&TransactionType=1", this.username, this.password, Math.Ceiling(double.Parse(upload.total)), status, upload.file);
 
                      
                         break;
@@ -58,6 +58,10 @@ namespace Scanda.AppTray.Models
                 if (response.IsSuccessStatusCode)
                 {
                     var resp = await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+
                 }
             }
         }

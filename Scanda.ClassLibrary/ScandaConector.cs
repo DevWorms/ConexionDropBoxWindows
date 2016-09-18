@@ -9,6 +9,10 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Windows.Forms;
+using System.Configuration;
 
 namespace Scanda.ClassLibrary
 {
@@ -154,7 +158,7 @@ namespace Scanda.ClassLibrary
         }
 
         //si cantidad -1 no hay limite
-        public static async Task deleteHistory(string userID, int cant)
+        public static async Task deleteHistory(string userID, int cant, Config config)
         {
             if (cant == -1)
             {
@@ -181,9 +185,28 @@ namespace Scanda.ClassLibrary
                         try
                         {
                             await client.Files.DeleteAsync(fm.PathDisplay);
+                            var espacio_archivo_borrar = (long)fm.Size;
+                            var espacio_usado = await ScandaConector.getUsedSpace(config.id_customer) * B_TO_MB;
+                            var espacio_nuevo = Math.Abs(espacio_archivo_borrar - espacio_usado);
+                            string url = ConfigurationManager.AppSettings["api_url"];
+                            using (var client = new HttpClient())
+                            {
+                                client.BaseAddress = new Uri(url);
+                                client.DefaultRequestHeaders.Accept.Clear();
+                                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                                HttpResponseMessage response = await client.GetAsync(string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, espacio_nuevo));
+                                if (response.IsSuccessStatusCode)
+                                {
+
+                                }
+
+
+                            }
                         }
                         catch (BadInputException ex)
                         {
+
+                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ScandaConector.deleteHistory ", ex.Message, ex.StackTrace), "E");
                             Console.WriteLine("Error de Token");
                             Console.WriteLine(ex.Message);
                         }
@@ -233,31 +256,21 @@ namespace Scanda.ClassLibrary
                     month = "" + date.Month;
 
                 //Zipeamos l archivo
-                string zip = await cifrar(archivo, usrId);
-                if (zip != "bloqueado")
-                {
-                    ruta = usrId + "/" + year + "/" + month;
-                    status.upload.status = 1;
-                    var res = await uploadZipFile(zip, ruta, status);
+                string zip = cifrar(archivo, usrId);
+                ruta = usrId + "/" + year + "/" + month;
+                status.upload.status = 1;
+                var res = await uploadZipFile(zip, ruta, status);
 
-                    //File.Delete(zip);
+                return true;
 
-                    return true;
-                }
-                else
-                {
-                    await Logger.sendLog(string.Format("El archivo {0} esta siendo usado por otro proceso", name), "E");
-                    return false;
-                }
 
-                List<string> eliminables = Directory.GetFiles("C:\\DBProtector\\").Where(ent => { return ent.EndsWith(".zip"); }).ToList();
-                
+
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("error de subida: {0} - ruta: {1}", ex.Message, ruta), "E");
+                await Logger.sendLog(string.Format("{0} |Error al sincronizar {1} | {2}", "ScandaConector.UploadFile", ex.Message, ex.StackTrace), "E");
+                Console.WriteLine(ex);
                 return false;
-                
 
             }
         }
@@ -361,117 +374,124 @@ namespace Scanda.ClassLibrary
         }
         private static async Task<bool> uploadZipFile(string origen, string folder, Status status)
         {
+            FileStream stream = null;
             try
             {
+
                 clientConf = new DropboxClientConfig("ScandaV1");
                 client = new DropboxClient(APITOKEN);
                 FileInfo info = new FileInfo(origen);
 
                 status.upload.total = ((info.Length * 1)) + ""; //Lo convierte a MB y a string
-                await Logger.sendLog(string.Format("subiendo un total de {0}", status.upload.total), "T");
+
                 string extension = info.Extension;
                 float size = info.Length / (B_TO_MB * 1.0f);
                 long nChunks = info.Length / CHUNK_SIZE;
-                FileStream stream = new FileStream(origen, FileMode.Open);
-                string nombre = info.Name;
-
-
-                await Logger.sendLog(string.Format("numero chunks {0}", nChunks), "T");
-
-                if (nChunks == 0)
+                stream = new FileStream(origen, FileMode.Open);
                 {
+                    string nombre = info.Name;
 
-
-                    await Logger.sendLog(string.Format("subidas {0} ", "/" + folder + "/" + nombre), "T");
-                    var subidaS = await client.Files.UploadAsync("/" + folder + "/" + nombre, OVERWRITE, false, body: stream);
-                    //subidaS.Wait();
-                    //Console.WriteLine(subidaS.Result.AsFile.Size);
-                    //stream.Close();
-                    status.upload.chunk = (CHUNK_SIZE) + "";
-
-                    await status.uploadStatusFile(status.upload);
-                }
-                else
-                {
-                    await Logger.sendLog(string.Format("chunk size {0} ", CHUNK_SIZE), "T");
-
-                    byte[] buffer = new byte[CHUNK_SIZE];
-                    string sessionId = null;
-
-                    
-                    for (var idx = 0; idx <= nChunks; idx++)
+                    if (nChunks == 0)
                     {
-                        status.upload.status = 2;
-                        var byteRead = stream.Read(buffer, 0, CHUNK_SIZE);
+                        status.upload.chunk = "0";
+                        await status.uploadStatusFile(status.upload);
+                        var subidaS = await client.Files.UploadAsync("/" + folder + "/" + nombre, OVERWRITE, false, body: stream);
+                        //subidaS.Wait();
+                        //Console.WriteLine(subidaS.Result.AsFile.Size);
+                        //stream.Close();
 
-                        status.upload.chunk = ( idx * CHUNK_SIZE)+ "";
-                        //status.upload.chunk = idx.ToString();
-                        //status.upload.total = nChunks.ToString();
-                        using (var memSream = new MemoryStream(buffer, 0, byteRead))
+                        status.upload.chunk = status.upload.total;
+                        status.upload.status = 3;
+                        await status.uploadStatusFile(status.upload);
+                    }
+                    else
+                    {
+                        byte[] buffer = new byte[CHUNK_SIZE];
+                        string sessionId = null;
+
+
+                        for (var idx = 0; idx <= nChunks; idx++)
                         {
-                            if (idx == 0)
+                            status.upload.status = 2;
+                            var byteRead = stream.Read(buffer, 0, CHUNK_SIZE);
+
+                            status.upload.chunk = (idx * CHUNK_SIZE) + "";
+                            //status.upload.chunk = idx.ToString();
+                            //status.upload.total = nChunks.ToString();
+                            using (var memSream = new MemoryStream(buffer, 0, byteRead))
                             {
-                                //var result = client.Files.UploadSessionStartAsync(body: memSream);
-                                //result.Wait();
-                                var result = await client.Files.UploadSessionStartAsync(body: memSream);
-                                sessionId = result.SessionId;
-                            }
-                            else
-                            {
-                                var cursor = new UploadSessionCursor(sessionId, (ulong)(CHUNK_SIZE * idx));
-                                await status.uploadStatusFile(status.upload);
-                                if (idx == nChunks)
+                                if (idx == 0)
                                 {
-                                    //var x = client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
-                                    //x.Wait();
-                                    var x = await client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
-                                    status.upload.status = 3;
-                                    await status.uploadStatusFile(status.upload);
+                                    //var result = client.Files.UploadSessionStartAsync(body: memSream);
+                                    //result.Wait();
+                                    var result = await client.Files.UploadSessionStartAsync(body: memSream);
+                                    sessionId = result.SessionId;
                                 }
                                 else
                                 {
-                                    //var x =  client.Files.UploadSessionAppendAsync(cursor, memSream);
-                                    //x.Wait();
-                                    //var x = await client.Files.UploadSessionAppendAsync(cursor, memSream);
-                                    await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
+                                    var cursor = new UploadSessionCursor(sessionId, (ulong)(CHUNK_SIZE * idx));
                                     await status.uploadStatusFile(status.upload);
-                                    // x.Wait();
-                                    //await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
+                                    if (idx == nChunks)
+                                    {
+                                        //var x = client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
+                                        //x.Wait();
+                                        var x = await client.Files.UploadSessionFinishAsync(cursor, new CommitInfo("/" + folder + "/" + nombre), memSream);
+                                        status.upload.status = 3;
+                                        await status.uploadStatusFile(status.upload);
+                                    }
+                                    else
+                                    {
+                                        //var x =  client.Files.UploadSessionAppendAsync(cursor, memSream);
+                                        //x.Wait();
+                                        //var x = await client.Files.UploadSessionAppendAsync(cursor, memSream);
+                                        await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
+                                        await status.uploadStatusFile(status.upload);
+                                        // x.Wait();
+                                        //await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                stream.Close();
                 return true;
             }
             catch (OutOfMemoryException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "ScandaConector.uploadZipFile", ex.Message, ex.StackTrace), "E");
                 Console.WriteLine("Se acabo la memoria");
                 return false;
             }
             catch (FileNotFoundException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "ScandaConector.uploadZipFile", ex.Message, ex.StackTrace), "E");
                 Console.WriteLine("No existe el archivo");
                 return false;
             }
             catch (AggregateException ex) //Excepciones al vuelo
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "ScandaConector.uploadZipFile", ex.Message, ex.StackTrace), "E");
                 Console.WriteLine("Tarea Cancelada");
                 return false;
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "ScandaConector.uploadZipFile", ex.Message, ex.StackTrace), "E");
                 Console.WriteLine(ex);
                 return false;
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Close();
+                    stream.Dispose();
+                }
             }
         }
         private static async Task<string> downloadZipFile(string path, string folderName)
         {
+            FileStream archivo = null;
             try
             {
                 clientConf = new DropboxClientConfig("ScandaV1");
@@ -480,7 +500,7 @@ namespace Scanda.ClassLibrary
                 var x = await client.Files.DownloadAsync(path);
 
                 FileMetadata metadata = x.Response;
-                FileStream archivo = File.Create(metadata.Name);
+                archivo = File.Create(metadata.Name);
 
                 var y = await x.GetContentAsStreamAsync();
 
@@ -488,23 +508,24 @@ namespace Scanda.ClassLibrary
                 stream.CopyTo(archivo);
 
                 archivo.Close();
+
                 return metadata.Name;
             }
             catch (OutOfMemoryException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.ClassLibrary.ScandaConector.downloadZipFile", ex.Message, ex.StackTrace), "E");
                 Console.WriteLine("Se acabo la memoria");
                 return null;
             }
             catch (FileNotFoundException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.ClassLibrary.ScandaConector.downloadZipFile", ex.Message, ex.StackTrace), "E");
                 Console.WriteLine("No existe el archivo");
                 return null;
             }
             catch (AggregateException ex) //Excepciones al vuelo
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Source, ex.Message, ex.InnerException), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.ClassLibrary.ScandaConector.downloadZipFile", ex.Message, ex.StackTrace), "E");
                 Console.WriteLine("Tarea Cancelada");
                 return null;
             }
@@ -512,6 +533,14 @@ namespace Scanda.ClassLibrary
             {
                 Console.WriteLine(ex);
                 return null;
+            }
+            finally
+            {
+                if (archivo!=null)
+                {
+                    archivo.Close();
+                    archivo.Dispose();
+                }
             }
         }
         public static async Task<long> getUsedSpace(string userID, int s = 1)
@@ -526,66 +555,26 @@ namespace Scanda.ClassLibrary
             return tam / B_TO_MB;
         }
 
-        protected static bool IsFileLocked(FileInfo file)
+     
+        private static string cifrar(string origen, string usrId)
         {
-            FileStream stream = null;
+            FileInfo info = new FileInfo(origen);
+            using (ZipFile zip = new ZipFile())
+            {
+                //Crifrar Password
+                zip.Password = SHA256string(usrId);
 
-            try
-            {
-                stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None);
-            }
-            catch (IOException)
-            {
-                //the file is unavailable because it is:
-                //still being written to
-                //or being processed by another thread
-                //or does not exist (has already been processed)
-                return true;
-            }
-            finally
-            {
-                if (stream != null)
-                    stream.Close();
+                zip.UseZip64WhenSaving = Zip64Option.Always;
+                zip.AddFile(origen, ".");
+                zip.Name = info.Name + ".zip";
+                if (File.Exists("C:\\DBProtector\\" + info.Name + ".zip"))
+                    File.Delete("C:\\DBPotector\\" + info.Name + ".zip");
+
+                zip.Save("C:\\DBProtector\\" + info.Name + ".zip");
+
             }
 
-            //file is not locked
-            return false;
-        }
-
-        private static async Task<string> cifrar(string origen, string usrId)
-        {
-            try
-            {
-                FileInfo info = new FileInfo(origen);
-                if (!IsFileLocked(info))
-                {
-
-
-                    using (ZipFile zip = new ZipFile())
-                    {
-                        //Crifrar Password
-                        zip.Password = SHA256string(usrId);
-
-                        zip.UseZip64WhenSaving = Zip64Option.Always;
-                        zip.AddFile(origen, ".");
-                        zip.Name = info.Name + ".zip";
-                        //zip.Save();
-                        zip.Save("C:\\DBProtector\\" + zip.Name);
-                        
-
-                    }
-
-                    return "C:\\DBProtector\\" + info.Name + ".zip";
-                }
-                else
-                    return "bloqueado";
-            }
-            catch (Exception ex)
-            {
-
-                return ex.Message;
-            }
-
+            return "C:\\DBProtector\\" + info.Name + ".zip";
         }
         private static string decifrar(string origen, string usrId)
         {
@@ -647,7 +636,19 @@ namespace Scanda.ClassLibrary
         {
             if (extensions == null)
                 return true;
-            return extensions.Contains(ext);
+
+            bool valido = false;
+
+            foreach (string extension in extensions)
+            {
+                if (ext.ToLower().Contains(extension.ToLower()))
+                {
+                    valido = true;
+                    break;
+                }
+            }
+
+            return valido;
         }
         private static async Task<FolderMetadata> createFolder(string path, string folderName)
         {
