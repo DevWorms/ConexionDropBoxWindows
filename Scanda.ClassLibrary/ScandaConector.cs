@@ -206,7 +206,7 @@ namespace Scanda.ClassLibrary
                         catch (BadInputException ex)
                         {
 
-                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ScandaConector.deleteHistory ", ex.Message, ex.StackTrace), "E");
+                            await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.deleteHistory "), "E");
                             Console.WriteLine("Error de Token");
                             Console.WriteLine(ex.Message);
                         }
@@ -268,7 +268,7 @@ namespace Scanda.ClassLibrary
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} |Error al sincronizar {1} | {2}", "ScandaConector.UploadFile", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} |Error al sincronizar {1} | {2}", ex.Message, ex.StackTrace, "ScandaConector.UploadFile"), "E");
                 Console.WriteLine(ex);
                 return false;
 
@@ -415,21 +415,26 @@ namespace Scanda.ClassLibrary
                             status.upload.status = 2;
                             var byteRead = stream.Read(buffer, 0, CHUNK_SIZE);
 
-                            status.upload.chunk = (idx * CHUNK_SIZE) + "";
+                            status.upload.chunk = (idx * (CHUNK_SIZE / 1024d) / 1024d) + "";
                             //status.upload.chunk = idx.ToString();
                             //status.upload.total = nChunks.ToString();
                             using (var memSream = new MemoryStream(buffer, 0, byteRead))
                             {
                                 if (idx == 0)
                                 {
+                                    status.upload.status = 1;
                                     //var result = client.Files.UploadSessionStartAsync(body: memSream);
                                     //result.Wait();
                                     var result = await client.Files.UploadSessionStartAsync(body: memSream);
                                     sessionId = result.SessionId;
+                                    await status.uploadStatusFile(status.upload);
+
                                 }
                                 else
                                 {
-                                    var cursor = new UploadSessionCursor(sessionId, (ulong)(CHUNK_SIZE * idx));
+                                    ulong trans = (ulong)CHUNK_SIZE * (ulong)idx;
+
+                                    var cursor = new UploadSessionCursor(sessionId, trans);
                                     await status.uploadStatusFile(status.upload);
                                     if (idx == nChunks)
                                     {
@@ -458,25 +463,25 @@ namespace Scanda.ClassLibrary
             }
             catch (OutOfMemoryException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "ScandaConector.uploadZipFile", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "ScandaConector.uploadZipFile"), "E");
                 Console.WriteLine("Se acabo la memoria");
                 return false;
             }
             catch (FileNotFoundException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "ScandaConector.uploadZipFile", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "ScandaConector.uploadZipFile"), "E");
                 Console.WriteLine("No existe el archivo");
                 return false;
             }
             catch (AggregateException ex) //Excepciones al vuelo
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "ScandaConector.uploadZipFile", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "ScandaConector.uploadZipFile"), "E");
                 Console.WriteLine("Tarea Cancelada");
                 return false;
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "ScandaConector.uploadZipFile", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "ScandaConector.uploadZipFile"), "E");
                 Console.WriteLine(ex);
                 return false;
             }
@@ -513,19 +518,19 @@ namespace Scanda.ClassLibrary
             }
             catch (OutOfMemoryException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.ClassLibrary.ScandaConector.downloadZipFile", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}",  ex.Message, ex.StackTrace, "Scanda.ClassLibrary.ScandaConector.downloadZipFile"), "E");
                 Console.WriteLine("Se acabo la memoria");
                 return null;
             }
             catch (FileNotFoundException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.ClassLibrary.ScandaConector.downloadZipFile", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.ClassLibrary.ScandaConector.downloadZipFile"), "E");
                 Console.WriteLine("No existe el archivo");
                 return null;
             }
             catch (AggregateException ex) //Excepciones al vuelo
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.ClassLibrary.ScandaConector.downloadZipFile", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.ClassLibrary.ScandaConector.downloadZipFile"), "E");
                 Console.WriteLine("Tarea Cancelada");
                 return null;
             }

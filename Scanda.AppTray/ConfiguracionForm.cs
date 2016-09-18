@@ -110,7 +110,7 @@ namespace Scanda.AppTray
                 this.Show();
             }
             catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.ConfiguracionForm_Refresh", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}",  ex.Message, ex.StackTrace, "Scanda.AppTray.ConfiguracionForm.ConfiguracionForm_Refresh"), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
                 //    + "\n" + ex.StackTrace
@@ -184,7 +184,7 @@ namespace Scanda.AppTray
                     File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
                 }
             } catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.Apptray.ConfiguracionForm.btnElegir_click", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.Apptray.ConfiguracionForm.btnElegir_click"), "E");
                 
             }
         }
@@ -288,7 +288,7 @@ namespace Scanda.AppTray
                     + "\n" + ex.StackTrace
                     + "\n" + ex.StackTrace
                     + "\n");*/
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm_Refresh.limpiarVariables", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}",  ex.Message, ex.StackTrace, "Scanda.AppTray.ConfiguracionForm_Refresh.limpiarVariables"), "E");
             }
         }
 
@@ -317,12 +317,12 @@ namespace Scanda.AppTray
                 if (string.IsNullOrEmpty(config.path))
                 {
                     MessageBox.Show("No se ha configurado la ruta de respaldos");
-                    await Logger.sendLog(string.Format("{0} | {1} | {2}","Scanda.AppTray.ConfiguracionForm.btnAceptar_Click", "No se ha configurado la ruta de respaldos",""), "W");
+                    await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "No se ha configurado la ruta de respaldos", "Scanda.AppTray.ConfiguracionForm.btnAceptar_Click"), "W");
                 }
                 if (string.IsNullOrEmpty(config.hist_path) && config.type_storage == "2")// carpeta externa
                 {
                     MessageBox.Show("No se ha configurado la ruta de historicos");
-                    await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.btnAceptar_Click", "No se ha configurado la ruta de historicos", ""), "W");
+                    await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "No se ha configurado la ruta de historicos", "Scanda.AppTray.ConfiguracionForm.btnAceptar_Click"), "W");
                   
                 }
             }
@@ -366,7 +366,7 @@ namespace Scanda.AppTray
                         else if (metroPB_CloudSpace.Value >= r.PBRedPercentage)
                         {
                             metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Red;
-                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.sync_accountinfo", "Cuenta llegando al limite de almacenamiento", ""), "W");
+                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Cuenta llegando al limite de almacenamiento", "Scanda.AppTray.ConfiguracionForm.sync_accountinfo"), "W");
 
                             
                         }
@@ -405,7 +405,7 @@ namespace Scanda.AppTray
                 }
             } catch(Exception ex) {
                 
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.sync_accpuntinto", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ConfiguracionForm.sync_accpuntinto"), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.StackTrace
@@ -435,7 +435,7 @@ namespace Scanda.AppTray
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.lastestUploads", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ConfiguracionForm.lastestUploads"), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.StackTrace
@@ -467,7 +467,7 @@ namespace Scanda.AppTray
                     }
                 }
             } catch (Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.sync_extensions", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ConfiguracionForm.sync_extensions"), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
                 //    + "\n" + ex.StackTrace
@@ -497,7 +497,7 @@ namespace Scanda.AppTray
                     btnUserFolder.Enabled = false;
                 }
             } catch (Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.ConfiguracionForm_load", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ConfiguracionForm.ConfiguracionForm_load"), "E");
                 //Logger.sendLog(ex.Message
                 //    + "\n" + ex.Source
                 //    + "\n" + ex.StackTrace
@@ -543,7 +543,7 @@ namespace Scanda.AppTray
                 }
             }
             catch (Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "ConfigurationForm.btnUserFolder_Click", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "ConfigurationForm.btnUserFolder_Click"), "E");
             }
         }
 

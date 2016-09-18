@@ -123,18 +123,18 @@ namespace Scanda.Service
                                     var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
                                     if (!x)
                                     {
-                                        await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.Service.DBProtector.StartUpload ", "Error al sincronizar: " + info.Name, "servicio de windows"), "E");
+                                        await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name, "Error al sincronizar " , "Scanda.Service.DBProtector.StartUpload "), "E");
 
                                     }
                                     else
                                     {
-                                        await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.Service.DBProtector.StartUpload ", "Archivo subido correctamente: ", info.Name), "T");
+                                        await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name,  "Archivo subido correctamente ", "Scanda.Service.DBProtector.StartUpload "), "T");
                                     }
                                 }
                             }
                             else
                             {
-                                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.Service.DBProtector.StartUpload ", "No hay respaldos pendientes por sincronizar",""), "W");
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "No hay respaldos pendientes por sincronizar", "Scanda.Service.DBProtector.StartUpload "), "W");
                             }
 
 
@@ -222,7 +222,7 @@ namespace Scanda.Service
                     catch (Exception ex)
                     {
                         // Termino de hacer todos los respaldos
-                        await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.Service.DBProtector.StartUpload", ex.Message, ex.StackTrace), "E");
+                        await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.Service.DBProtector.StartUpload"), "E");
                         Console.WriteLine(ex);
                         /*Logger.sendLog(ex.Message
                         + "\n" + ex.Source
@@ -261,7 +261,7 @@ namespace Scanda.Service
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}","Scanda.Service.DBProtector.sync_updateAccount", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.Service.DBProtector.sync_updateAccount"), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.StackTrace

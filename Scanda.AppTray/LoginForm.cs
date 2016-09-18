@@ -148,7 +148,7 @@ namespace Scanda.AppTray
             {
                 lblMessages.Text = ex.Message;
                 // Para los logs
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.ConfiguracionForm.btnLogin_click", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ConfiguracionForm.btnLogin_click"), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.StackTrace
@@ -182,7 +182,7 @@ namespace Scanda.AppTray
                 }
             }
             catch (Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.LoginForm.sync_accountinfo", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}",  ex.Message, ex.StackTrace, "Scanda.AppTray.LoginForm.sync_accountinfo"), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.StackTrace
@@ -209,7 +209,7 @@ namespace Scanda.AppTray
                 }
             }
             catch (Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.LoginForm.sync_lastestUploads", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.LoginForm.sync_lastestUploads"), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.StackTrace
@@ -243,7 +243,7 @@ namespace Scanda.AppTray
             }
 
             catch (Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.LoginForm.sync_extensions", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.LoginForm.sync_extensions"), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.StackTrace
@@ -305,7 +305,7 @@ namespace Scanda.AppTray
                     + "\n" + ex.StackTrace
                     + "\n" + ex.StackTrace
                     + "\n");*/
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.LoginForm.limpiarvariables", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.LoginForm.limpiarvariables"), "E");
             }
         }
 

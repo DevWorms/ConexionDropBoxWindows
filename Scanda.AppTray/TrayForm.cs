@@ -195,12 +195,12 @@ namespace Scanda.AppTray
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", file[2]), ToolTipIcon.Error);
                                 
-                                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.FormTray.RecuperarForm_Close", "Error al sincronizar ", file[2]), "E");
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", file[2], "Error al sincronizar ", "Scanda.AppTray.FormTray.RecuperarForm_Close"), "E");
                             }
                             else
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "DBProtector", string.Format("Finalizo descarga de {0}", file[2]), ToolTipIcon.Info);
-                                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.FormTray.RecuperarForm_Close", "Finalizo descarga de ", file[2]), "T");
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", file[2], "Finalizo descarga ", "Scanda.AppTray.FormTray.RecuperarForm_Close"), "T");
                                 
                                 switch (int.Parse(config.type_storage))
                                 {
@@ -234,7 +234,7 @@ namespace Scanda.AppTray
                 }
                 // notifyIconScanda.Icon = Properties.Resources.AppIcon;
             } catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.FormTray.RecuperarForm_Close", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.FormTray.RecuperarForm_Close"), "E");
             }
             finally
             {
@@ -461,14 +461,14 @@ namespace Scanda.AppTray
                             if (!x)
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
-                                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click", "Error al sincronizar ", info.Name), "E");
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name, "Error al sincronizar ", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "E");
                                 
                             }
                             else
                             {
 
                                 notifyIconScanda.ShowBalloonTip(1000, "DBProtector", string.Format("Finalizo subida de {0}", info.Name), ToolTipIcon.Info);
-                                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click", "Archivo subido correctamente: ", info.Name), "T");
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name, "Archivo subido correctamente ", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "T");
                                 
                             }
                         }
@@ -571,7 +571,7 @@ namespace Scanda.AppTray
                 syncNowToolStripMenuItem.Enabled = true;
                 configuracionToolStripMenuItem.Enabled = true;
                 descargarToolStripMenuItem.Enabled = true;
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.StackTrace
@@ -606,7 +606,7 @@ namespace Scanda.AppTray
                     }
                 }
             }catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "Scadna.AppTray.FormTray.sync_updateAccount", ex.Message, ex.StackTrace), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scadna.AppTray.FormTray.sync_updateAccount"), "E");
                 /*Logger.sendLog(ex.Message
                     + "\n" + ex.Source
                     + "\n" + ex.StackTrace
