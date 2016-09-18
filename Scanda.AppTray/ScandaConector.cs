@@ -400,7 +400,7 @@ namespace Scanda.AppTray
                                 }
                                 else
                                 {
-                                    var cursor = new UploadSessionCursor(sessionId, (ulong)(CHUNK_SIZE * idx));
+                                    var cursor = new UploadSessionCursor(sessionId, ((ulong)CHUNK_SIZE * (ulong)idx));
                                     await status.uploadStatusFile(status.upload);
                                     if (idx == nChunks)
                                     {

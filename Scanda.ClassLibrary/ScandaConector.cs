@@ -240,7 +240,7 @@ namespace Scanda.ClassLibrary
                     status.upload.status = 1;
                     var res = await uploadZipFile(zip, ruta, status);
 
-                    File.Delete(zip);
+                    //File.Delete(zip);
 
                     return true;
                 }
@@ -249,8 +249,9 @@ namespace Scanda.ClassLibrary
                     await Logger.sendLog(string.Format("El archivo {0} esta siendo usado por otro proceso", name), "E");
                     return false;
                 }
-                
 
+                List<string> eliminables = Directory.GetFiles("C:\\DBProtector\\").Where(ent => { return ent.EndsWith(".zip"); }).ToList();
+                
             }
             catch (Exception ex)
             {
@@ -441,6 +442,7 @@ namespace Scanda.ClassLibrary
                         }
                     }
                 }
+                stream.Close();
                 return true;
             }
             catch (OutOfMemoryException ex)
