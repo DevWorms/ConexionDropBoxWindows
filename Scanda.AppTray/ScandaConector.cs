@@ -229,8 +229,7 @@ namespace Scanda.AppTray
 
         public static async Task<bool> uploadFile(string archivo, string usrId, Status status, List<string> extensions = null, Config config = null, string config_path = null)
         {
-            await sync_accountinfo(config, config_path);
-
+            
             status.upload.file = archivo;
             status.upload.status = 1;
             try
@@ -276,8 +275,9 @@ namespace Scanda.AppTray
                 await Logger.sendLog(string.Format("{0} | {1} | {2}", archivo, "Comenzando subida...", "Scanda.AppTray.ScandaConector.uploadFile"), "T");
                 var res = await uploadZipFile(zip, ruta, status);
                 await Logger.sendLog(string.Format("{0} | {1} | {2}", archivo, "subida terminada...", "Scanda.AppTray.ScandaConector.uploadFile"), "T");
+                await sync_accountinfo(config, config_path);
 
-              
+
                 // Realizamos la limpieza en Cloud
                 await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza limpieza en la nube", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "T");
 
@@ -352,18 +352,6 @@ namespace Scanda.AppTray
                 await sync_accountinfo(config, config_path);
                 await sync_updateAccount(config, config_path);
 
-                //Se borran los archivos zip de la carpeta dbprotector
-
-                List<string> eliminables = Directory.GetFiles("C:\\DBProtector\\").Where(ent => { return ent.EndsWith(".zip"); }).ToList();
-
-                if (eliminables != null)
-                {
-                    foreach (string file in eliminables)
-                    {
-
-                        File.Delete(file); //Se borra el zip creado
-                    }
-                }
 
                 return true;
 
@@ -373,6 +361,21 @@ namespace Scanda.AppTray
                 await Logger.sendLog(string.Format("{0} | Error al sincronizar {1} | {2}", "Scanda.AppTray.ScandaConector.uploadFile", ex.Message, ex.StackTrace), "E");
                 return false;
 
+            }
+            finally
+            {
+
+                //Se borran los archivos zip de la carpeta dbprotector
+
+                List<string> eliminables = Directory.GetFiles("C:\\DBProtector\\").Where(ent => { return ent.EndsWith(".zip"); }).ToList();
+
+                if (eliminables != null)
+                {
+                    foreach (string file in eliminables)
+                    {
+                        File.Delete(file); //Se borra el zip creado
+                    }
+                }
             }
         }
 
@@ -809,14 +812,14 @@ namespace Scanda.AppTray
                         }
                         else
                         {
-                            int res =Math.Abs( r.StorageLimit - r.UsedStorage);
-                            if(tam < res)
+                            int res = r.StorageLimit - r.UsedStorage;
+                            if(res > 0)
                             {
                                 tamvalido = true;
                             }
                             else
                             {
-                                await Logger.sendLog(string.Format("{0} | {1} | {2}"," Sin espacio", "Se agoto el espacio ya este cliente tiene " + r.StorageLimit + " en la nube", "Scadna.AppTray.ScandaConector.isValidSize"), "E");
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}"," Sin espacio", "Se agoto el espacio, este cliente cuenta con " + r.StorageLimit + " MB disponibles en la nube", "Scadna.AppTray.ScandaConector.isValidSize"), "E");
                                 tamvalido = false;
                             }
                         }

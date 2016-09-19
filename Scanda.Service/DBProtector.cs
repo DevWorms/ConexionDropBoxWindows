@@ -79,10 +79,7 @@ namespace Scanda.Service
 
         public async Task StartUpload()
         {
-            await sync_accountinfo(config, configuration_path);
-
-            await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Servicio de windows ejecutandose ", "Scanda.Service.DBProtector.StartUpload"), "E");
-
+            
             if (!string.IsNullOrEmpty(config.id_customer) && !string.IsNullOrEmpty(config.path)  )
             {
                 if (!((config.type_storage != "3") && string.IsNullOrEmpty(config.hist_path)))
@@ -124,14 +121,13 @@ namespace Scanda.Service
 
                                     FileInfo info = new FileInfo(file);
                                     var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions, config, configuration_path);
-                                    if (!x)
+                                    switch (x)
                                     {
-                                        await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name, "Error al sincronizar " , "Scanda.Service.DBProtector.StartUpload "), "E");
-
-                                    }
-                                    else
-                                    {
-                                        await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name,  "Archivo subido correctamente ", "Scanda.Service.DBProtector.StartUpload "), "T");
+                                        case 0: 
+                                            await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name, "Error al sincronizar " , "Scanda.Service.DBProtector.StartUpload "), "E");
+                                            break;
+                                        case 1: await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name,  "Archivo subido correctamente ", "Scanda.Service.DBProtector.StartUpload "), "T");
+                                            break;
                                     }
                                 }
                             }
@@ -144,19 +140,7 @@ namespace Scanda.Service
                             
                         }
 
-
-                        //Se borran los archivos zip de la carpeta dbprotector
-
-                        List<string> eliminables = Directory.GetFiles("C:\\DBProtector\\").Where(ent => { return ent.EndsWith(".zip"); }).ToList();
-
-                        if (eliminables != null)
-                        {
-                            foreach (string file in eliminables)
-                            {
-
-                                File.Delete(file); //Se borra el zip creado
-                            }
-                        }
+                        
 
                     }
                     catch (Exception ex)
@@ -170,73 +154,15 @@ namespace Scanda.Service
                         + "\n" + ex.StackTrace
                         + "\n", "E");*/
                     }
-                }
-            }
-        }
-
-        private async Task sync_updateAccount()
-        {
-            try
-            {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza actualizando informacion del usuario...", "Scanda.Service.DBProtector.syncUpdateAccount"), "T");
-
-                // Obtenemos los datos de dropbox
-                var x = await ScandaConector.getUsedSpace(config.id_customer);
-                string url = ConfigurationManager.AppSettings["api_url"];
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri(url);
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    HttpResponseMessage response = await client.GetAsync(string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, x));
-                    if (response.IsSuccessStatusCode)
+                    finally
                     {
-                      
+                        
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.Service.DBProtector.sync_updateAccount"), "E");
-                /*Logger.sendLog(ex.Message
-                    + "\n" + ex.Source
-                    + "\n" + ex.StackTrace
-                    + "\n" + ex.StackTrace
-                    + "\n", "E");*/
-            }
-        }
-        private static async Task sync_accountinfo(Config config, string config_path)
-        {
-            try
-            {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza actualizando informacion del usuario...", "Scanda.AppTray.ScandaConector.syncUpdateAccount"), "T");
-
-                string url = ConfigurationManager.AppSettings["api_url"];
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri(url);
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    HttpResponseMessage response = await client.GetAsync(string.Format("Account_GET?User={0}&Password={1}", config.user, config.password));
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var resp = await response.Content.ReadAsStringAsync();
-                        Account r = JsonConvert.DeserializeObject<Account>(resp);
-                        config.time = r.UploadFrecuency.ToString();
-                        config.time_type = "Horas";
-                        config.type_storage = r.FileTreatmen.ToString();
-                        config.file_historical = r.FileHistoricalNumber.ToString();
-                        config.cloud_historical = r.FileHistoricalNumberCloud.ToString();
-                        File.WriteAllText(config_path, JsonConvert.SerializeObject(config));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.Service.DBProtector.sync_updateAccount"), "E");
-            }
         }
 
+     
     }
 
 

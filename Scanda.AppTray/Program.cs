@@ -98,8 +98,8 @@ namespace Scanda.AppTray
         private static void SetStartup()
         {
             // Set the application to run at startup
-            RegistryKey key = Registry.CurrentUser.OpenSubKey(StartupKey, true);
-            key.SetValue(StartupValue, Application.ExecutablePath.ToString());
+         //   RegistryKey key = Registry.CurrentUser.OpenSubKey(StartupKey, true);
+         //   key.SetValue(StartupValue, Application.ExecutablePath.ToString());
         }
     }
 }
