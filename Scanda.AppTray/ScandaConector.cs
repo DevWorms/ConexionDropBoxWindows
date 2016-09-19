@@ -816,6 +816,7 @@ namespace Scanda.AppTray
                             }
                             else
                             {
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}"," Sin espacio", "Se agoto el espacio ya este cliente tiene " + r.StorageLimit + " en la nube", "Scadna.AppTray.ScandaConector.isValidSize"), "E");
                                 tamvalido = false;
                             }
                         }

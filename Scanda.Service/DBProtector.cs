@@ -123,7 +123,7 @@ namespace Scanda.Service
                                     Status temp2 = new Status(base_url, null, null, config.user, config.password);
 
                                     FileInfo info = new FileInfo(file);
-                                    var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
+                                    var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions, config, configuration_path);
                                     if (!x)
                                     {
                                         await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name, "Error al sincronizar " , "Scanda.Service.DBProtector.StartUpload "), "E");
@@ -141,78 +141,7 @@ namespace Scanda.Service
                             }
 
 
-                            // Realizamos la limpieza en Cloud
-                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza limpieza en la nube", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "T");
-
-                            await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical),config);
-                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Termina limpieza en la nube", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "T");
-
-                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "Eliminando archivos temporales", "Comienza limpieza de archivos temporales local", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "T");
-
-                            #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
-                            if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
-                            {
-                                // Comenzamos a mover los archivos 
-                                List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name) && isValidExt(ent.Name, config.extensions)).OrderBy(f => f.LastWriteTime).ToList();
-                                foreach (FileInfo file in fileEntries2)
-                                {
-                                    if (isValidFileName(file.Name))
-                                    {
-                                        //cuando vale 1 y 2 se mueve a una carpeta el respaldo, cuanfdo vale 3 se borra localmente
-                                        if (config.type_storage == "1" || config.type_storage == "2")
-                                        {
-                                            // Se copia a Historicos
-                                            if (File.Exists(config.hist_path + "\\" + file.Name))
-                                                File.Delete(config.hist_path + "\\" + file.Name);
-                                            File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
-                                        }
-                                        File.Delete(config.path + "\\" + file.Name);
-                                    }
-                                }
-
-                                List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                                // verificamos el limite
-
-                                //Borramos en la nube
-                                //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
-                                //Borramos local
-                                bool canTransfer = false;
-                                while (!canTransfer)
-                                {
-                                    if (histFileEntries.Count() <= int.Parse(config.file_historical))
-                                    {
-
-                                        canTransfer = true;
-                                    }
-                                    else
-                                    {
-                                        FileInfo item = histFileEntries.FirstOrDefault();
-                                        if (item != null)
-                                            File.Delete(config.hist_path + "\\" + item.Name);
-                                        histFileEntries.Remove(item);
-
-                                    }
-                                }
-
-                            }
-                            else if (config.type_storage == "3")
-                            {
-                                // Comenzamos a mover los archivos 
-                                List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                                foreach (FileInfo file in fileEntries2)
-                                {
-                                    if (isValidFileName(file.Name))
-                                    {
-                                        // Se borra el archivo localmente porque la configurcion es 3
-                                        File.Delete(config.path + "\\" + file.Name);
-                                    }
-                                }
-                            }
-
-                            #endregion
-                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Termina limpieza de archivos temporales local", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "T");
-
-                            await sync_updateAccount();
+                            
                         }
 
 
