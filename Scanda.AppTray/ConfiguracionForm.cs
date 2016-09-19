@@ -257,6 +257,7 @@ namespace Scanda.AppTray
                 metroPB_CloudSpace.Value = 0;
                 metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
                 metroPB_CloudSpace.Refresh();
+                metroPB_CloudSpace.ForeColor = System.Drawing.Color.White;
                 mtxt_time.Text = "0 Horas";
                 mtxt_localHist.Text = "0";
                 mtxt_cloudHist.Text = "0";
@@ -347,7 +348,9 @@ namespace Scanda.AppTray
                         var resp = await response.Content.ReadAsStringAsync();
                         Account r = JsonConvert.DeserializeObject<Account>(resp);
                         mtxt_user.Text = config.user; // r.DBoxUser;
-                        mtxt_totalspace.Text =  r.UsedStorage.ToString() + " MB" + " de "+ r.StorageLimit + " MB usados";
+
+                        string usado = (r.UsedStorage > r.StorageLimit ? r.StorageLimit : r.UsedStorage).ToString();
+                        mtxt_totalspace.Text = usado + " MB" + " de "+ r.StorageLimit + " MB usados";
                         // mtxt_avalaiblespace.Text = (r.StorageLimit - r.UsedStorage).ToString();
 
                         double porcentaje = (((float)r.UsedStorage * 100) / (float)r.StorageLimit);

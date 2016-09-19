@@ -417,6 +417,7 @@ namespace Scanda.AppTray
 
         private async void syncNowToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
             try
             {
                 json = File.ReadAllText(configuration_path);
@@ -457,7 +458,8 @@ namespace Scanda.AppTray
                         {
                             Status temp2 = new Status(base_url, notifyIconScanda, syncNowToolStripMenuItem, config.user, config.password);
                             FileInfo info = new FileInfo(file);
-                            var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions);
+                            
+                            var x = await ScandaConector.uploadFile(file, config.id_customer, temp2, config.extensions, config, configuration_path);
                             if (!x)
                             {
                                 notifyIconScanda.ShowBalloonTip(1000, "Alerta", string.Format("Error al sincronizar {0}", info.Name), ToolTipIcon.Error);
@@ -480,84 +482,11 @@ namespace Scanda.AppTray
                     }
 
 
-                    // Realizamos la limpieza en Cloud
-                    await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical), config);
-                    #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
-                    if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
-                    {
-                        // Comenzamos a mover los archivos 
-                        List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name) && isValidExt(ent.Name, config.extensions)).OrderBy(f => f.LastWriteTime).ToList();
-                        foreach (FileInfo file in fileEntries2)
-                        {
-                            if (isValidFileName(file.Name))
-                            {
-                                //cuando vale 1 y 2 se mueve a una carpeta el respaldo, cuanfdo vale 3 se borra localmente
-                                if (config.type_storage == "1" || config.type_storage == "2")
-                                {
-                                    // Se copia a Historicos
-                                    if (File.Exists(config.hist_path + "\\" + file.Name))
-                                        File.Delete(config.hist_path + "\\" + file.Name);
-                                    File.Copy(config.path + "\\" + file.Name, config.hist_path + "\\" + file.Name);
-                                }
-                                File.Delete(config.path + "\\" + file.Name);
-                            }
-                        }
-
-                        List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                        // verificamos el limite
-
-                        //Borramos en la nube
-                        //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
-                        //Borramos local
-                        bool canTransfer = false;
-                        while (!canTransfer)
-                        {
-                            if (histFileEntries.Count() <= int.Parse(config.file_historical))
-                            {
-                               
-                                canTransfer = true;
-                            }
-                            else
-                            {
-                                FileInfo item = histFileEntries.FirstOrDefault();
-                                if (item != null)
-                                    File.Delete(config.hist_path + "\\" + item.Name);
-                                histFileEntries.Remove(item);
-
-                            }
-                        }
-
-                    }
-                    else if (config.type_storage == "3")
-                    {
-                        // Comenzamos a mover los archivos 
-                        List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                        foreach (FileInfo file in fileEntries2)
-                        {
-                            if (isValidFileName(file.Name))
-                            {
-                                // Se borra el archivo localmente porque la configurcion es 3
-                                File.Delete(config.path + "\\" + file.Name);
-                            }
-                        }
-                    }
-                    #endregion
-                    await sync_updateAccount();
+                   
                 }
 
 
-                //Se borran los archivos zip de la carpeta dbprotector
-
-                List<string> eliminables = Directory.GetFiles("C:\\DBProtector\\").Where(ent => { return ent.EndsWith(".zip"); }).ToList();
-
-                if (eliminables != null)
-                {
-                    foreach (string file in eliminables)
-                    {
-
-                        File.Delete(file); //Se borra el zip creado
-                    }
-                }
+               
                 // Termino de hacer todos los respaldos
                 syncNowToolStripMenuItem.Text = "Sincronizar ahora";
                 syncNowToolStripMenuItem.Enabled = true;
@@ -578,64 +507,19 @@ namespace Scanda.AppTray
                     + "\n" + ex.StackTrace
                     + "\n", "E");*/
             }
+            finally
+            {
+                syncNowToolStripMenuItem.Text = "Sincronizar ahora";
+                syncNowToolStripMenuItem.Enabled = true;
+                configuracionToolStripMenuItem.Enabled = true;
+                descargarToolStripMenuItem.Enabled = true;
+            }
            
 
         }
-        private async Task sync_updateAccount()
-        {
-            try
-            {
-                // Obtenemos los datos de dropbox
-                var x = await ScandaConector.getUsedSpace(config.id_customer);
-                string url = ConfigurationManager.AppSettings["api_url"];
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri(url);
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    HttpResponseMessage response = await client.GetAsync(string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, x));
-                    if (response.IsSuccessStatusCode)
-                    {
-                        /*var resp = await response.Content.ReadAsStringAsync();
-                        Account r = JsonConvert.DeserializeObject<Account>(resp);
-                        config.time = r.UploadFrecuency.ToString();
-                        config.time_type = "Horas";
-                        config.type_storage = r.FileTreatmen.ToString();
-                        config.file_historical = r.FileHistoricalNumber.ToString();
-                        File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));*/
-                    }
-                }
-            }catch(Exception ex) {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scadna.AppTray.FormTray.sync_updateAccount"), "E");
-                /*Logger.sendLog(ex.Message
-                    + "\n" + ex.Source
-                    + "\n" + ex.StackTrace
-                    + "\n" + ex.StackTrace
-                    + "\n", "E");*/
-            }
-        }
-        private async Task sync_accountinfo()
-        {
-            string url = ConfigurationManager.AppSettings["api_url"];
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage response = await client.GetAsync(string.Format("Account_GET?User={0}&Password={0}", config.user, config.password));
-                if (response.IsSuccessStatusCode)
-                {
-                    var resp = await response.Content.ReadAsStringAsync();
-                    Account r = JsonConvert.DeserializeObject<Account>(resp);
-                    config.time = r.UploadFrecuency.ToString();
-                    config.time_type = "Horas";
-                    config.type_storage = r.FileTreatmen.ToString();
-                    config.file_historical = r.FileHistoricalNumber.ToString();
-                    config.cloud_historical = r.FileHistoricalNumberCloud.ToString();
-                    File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
-                }
-            }
-        }
+
+
+    
 
         private void notifyIconScanda_MouseDoubleClick(object sender, MouseEventArgs e)
         {

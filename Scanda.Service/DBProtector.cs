@@ -79,7 +79,10 @@ namespace Scanda.Service
 
         public async Task StartUpload()
         {
-           
+            await sync_accountinfo(config, configuration_path);
+
+            await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Servicio de windows ejecutandose ", "Scanda.Service.DBProtector.StartUpload"), "E");
+
             if (!string.IsNullOrEmpty(config.id_customer) && !string.IsNullOrEmpty(config.path)  )
             {
                 if (!((config.type_storage != "3") && string.IsNullOrEmpty(config.hist_path)))
@@ -139,7 +142,13 @@ namespace Scanda.Service
 
 
                             // Realizamos la limpieza en Cloud
+                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza limpieza en la nube", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "T");
+
                             await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical),config);
+                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Termina limpieza en la nube", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "T");
+
+                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "Eliminando archivos temporales", "Comienza limpieza de archivos temporales local", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "T");
+
                             #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
                             if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
                             {
@@ -201,6 +210,8 @@ namespace Scanda.Service
                             }
 
                             #endregion
+                            await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Termina limpieza de archivos temporales local", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "T");
+
                             await sync_updateAccount();
                         }
 
@@ -238,6 +249,8 @@ namespace Scanda.Service
         {
             try
             {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza actualizando informacion del usuario...", "Scanda.Service.DBProtector.syncUpdateAccount"), "T");
+
                 // Obtenemos los datos de dropbox
                 var x = await ScandaConector.getUsedSpace(config.id_customer);
                 string url = ConfigurationManager.AppSettings["api_url"];
@@ -249,13 +262,7 @@ namespace Scanda.Service
                     HttpResponseMessage response = await client.GetAsync(string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, x));
                     if (response.IsSuccessStatusCode)
                     {
-                        /*var resp = await response.Content.ReadAsStringAsync();
-                        Account r = JsonConvert.DeserializeObject<Account>(resp);
-                        config.time = r.UploadFrecuency.ToString();
-                        config.time_type = "Horas";
-                        config.type_storage = r.FileTreatmen.ToString();
-                        config.file_historical = r.FileHistoricalNumber.ToString();
-                        File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));*/
+                      
                     }
                 }
             }
@@ -269,26 +276,35 @@ namespace Scanda.Service
                     + "\n", "E");*/
             }
         }
-        private async Task sync_accountinfo()
+        private static async Task sync_accountinfo(Config config, string config_path)
         {
-            string url = ConfigurationManager.AppSettings["api_url"];
-            using (var client = new HttpClient())
+            try
             {
-                client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage response = await client.GetAsync(string.Format("Account_GET?User={0}&Password={0}", config.user, config.password));
-                if (response.IsSuccessStatusCode)
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza actualizando informacion del usuario...", "Scanda.AppTray.ScandaConector.syncUpdateAccount"), "T");
+
+                string url = ConfigurationManager.AppSettings["api_url"];
+                using (var client = new HttpClient())
                 {
-                    var resp = await response.Content.ReadAsStringAsync();
-                    Account r = JsonConvert.DeserializeObject<Account>(resp);
-                    config.time = r.UploadFrecuency.ToString();
-                    config.time_type = "Horas";
-                    config.type_storage = r.FileTreatmen.ToString();
-                    config.file_historical = r.FileHistoricalNumber.ToString();
-                    config.cloud_historical = r.FileHistoricalNumberCloud.ToString();
-                    File.WriteAllText(configuration_path, JsonConvert.SerializeObject(config));
+                    client.BaseAddress = new Uri(url);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    HttpResponseMessage response = await client.GetAsync(string.Format("Account_GET?User={0}&Password={1}", config.user, config.password));
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var resp = await response.Content.ReadAsStringAsync();
+                        Account r = JsonConvert.DeserializeObject<Account>(resp);
+                        config.time = r.UploadFrecuency.ToString();
+                        config.time_type = "Horas";
+                        config.type_storage = r.FileTreatmen.ToString();
+                        config.file_historical = r.FileHistoricalNumber.ToString();
+                        config.cloud_historical = r.FileHistoricalNumberCloud.ToString();
+                        File.WriteAllText(config_path, JsonConvert.SerializeObject(config));
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.Service.DBProtector.sync_updateAccount"), "E");
             }
         }
 
