@@ -368,7 +368,7 @@
             this.metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
             this.metroPB_CloudSpace.TabIndex = 10;
             this.metroPB_CloudSpace.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.metroPB_CloudSpace.Theme = MetroFramework.MetroThemeStyle.Light;
+            this.metroPB_CloudSpace.Theme = MetroFramework.MetroThemeStyle.Default;
             this.metroPB_CloudSpace.Click += new System.EventHandler(this.metroPB_CloudSpace_Click);
             // 
             // metroTabPageHistorico

@@ -226,6 +226,7 @@ namespace Scanda.ClassLibrary
             string ruta = string.Empty;
             try
             {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Servicio de windows ejecutandose ", "Scanda.Service.DBProtector.StartUpload"), "T");
 
                 FileInfo info = new FileInfo(archivo);
 
@@ -234,8 +235,7 @@ namespace Scanda.ClassLibrary
                 {
 
                     
-                    await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Servicio de windows ejecutandose ", "Scanda.Service.DBProtector.StartUpload"), "T");
-
+                    
 
                     //validamos extensiones
                     if (!isValidExt(info.Extension, extensions))
@@ -297,6 +297,9 @@ namespace Scanda.ClassLibrary
                         //{
                         if (isValidFileName(info.Name))
                         {
+                            string desde = (config.path + "\\" + info.Name).Replace("\u0027\\", "");
+                            string hacia = (config.hist_path + "\\" + info.Name).Replace("\u0027", "");
+
                             //cuando vale 1 y 2 se mueve a una carpeta el respaldo, cuanfdo vale 3 se borra localmente
                             if (config.type_storage == "1" || config.type_storage == "2")
                             {
@@ -304,14 +307,12 @@ namespace Scanda.ClassLibrary
                                 if (File.Exists(config.hist_path + "\\" + info.Name))
                                     File.Delete(config.hist_path + "\\" + info.Name);
 
-                                string desde = (config.path + "\\" + info.Name).Replace("\u0027\\", "");
-                                string hacia = (config.path + "\\" + info.Name).Replace("\u0027", "");
                                 await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name, "Moviendo archivo de  " + desde+ " hacia " + hacia, "Scanda.AppTray.Scanda.AppTray.ScandaConector.uploadFile"), "T");
-                                File.Copy(config.path + "\\" + info.Name, config.hist_path + "\\" + info.Name);
+                                File.Copy(desde, hacia);
                                 await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name, "Movido a "+ config.hist_path + "\\" + info.Name, "Scanda.AppTray.Scanda.AppTray.ScandaConector.uploadFile"), "T");
 
                             }
-                            File.Delete(config.path + "\\" + info.Name);
+                            File.Delete(desde);
                         }
                         //}
 

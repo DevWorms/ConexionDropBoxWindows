@@ -257,7 +257,9 @@ namespace Scanda.AppTray
                 metroPB_CloudSpace.Value = 0;
                 metroPB_CloudSpace.Style = MetroFramework.MetroColorStyle.Green;
                 metroPB_CloudSpace.Refresh();
-                metroPB_CloudSpace.ForeColor = System.Drawing.Color.White;
+                metroPB_CloudSpace.Enabled = true;
+                
+
                 mtxt_time.Text = "0 Horas";
                 mtxt_localHist.Text = "0";
                 mtxt_cloudHist.Text = "0";

@@ -148,7 +148,15 @@ namespace Scanda.AppTray
                 foreach (string client in metadatos.Keys)
                 {
                     FileMetadata fileData = metadatos[client].AsFile;
-                    ret.Add(client, fileData.ServerModified.ToString() + " " + fileData.Name);
+
+                    string fechaAno = fileData.Name.Substring(fileData.Name .Length- 22,4);
+                    string fechaDia = fileData.Name.Substring(fileData.Name.Length - 18, 2);
+                    string fechames = fileData.Name.Substring(fileData.Name.Length - 16, 2);
+                    string fechahora = fileData.Name.Substring(fileData.Name.Length - 14, 2);
+                    string fechaminuto = fileData.Name.Substring(fileData.Name.Length - 12, 2);
+                    string fechasegundo = fileData.Name.Substring(fileData.Name.Length - 10, 2);
+                    string fecha = fechaDia + "/" + fechames + "/" + fechaAno + " " + fechahora + ":" + fechaminuto + ":" + fechasegundo;
+                    ret.Add(client, fecha + " " + fileData.Name);
                 }
 
                 return ret;
