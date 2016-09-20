@@ -53,7 +53,7 @@ namespace Scanda.AppTray
                 // storage_files.AddRange(files);
             }
             int y = 20;
-            var parents = storage_files.Where(ent => ent.rfc != "").Select(ent => ent.rfc).ToArray();
+            var parents = storage_files.Where(ent => ent.rfc != "").Select(ent => ent.rfc).Distinct().ToArray();
             foreach (var parent in parents)
             {
                 FileDetail[] files = storage_files.Where(ent => ent.rfc == parent).ToArray<FileDetail>();
