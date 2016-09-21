@@ -353,7 +353,7 @@ namespace Scanda.AppTray
 
                         double porcentaje = (((float)r.UsedStorage * 100) / (float)r.StorageLimit);
                         string usado = (r.UsedStorage > r.StorageLimit ? r.StorageLimit : r.UsedStorage).ToString();
-                        mtxt_totalspace.Text = string.Format("{0} MB de {1}  MB usados, Usado al {2}%", usado, r.StorageLimit, ((int)Math.Ceiling(porcentaje) >= 100 ? 100 : (int)Math.Ceiling(porcentaje)));
+                        mtxt_totalspace.Text = string.Format("{0} MB de {1}  MB usados, espacio consumido al {2}%", usado, r.StorageLimit, ((int)Math.Ceiling(porcentaje) >= 100 ? 100 : (int)Math.Ceiling(porcentaje)));
                         // mtxt_avalaiblespace.Text = (r.StorageLimit - r.UsedStorage).ToString();
                         
                         metroPB_CloudSpace.Value = ((int)Math.Ceiling(porcentaje)>=100 ? 100:(int)Math.Ceiling(porcentaje));
