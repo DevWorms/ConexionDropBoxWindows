@@ -52,9 +52,10 @@
             this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLogin.Font = new System.Drawing.Font("Microsoft YaHei UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnLogin.ForeColor = System.Drawing.Color.White;
-            this.btnLogin.Location = new System.Drawing.Point(117, 282);
+            this.btnLogin.Location = new System.Drawing.Point(156, 347);
+            this.btnLogin.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(115, 30);
+            this.btnLogin.Size = new System.Drawing.Size(153, 37);
             this.btnLogin.TabIndex = 0;
             this.btnLogin.Text = "Iniciar Sesion";
             this.btnLogin.UseVisualStyleBackColor = false;
@@ -64,19 +65,21 @@
             // 
             this.txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtUsername.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtUsername.Location = new System.Drawing.Point(117, 188);
+            this.txtUsername.Location = new System.Drawing.Point(156, 231);
+            this.txtUsername.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(261, 26);
+            this.txtUsername.Size = new System.Drawing.Size(347, 30);
             this.txtUsername.TabIndex = 1;
             // 
             // txtPassword
             // 
             this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPassword.Location = new System.Drawing.Point(117, 231);
+            this.txtPassword.Location = new System.Drawing.Point(156, 284);
+            this.txtPassword.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
-            this.txtPassword.Size = new System.Drawing.Size(261, 26);
+            this.txtPassword.Size = new System.Drawing.Size(347, 30);
             this.txtPassword.TabIndex = 2;
             // 
             // lblAlert
@@ -84,17 +87,19 @@
             this.lblAlert.AutoSize = true;
             this.lblAlert.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.lblAlert.ForeColor = System.Drawing.Color.Red;
-            this.lblAlert.Location = new System.Drawing.Point(126, 238);
+            this.lblAlert.Location = new System.Drawing.Point(168, 293);
+            this.lblAlert.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblAlert.Name = "lblAlert";
-            this.lblAlert.Size = new System.Drawing.Size(0, 13);
+            this.lblAlert.Size = new System.Drawing.Size(0, 17);
             this.lblAlert.TabIndex = 5;
             // 
             // pbx_logo
             // 
             this.pbx_logo.Image = global::Scanda.AppTray.Properties.Resources.DB_Protector_64X64;
-            this.pbx_logo.Location = new System.Drawing.Point(181, 28);
+            this.pbx_logo.Location = new System.Drawing.Point(241, 34);
+            this.pbx_logo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pbx_logo.Name = "pbx_logo";
-            this.pbx_logo.Size = new System.Drawing.Size(117, 73);
+            this.pbx_logo.Size = new System.Drawing.Size(156, 90);
             this.pbx_logo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbx_logo.TabIndex = 6;
             this.pbx_logo.TabStop = false;
@@ -104,9 +109,10 @@
             this.lblCompany.AutoSize = true;
             this.lblCompany.Font = new System.Drawing.Font("Microsoft Tai Le", 7.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCompany.ForeColor = System.Drawing.Color.Gray;
-            this.lblCompany.Location = new System.Drawing.Point(114, 349);
+            this.lblCompany.Location = new System.Drawing.Point(152, 430);
+            this.lblCompany.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblCompany.Name = "lblCompany";
-            this.lblCompany.Size = new System.Drawing.Size(75, 13);
+            this.lblCompany.Size = new System.Drawing.Size(98, 16);
             this.lblCompany.TabIndex = 7;
             this.lblCompany.Text = "@ 2016 Scanda";
             this.lblCompany.Visible = false;
@@ -117,9 +123,10 @@
             this.lblMessages.Font = new System.Drawing.Font("Microsoft YaHei UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblMessages.ForeColor = System.Drawing.Color.Red;
             this.lblMessages.ImageAlign = System.Drawing.ContentAlignment.TopRight;
-            this.lblMessages.Location = new System.Drawing.Point(114, 152);
+            this.lblMessages.Location = new System.Drawing.Point(152, 187);
+            this.lblMessages.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblMessages.Name = "lblMessages";
-            this.lblMessages.Size = new System.Drawing.Size(0, 19);
+            this.lblMessages.Size = new System.Drawing.Size(0, 23);
             this.lblMessages.TabIndex = 9;
             // 
             // mlbl_info
@@ -127,9 +134,10 @@
             this.mlbl_info.AutoSize = true;
             this.mlbl_info.FontSize = MetroFramework.MetroLabelSize.Tall;
             this.mlbl_info.FontWeight = MetroFramework.MetroLabelWeight.Regular;
-            this.mlbl_info.Location = new System.Drawing.Point(191, 117);
+            this.mlbl_info.Location = new System.Drawing.Point(255, 144);
+            this.mlbl_info.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.mlbl_info.Name = "mlbl_info";
-            this.mlbl_info.Size = new System.Drawing.Size(107, 25);
+            this.mlbl_info.Size = new System.Drawing.Size(115, 25);
             this.mlbl_info.TabIndex = 10;
             this.mlbl_info.Text = "Inicia sesión";
             this.mlbl_info.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -139,17 +147,18 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Tai Le", 7.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.Gray;
-            this.label1.Location = new System.Drawing.Point(354, 349);
+            this.label1.Location = new System.Drawing.Point(472, 430);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(24, 13);
+            this.label1.Size = new System.Drawing.Size(38, 16);
             this.label1.TabIndex = 11;
-            this.label1.Text = "v1.9";
+            this.label1.Text = "v1.10";
             // 
             // LoginForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(481, 395);
+            this.ClientSize = new System.Drawing.Size(641, 486);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.mlbl_info);
             this.Controls.Add(this.lblMessages);
@@ -161,8 +170,10 @@
             this.Controls.Add(this.btnLogin);
             this.ForeColor = System.Drawing.Color.Black;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MaximizeBox = false;
             this.Name = "LoginForm";
+            this.Padding = new System.Windows.Forms.Padding(27, 74, 27, 25);
             this.Resizable = false;
             this.Theme = MetroFramework.MetroThemeStyle.Light;
             this.Load += new System.EventHandler(this.LoginForm_Load);
