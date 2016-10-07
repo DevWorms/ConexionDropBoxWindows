@@ -34,6 +34,8 @@
             this.tableLayoutPanel_Main = new System.Windows.Forms.TableLayoutPanel();
             this.mbtnCancel = new MetroFramework.Controls.MetroButton();
             this.mbtnDownload = new MetroFramework.Controls.MetroButton();
+            this.label1 = new System.Windows.Forms.Label();
+            this.lblCompany = new System.Windows.Forms.Label();
             this.metroTabControlPrincipal.SuspendLayout();
             this.metroTabPageRespaldos.SuspendLayout();
             this.SuspendLayout();
@@ -92,12 +94,37 @@
             this.mbtnDownload.Text = "Descargar Seleccionados";
             this.mbtnDownload.Click += new System.EventHandler(this.mbtnDownload_Click);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Tai Le", 7.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.Gray;
+            this.label1.Location = new System.Drawing.Point(268, 428);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(29, 13);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "v1.10";
+            // 
+            // lblCompany
+            // 
+            this.lblCompany.AutoSize = true;
+            this.lblCompany.Font = new System.Drawing.Font("Microsoft Tai Le", 7.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCompany.ForeColor = System.Drawing.Color.Gray;
+            this.lblCompany.Location = new System.Drawing.Point(28, 428);
+            this.lblCompany.Name = "lblCompany";
+            this.lblCompany.Size = new System.Drawing.Size(70, 13);
+            this.lblCompany.TabIndex = 12;
+            this.lblCompany.Text = "@ 2016 Xamal";
+            this.lblCompany.Visible = false;
+            // 
             // RecuperarForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.mbtnCancel;
             this.ClientSize = new System.Drawing.Size(715, 474);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.lblCompany);
             this.Controls.Add(this.mbtnDownload);
             this.Controls.Add(this.mbtnCancel);
             this.Controls.Add(this.metroTabControlPrincipal);
@@ -110,6 +137,7 @@
             this.metroTabControlPrincipal.ResumeLayout(false);
             this.metroTabPageRespaldos.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -120,5 +148,7 @@
         private MetroFramework.Controls.MetroButton mbtnCancel;
         private MetroFramework.Controls.MetroButton mbtnDownload;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel_Main;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblCompany;
     }
 }
