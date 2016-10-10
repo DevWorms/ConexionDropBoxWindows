@@ -1086,7 +1086,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_019A67A9201744C7BDD300137731210C"
             {
-            "SourcePath" = "8:C:\\Users\\Juan\\Downloads\\DB_Protector_64X64.png"
+            "SourcePath" = "8:C:\\DB_Protector_64X64.png"
             "TargetName" = "8:DB_Protector_64X64.png"
             "Tag" = "8:"
             "Folder" = "8:_8E01F730C8AB4036BD468041BE3FC420"
@@ -1106,7 +1106,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_041BE0231D8C41499AD105506A597C1F"
             {
-            "SourcePath" = "8:C:\\Users\\Juan\\Downloads\\DB_Protector_32X32.png"
+            "SourcePath" = "8:C:\\DB_Protector_32X32.png"
             "TargetName" = "8:DB_Protector_32X32.png"
             "Tag" = "8:"
             "Folder" = "8:_8E01F730C8AB4036BD468041BE3FC420"
@@ -1560,7 +1560,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2FAA365579F349E0A8A7F8A5C44B3A7C"
             {
-            "SourcePath" = "8:C:\\Users\\Juan\\Downloads\\DB_Protector_16X16-01.png"
+            "SourcePath" = "8:C:\\DB_Protector_16X16-01.png"
             "TargetName" = "8:DB_Protector_16X16-01.png"
             "Tag" = "8:"
             "Folder" = "8:_8E01F730C8AB4036BD468041BE3FC420"
@@ -1580,7 +1580,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_328950F999AA432A806FA7BAF46428EE"
             {
-            "SourcePath" = "8:C:\\Users\\Juan\\Downloads\\DB_Protector_32X32.ico"
+            "SourcePath" = "8:C:\\DB_Protector_32X32.ico"
             "TargetName" = "8:DB_Protector_32X32.ico"
             "Tag" = "8:"
             "Folder" = "8:_52A10CB248C442D390DE71A15C881241"
