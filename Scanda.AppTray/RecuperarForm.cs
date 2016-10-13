@@ -22,7 +22,7 @@ namespace Scanda.AppTray
         public List<Control> controls = new List<Control>() { };
         private Config config;
         private string json;
-        private string RFCregexp = "([A-Zz-z]{4}\\d{6}(---|\\w{3})?)";
+        private string RFCregexp = "([A-Zz-z]{3,4}\\d{6}(---|\\w{3})?)";
         public RecuperarForm(bool isNuevaInstancia, string configPath)
         {
             InitializeComponent();

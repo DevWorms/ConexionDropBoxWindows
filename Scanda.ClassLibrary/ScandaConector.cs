@@ -591,8 +591,9 @@ namespace Scanda.ClassLibrary
                 clientConf = new DropboxClientConfig("ScandaV1");
                 client = new DropboxClient(APITOKEN);
                 FileInfo info = new FileInfo(origen);
-
-                status.upload.total = ((info.Length * 1)) + ""; //Lo convierte a MB y a string
+                
+                status.upload.total = ((info.Length * 1)) / (B_TO_MB * 1.0f) + ""; //Esta en bytes para convertirlos en megas /1024d)/1024d
+                await Logger.sendLog(string.Format("Peso total del archivo es de {0} en megas {1}", info.Length, status.upload.total), "T");
 
                 string extension = info.Extension;
                 float size = info.Length / (B_TO_MB * 1.0f);
@@ -637,6 +638,8 @@ namespace Scanda.ClassLibrary
                                     //result.Wait();
                                     var result = await client.Files.UploadSessionStartAsync(body: memSream);
                                     sessionId = result.SessionId;
+                                    await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Servicio de windows ejecutandose ", "Scanda.Service.DBProtector.StartUpload"), "T");
+
                                     await status.uploadStatusFile(status.upload);
 
                                 }

@@ -42,22 +42,28 @@ namespace Scanda.ClassLibrary
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 string requestUrl = "";
                 string status = upload.status == 3 ? "Finalizado" : "EnProgreso";
-                switch(upload.status)
+                switch (upload.status)
                 {
                     case 1:
-                        requestUrl = string.Format("FileTransaction_SET?User={0}&Password={1}&StartDate={2}&ActualChunk={3}&TotalChunk={4}&Status={5}&FileName={6}&TransactionType=1", this.username, this.password, unixTimestamp, upload.chunk, upload.total, status, upload.file);
+                        requestUrl = string.Format("FileTransaction_SET?User={0}&Password={1}&StartDate={2}&ActualChunk={3}&TotalChunk={4}&Status={5}&FileName={6}&TransactionType=1", this.username, this.password, unixTimestamp, Math.Ceiling(double.Parse(upload.chunk)), Math.Ceiling(double.Parse(upload.total)), status, upload.file);
                         break;
                     case 2:
-                        requestUrl = string.Format("FileTransaction_UPDATE?User={0}&Password={1}&ActualChunk={2}&Status={3}&FileName={4}&TransactionType=1", this.username, this.password, upload.chunk, status, upload.file);
+                        requestUrl = string.Format("FileTransaction_UPDATE?User={0}&Password={1}&ActualChunk={2}&Status={3}&FileName={4}&TransactionType=1", this.username, this.password, Math.Ceiling(double.Parse(upload.chunk)), status, upload.file);
                         break;
                     case 3:
-                        requestUrl = string.Format("FileTransaction_UPDATE?User={0}&Password={1}&ActualChunk={2}&Status={3}&FileName={4}&TransactionType=1", this.username, this.password, upload.chunk, status, upload.file);
+                        requestUrl = string.Format("FileTransaction_UPDATE?User={0}&Password={1}&ActualChunk={2}&Status={3}&FileName={4}&TransactionType=1", this.username, this.password, Math.Ceiling(double.Parse(upload.total)), status, upload.file);
+
+
                         break;
                 }
                 HttpResponseMessage response = await client.GetAsync(requestUrl);
                 if (response.IsSuccessStatusCode)
                 {
                     var resp = await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+
                 }
             }
         }

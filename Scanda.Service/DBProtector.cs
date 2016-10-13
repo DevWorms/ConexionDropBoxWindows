@@ -82,8 +82,10 @@ namespace Scanda.Service
             
             if (!string.IsNullOrEmpty(config.id_customer) && !string.IsNullOrEmpty(config.path)  )
             {
-                if (!((config.type_storage != "3") && string.IsNullOrEmpty(config.hist_path)))
-                { //esta validacion es para evitar que se traten de subir respaldos sin una ruta de respaldos, 3 indica que no se deben de considerar respaldos en ninguna carpeta local
+                if (config.type_storage == "3" && string.IsNullOrEmpty(config.hist_path))
+                    return;
+                
+                 //esta validacion es para evitar que se traten de subir respaldos sin una ruta de respaldos, 3 indica que no se deben de considerar respaldos en ninguna carpeta local
                     try
                     {
                         json = File.ReadAllText(configuration_path);
@@ -159,7 +161,7 @@ namespace Scanda.Service
                         
                     }
                 }
-            }
+            
         }
 
      

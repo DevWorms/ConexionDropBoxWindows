@@ -67,7 +67,7 @@ namespace Scanda.AppTray
                 }
                 return lista;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return new List<string>(); //Lista vacia
             }
@@ -156,7 +156,7 @@ namespace Scanda.AppTray
                     string fechaminuto = fileData.Name.Substring(fileData.Name.Length - 12, 2);
                     string fechasegundo = fileData.Name.Substring(fileData.Name.Length - 10, 2);
                     string fecha = fechaDia + "/" + fechames + "/" + fechaAno + " " + fechahora + ":" + fechaminuto + ":" + fechasegundo;
-                    ret.Add(client, fecha + " " + fileData.Name);
+                    ret.Add(client, fecha);
                 }
 
                 return ret;
@@ -713,6 +713,8 @@ namespace Scanda.AppTray
             }
             catch (Exception ex)
             {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.downloadZipFile"), "E");
+                Console.WriteLine("Exepcion general ");
                 Console.WriteLine(ex);
                 return null;
             }
