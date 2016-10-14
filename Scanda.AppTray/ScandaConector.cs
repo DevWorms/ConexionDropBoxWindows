@@ -684,6 +684,11 @@ namespace Scanda.AppTray
 
                 FileMetadata metadata = x.Response;
                 archivo = File.Create(metadata.Name);
+
+                //
+
+                Stream stream = await x.GetContentAsStreamAsync();
+                stream.CopyTo(archivo);
                 archivo.Close();
 
                 /*
@@ -691,13 +696,13 @@ namespace Scanda.AppTray
 
                 Stream stream = y;
                 stream.CopyTo(archivo);
-                */
+                
 
                 var y = await x.GetContentAsByteArrayAsync();
                 File.WriteAllBytes(metadata.Name, y);
+                */
 
 
-                
                 return metadata.Name;
             }
             catch (OutOfMemoryException ex)
