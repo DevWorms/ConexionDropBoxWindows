@@ -595,8 +595,11 @@ namespace Scanda.AppTray
                             status.upload.chunk = (idx * (CHUNK_SIZE/1024d)/1024d) + "";
                             //status.upload.chunk = idx.ToString();
                             //status.upload.total = nChunks.ToString();
-                            using (var memSream = new MemoryStream(buffer, 0, byteRead))
+                            //using (var memSream = new MemoryStream(buffer, 0, byteRead))
+                            MemoryStream memSream = new MemoryStream(buffer, 0, byteRead);
+                            try
                             {
+                               
                                 if (idx == 0)
                                 {
                                     status.upload.status = 1; 
@@ -632,6 +635,16 @@ namespace Scanda.AppTray
                                         //await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
                                     }
                                 }
+                            }
+                            catch(Exception ex)
+                            {
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.uploadZipFile"), "E");
+                                Console.WriteLine("Error En el Upload");
+                                return false;
+                            }
+                            finally
+                            {
+                                    memSream.Dispose();
                             }
                         }
                     }
