@@ -23,7 +23,7 @@ namespace Scanda.AppTray
         static DropboxClient client;
         static DropboxClientConfig clientConf;
         //static string APITOKEN = "f-taP7WG2wAAAAAAAAAATT2oK8oc3cov6Bfk5dQlxjFubRX7cWBoJS5PyErF8HmQ";
-        static string APITOKEN = "f-taP7WG2wAAAAAAAAAATT2oK8oc3cov6Bfk5dQlxjFubRX7cWBoJS5PyErF8HmQ";
+        //static string APITOKEN = "f-taP7WG2wAAAAAAAAAATT2oK8oc3cov6Bfk5dQlxjFubRX7cWBoJS5PyErF8HmQ";
 
         static int B_TO_MB = 1024 * 1024;
         static int CHUNK_SIZE = 5 * B_TO_MB;
@@ -294,7 +294,7 @@ namespace Scanda.AppTray
 
                     await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical), config);
                     await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Termina limpieza en la nube", "Scanda.AppTray.Scanda.AppTray.ScandaConector.uploadFile"), "T");
-                    
+
                     #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
                     if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
                     {
@@ -360,10 +360,10 @@ namespace Scanda.AppTray
 
                     await sync_accountinfo(config, config_path);
                     await sync_updateAccount(config, config_path);
+                    return true;
                 }
-
-                return true;
-
+                else
+                    return false;
             }
             catch (Exception ex)
             {
@@ -373,7 +373,6 @@ namespace Scanda.AppTray
             }
             finally
             {
-
                 //Se borran los archivos zip de la carpeta dbprotector
 
                 List<string> eliminables = Directory.GetFiles("C:\\DBProtector\\").Where(ent => { return ent.EndsWith(".zip"); }).ToList();
