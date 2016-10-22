@@ -1,7 +1,6 @@
 ﻿using Dropbox.Api;
 using Dropbox.Api.Files;
 using Ionic.Zip;
-using Scanda.AppTray.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,14 +15,14 @@ using System.Windows.Forms;
 using System.Configuration;
 using Newtonsoft.Json;
 
-namespace Scanda.AppTray
+namespace Scanda.ClassLibrary
 {
     public class ScandaConector
     {
         static DropboxClient client;
         static DropboxClientConfig clientConf;
         //static string APITOKEN = "f-taP7WG2wAAAAAAAAAATT2oK8oc3cov6Bfk5dQlxjFubRX7cWBoJS5PyErF8HmQ";
-        //static string APITOKEN = "f-taP7WG2wAAAAAAAAAATT2oK8oc3cov6Bfk5dQlxjFubRX7cWBoJS5PyErF8HmQ";
+        static string APITOKEN = "f-taP7WG2wAAAAAAAAAATT2oK8oc3cov6Bfk5dQlxjFubRX7cWBoJS5PyErF8HmQ";
 
         static int B_TO_MB = 1024 * 1024;
         static int CHUNK_SIZE = 5 * B_TO_MB;
@@ -67,7 +66,7 @@ namespace Scanda.AppTray
                 }
                 return lista;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new List<string>(); //Lista vacia
             }
@@ -148,15 +147,7 @@ namespace Scanda.AppTray
                 foreach (string client in metadatos.Keys)
                 {
                     FileMetadata fileData = metadatos[client].AsFile;
-
-                    string fechaAno = fileData.Name.Substring(fileData.Name.Length - 22, 4);
-                    string fechaDia = fileData.Name.Substring(fileData.Name.Length - 18, 2);
-                    string fechames = fileData.Name.Substring(fileData.Name.Length - 16, 2);
-                    string fechahora = fileData.Name.Substring(fileData.Name.Length - 14, 2);
-                    string fechaminuto = fileData.Name.Substring(fileData.Name.Length - 12, 2);
-                    string fechasegundo = fileData.Name.Substring(fileData.Name.Length - 10, 2);
-                    string fecha = fechaDia + "/" + fechames + "/" + fechaAno + " " + fechahora + ":" + fechaminuto + ":" + fechasegundo;
-                    ret.Add(client, fecha);
+                    ret.Add(client, fileData.ServerModified.ToString() + " " + fileData.Name);
                 }
 
                 return ret;
@@ -194,22 +185,17 @@ namespace Scanda.AppTray
                         //Necesitamos crear un cliente
                         try
                         {
-
                             await client.Files.DeleteAsync(fm.PathDisplay);
                             var espacio_archivo_borrar = (long)fm.Size;
                             var espacio_usado = await ScandaConector.getUsedSpace(config.id_customer) * B_TO_MB;
                             var espacio_nuevo = Math.Abs(espacio_archivo_borrar - espacio_usado);
-                            double espacio = (double)espacio_nuevo / (double)1024 / (double)1024;
-
-                            int espacio_usado_Final = (int)Math.Ceiling(espacio);
                             string url = ConfigurationManager.AppSettings["api_url"];
                             using (var client = new HttpClient())
                             {
                                 client.BaseAddress = new Uri(url);
                                 client.DefaultRequestHeaders.Accept.Clear();
                                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                                string llamada = string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, espacio_usado_Final);
-                                HttpResponseMessage response = await client.GetAsync(llamada);
+                                HttpResponseMessage response = await client.GetAsync(string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, espacio_nuevo));
                                 if (response.IsSuccessStatusCode)
                                 {
 
@@ -220,13 +206,9 @@ namespace Scanda.AppTray
                         }
                         catch (BadInputException ex)
                         {
+
                             await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.deleteHistory "), "E");
                             Console.WriteLine("Error de Token");
-                            Console.WriteLine(ex.Message);
-                        }
-                        catch (Exception ex)
-                        {
-                            await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.deleteHistory "), "E");
                             Console.WriteLine(ex.Message);
                         }
                     }
@@ -235,146 +217,164 @@ namespace Scanda.AppTray
         }
 
 
+        
 
-        public static async Task<bool> uploadFile(string archivo, string usrId, Status status, List<string> extensions = null, Config config = null, string config_path = null)
+        public static async Task<int> uploadFile(string archivo, string usrId, Status status, List<string> extensions = null, Config config = null, string config_path = null)
         {
-
             status.upload.file = archivo;
             status.upload.status = 1;
+            string ruta = string.Empty;
             try
             {
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Servicio de windows ejecutandose ", "Scanda.Service.DBProtector.StartUpload"), "T");
+
                 FileInfo info = new FileInfo(archivo);
-                //validamos extensiones
-                if (!isValidExt(info.Extension, extensions))
-                    return false; // No es una extension valida
 
-
-                double size = (double)info.Length / (double)B_TO_MB;
-
-                //Validamos el tamanio
-                bool esvalido = await isValidSize(Math.Ceiling(size), config);
-                if (!esvalido)
-                    return false;
-
-
-                string name = info.Name;
-                status.upload.file = info.Name;
-                //NOmbre del archivo
-                if (!isValidFileName(name))
-                    return false;
-
-
-                //Generamos la ruta
-                DateTime date = DateTime.Today;
-                string year;
-                string month;
-
-                year = date.Year + "";
-                if (date.Month < 10)
-                    month = "0" + date.Month;
-                else
-                    month = "" + date.Month;
-
-                //Zipeamos l archivo
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", archivo, "Cifrando archivo...", "Scanda.AppTray.ScandaConector.uploadFile"), "T");
-                string zip = cifrar(archivo, usrId);
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", archivo, "Cifrando completo...", "Scanda.AppTray.ScandaConector.uploadFile"), "T");
-                string ruta = usrId + "/" + year + "/" + month;
-                status.upload.status = 1;
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", archivo, "Comenzando subida...", "Scanda.AppTray.ScandaConector.uploadFile"), "T");
-                var res = await uploadZipFile(zip, ruta, status);
-
-                if (res)
+                //validamos q el archivo no se este usando por otro proceso
+                if (!IsLocked(info))
                 {
-                    await Logger.sendLog(string.Format("{0} | {1} | {2}", archivo, "subida terminada...", "Scanda.AppTray.ScandaConector.uploadFile"), "T");
-                    await sync_accountinfo(config, config_path);
+
+                    
+                    
+
+                    //validamos extensiones
+                    if (!isValidExt(info.Extension, extensions))
+                        return 0; //Fracaso// No es una extension valida
 
 
-                    // Realizamos la limpieza en Cloud
-                    await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza limpieza en la nube", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "T");
+                    double size = info.Length / B_TO_MB;
 
-                    await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical), config);
-                    await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Termina limpieza en la nube", "Scanda.AppTray.Scanda.AppTray.ScandaConector.uploadFile"), "T");
+                    //Validamos el tamanio
+                    bool esvalido = await isValidSize(Math.Ceiling(size), config);
+                    if (!esvalido)
+                        return 0;//Fracaso
 
-                    #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
-                    if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
+
+                    string name = info.Name;
+                    status.upload.file = info.Name;
+                    //NOmbre del archivo
+                    if (!isValidFileName(name))
+                        return 0; //Fracaso
+
+
+                    //Generamos la ruta
+                    DateTime date = DateTime.Today;
+                    string year;
+                    string month;
+
+                    year = date.Year + "";
+                    if (date.Month < 10)
+                        month = "0" + date.Month;
+                    else
+                        month = "" + date.Month;
+
+                    //Zipeamos l archivo
+                    await Logger.sendLog(string.Format("{0} | {1} | {2}", archivo, "Cifrando archivo...", "Scanda.ClassLibrary.ScandaConector.uploadFile"), "T");
+                    string zip = cifrar(archivo, usrId);
+                    await Logger.sendLog(string.Format("{0} | {1} | {2}", archivo, "Cifrando completo...", "Scanda.ClassLibrary.ScandaConector.uploadFile"), "T");
+
+                    ruta = usrId + "/" + year + "/" + month;
+                    status.upload.status = 1;
+                    await Logger.sendLog(string.Format("{0} | {1} | {2}", archivo, "Comenzando subida...", "Scanda.ClassLibrary.ScandaConector.uploadFile"), "T");
+                    var res = await uploadZipFile(zip, ruta, status);
+                    if (res)
                     {
-                        // Comenzamos a mover los archivos 
-                        //  List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name) && isValidExt(ent.Name, config.extensions)).OrderBy(f => f.LastWriteTime).ToList();
-                        // foreach (FileInfo file in fileEntries2)
-                        //{
-                        if (isValidFileName(info.Name))
+
+                        await Logger.sendLog(string.Format("{0} | {1} | {2}", archivo, "subida terminada...", "Scanda.ClassLibrary.ScandaConector.uploadFile"), "T");
+                        await sync_accountinfo(config, config_path);
+
+                        // Realizamos la limpieza en Cloud
+                        await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza limpieza en la nube", "Scanda.AppTray.FormTray.syncNowToolStripMenuItem_Click"), "T");
+
+                        await ScandaConector.deleteHistory(config.id_customer, int.Parse(config.cloud_historical), config);
+                        await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Termina limpieza en la nube", "Scanda.AppTray.Scanda.AppTray.ScandaConector.uploadFile"), "T");
+
+                        await Logger.sendLog(string.Format("{0} | {1} | {2}", "Eliminando archivos temporales", "Comienza limpieza de archivos temporales local", "Scanda.AppTray.Scanda.AppTray.ScandaConector.uploadFile"), "T");
+
+                        #region Realizamos el movimiento de los archivos que se suben a la carpeta historicos
+                        if (!string.IsNullOrEmpty(config.type_storage) && config.type_storage != "3")
                         {
-                            //cuando vale 1 y 2 se mueve a una carpeta el respaldo, cuanfdo vale 3 se borra localmente
-                            if (config.type_storage == "1" || config.type_storage == "2")
+                            // Comenzamos a mover los archivos 
+                            //  List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().Where(ent => isValidFileName(ent.Name) && isValidExt(ent.Name, config.extensions)).OrderBy(f => f.LastWriteTime).ToList();
+                            // foreach (FileInfo file in fileEntries2)
+                            //{
+                            if (isValidFileName(info.Name))
                             {
-                                // Se copia a Historicos
-                                if (File.Exists(config.hist_path + "\\" + info.Name))
-                                    File.Delete(config.hist_path + "\\" + info.Name);
-                                File.Copy(config.path + "\\" + info.Name, config.hist_path + "\\" + info.Name);
+                                string desde = (config.path + "\\" + info.Name).Replace("\u0027\\", "");
+                                string hacia = (config.hist_path + "\\" + info.Name).Replace("\u0027", "");
+
+                                //cuando vale 1 y 2 se mueve a una carpeta el respaldo, cuanfdo vale 3 se borra localmente
+                                if (config.type_storage == "1" || config.type_storage == "2")
+                                {
+                                    // Se copia a Historicos
+                                    if (File.Exists(config.hist_path + "\\" + info.Name))
+                                        File.Delete(config.hist_path + "\\" + info.Name);
+
+                                    await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name, "Moviendo archivo de  " + desde + " hacia " + hacia, "Scanda.AppTray.Scanda.AppTray.ScandaConector.uploadFile"), "T");
+                                    File.Copy(desde, hacia);
+                                    await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name, "Movido a " + config.hist_path + "\\" + info.Name, "Scanda.AppTray.Scanda.AppTray.ScandaConector.uploadFile"), "T");
+
+                                }
+                                File.Delete(desde);
                             }
-                            File.Delete(config.path + "\\" + info.Name);
+                            //}
+
+                            List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                            // verificamos el limite
+
+                            //Borramos en la nube
+                            //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
+                            //Borramos local
+                            bool canTransfer = false;
+                            while (!canTransfer)
+                            {
+                                if (histFileEntries.Count() <= int.Parse(config.file_historical))
+                                {
+
+                                    canTransfer = true;
+
+                                }
+                                else
+                                {
+
+                                    FileInfo item = histFileEntries.FirstOrDefault();
+                                    if (item != null)
+                                        File.Delete(config.hist_path + "\\" + item.Name);
+                                    histFileEntries.Remove(item);
+                                    await Logger.sendLog(string.Format("{0} | {1} | {2}", item.Name, "limpiado de historico local", "Scanda.AppTray.Scanda.AppTray.ScandaConector.uploadFile"), "T");
+
+                                }
+                            }
+
                         }
-                        //}
-
-                        List<FileInfo> histFileEntries = new DirectoryInfo(config.hist_path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                        // verificamos el limite
-
-                        //Borramos en la nube
-                        //ScandaConector.deleteHistory(config.id_customer, config.file_historical);
-                        //Borramos local
-                        bool canTransfer = false;
-                        while (!canTransfer)
+                        else if (config.type_storage == "3")
                         {
-                            if (histFileEntries.Count() <= int.Parse(config.file_historical))
+                            // Comenzamos a mover los archivos 
+                            //  List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                            //   foreach (FileInfo file in fileEntries2)
+                            // {
+                            if (isValidFileName(info.Name))
                             {
-
-                                canTransfer = true;
+                                // Se borra el archivo localmente porque la configurcion es 3
+                                File.Delete(config.path + "\\" + info.Name);
                             }
-                            else
-                            {
-                                FileInfo item = histFileEntries.FirstOrDefault();
-                                if (item != null)
-                                    File.Delete(config.hist_path + "\\" + item.Name);
-                                histFileEntries.Remove(item);
-
-                            }
+                            //}
                         }
 
+                        #endregion
+                        await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Termina limpieza de archivos temporales local", "Scanda.AppTray.ScandaConector.syncNowToolStripMenuItem_Click"), "T");
+
+                        await sync_accountinfo(config, config_path);
+                        await sync_updateAccount(config, config_path);
                     }
-                    else if (config.type_storage == "3")
-                    {
-                        // Comenzamos a mover los archivos 
-                        //  List<FileInfo> fileEntries2 = new DirectoryInfo(config.path).GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                        //   foreach (FileInfo file in fileEntries2)
-                        // {
-                        if (isValidFileName(info.Name))
-                        {
-                            // Se borra el archivo localmente porque la configurcion es 3
-                            File.Delete(config.path + "\\" + info.Name);
-                        }
-                        //}
-                    }
 
-                    #endregion
-                    await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Termina limpieza de archivos temporales local", "Scanda.AppTray.ScandaConector.syncNowToolStripMenuItem_Click"), "T");
-
-                    await sync_accountinfo(config, config_path);
-                    await sync_updateAccount(config, config_path);
-                    return true;
                 }
                 else
-                    return false;
-            }
-            catch (Exception ex)
-            {
-                await Logger.sendLog(string.Format("{0} | Error al sincronizar {1} | {2}", "Scanda.AppTray.ScandaConector.uploadFile", ex.Message, ex.StackTrace), "E");
-                return false;
+                {
+                    await Logger.sendLog(string.Format("{0} | {1} | {2}", info.Name, "carga en progreso servicio de windows ", "Scanda.classlibrary.ScandaConector.uploadfile"), "T");
+                    return 3;//Archivo cargandose
+                }
 
-            }
-            finally
-            {
-                //Se borran los archivos zip de la carpeta dbprotector
 
                 List<string> eliminables = Directory.GetFiles("C:\\DBProtector\\").Where(ent => { return ent.EndsWith(".zip"); }).ToList();
 
@@ -382,17 +382,53 @@ namespace Scanda.AppTray
                 {
                     foreach (string file in eliminables)
                     {
-                        File.Delete(file); //Se borra el zip creado
+                        if (!IsLocked(new FileInfo(file)))
+                            File.Delete(file); //Se borra el zip creado
                     }
                 }
+                return 1; // Exito
+
+
+
             }
+            catch (Exception ex)
+            {
+                await Logger.sendLog(string.Format("{0} |Error al sincronizar {1} | {2}", ex.Message, ex.StackTrace, "ClassLibrary.UploadFile"), "E");
+                Console.WriteLine(ex);
+
+                List<string> eliminables = Directory.GetFiles("C:\\DBProtector\\").Where(ent => { return ent.EndsWith(".zip"); }).ToList();
+
+                if (eliminables != null)
+                {
+                    foreach (string file in eliminables)
+                    {
+                        if (!IsLocked(new FileInfo(file)))
+                            File.Delete(file); //Se borra el zip creado
+                    }
+                }
+                return 0;// fracaso
+
+            }
+        }
+        
+
+        private static bool IsLocked(FileInfo f)
+        {
+            try
+            {
+                string fpath = f.FullName;
+                FileStream fs = File.OpenWrite(fpath);
+                fs.Close();
+                return false;
+            }
+            catch (Exception) { return true; }
         }
 
         private static async Task sync_updateAccount(Config config, string config_path)
         {
             try
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza actualizando informacion del usuario...", "Scanda.AppTray.ScandaConector.syncUpdateAccount"), "T");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza actualizando informacion del usuario...", "Scanda.ClassLibrary.ScandaConector.syncUpdateAccount"), "T");
 
                 // Obtenemos los datos de dropbox
                 var x = await ScandaConector.getUsedSpace(config.id_customer);
@@ -409,12 +445,12 @@ namespace Scanda.AppTray
 
                     }
                 }
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "informacion del usuario actualizada", "Scanda.AppTray.ScandaConector.syncUpdateAccount"), "T");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "informacion del usuario actualizada", "Scanda.ClassLibrary.ScandaConector.syncUpdateAccount"), "T");
 
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scadna.AppTray.ScandaConector.sync_updateAccount"), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scadna.AppTray.ClassLibrary.sync_updateAccount"), "E");
             }
         }
 
@@ -422,7 +458,7 @@ namespace Scanda.AppTray
         {
             try
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza actualizando informacion del usuario...", "Scanda.AppTray.ScandaConector.syncUpdateAccount"), "T");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Comienza actualizando informacion del usuario...", "Scanda.ClassLibrary.ScandaConector.syncUpdateAccount"), "T");
 
                 string url = ConfigurationManager.AppSettings["api_url"];
                 using (var client = new HttpClient())
@@ -446,7 +482,7 @@ namespace Scanda.AppTray
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scadna.AppTray.ScandaConector.sync_accountinfo"), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scadna.ClassLibrary.sync_accountinfo"), "E");
             }
         }
 
@@ -461,12 +497,12 @@ namespace Scanda.AppTray
 
                 string pathRemoto = usrId + "/" + year + "/" + month + "/" + fileN;
                 status.download.status = 1;
-
+                
                 status.download.path = destino + "/" + fileN;
                 await status.downloadStatusFile(status.download);
                 //Bajo el zip a la carpeta del programa
                 string zip = await downloadZipFile(pathRemoto, "C:\\DBProtector");
-                //string zip = await downloadZipFile(pathRemoto, destino);
+                ////string zip = await downloadZipFile(pathRemoto, destino);
                 //extraemos el archivo
                 string archivo = decifrar(zip, usrId);
                 //delete zip
@@ -478,7 +514,7 @@ namespace Scanda.AppTray
 
                 FileInfo info = new FileInfo(destino + "/" + archivo);
 
-                status.download.chunk = info.Length + "";
+                status.download.chunk = info.Length+"";
                 status.download.status = 3;
                 status.download.path = destino + "/" + archivo;
                 await status.downloadStatusFile(status.download);
@@ -558,8 +594,9 @@ namespace Scanda.AppTray
                 clientConf = new DropboxClientConfig("ScandaV1");
                 client = new DropboxClient(APITOKEN);
                 FileInfo info = new FileInfo(origen);
-
+                
                 status.upload.total = ((info.Length * 1)) / (B_TO_MB * 1.0f) + ""; //Esta en bytes para convertirlos en megas /1024d)/1024d
+                await Logger.sendLog(string.Format("Peso total del archivo es de {0} en megas {1}", info.Length, status.upload.total), "T");
 
                 string extension = info.Extension;
                 float size = info.Length / (B_TO_MB * 1.0f);
@@ -595,11 +632,9 @@ namespace Scanda.AppTray
                             status.upload.chunk = (idx * (CHUNK_SIZE / 1024d) / 1024d) + "";
                             //status.upload.chunk = idx.ToString();
                             //status.upload.total = nChunks.ToString();
-                            //using (var memSream = new MemoryStream(buffer, 0, byteRead))
                             MemoryStream memSream = new MemoryStream(buffer, 0, byteRead);
                             try
                             {
-
                                 if (idx == 0)
                                 {
                                     status.upload.status = 1;
@@ -607,6 +642,8 @@ namespace Scanda.AppTray
                                     //result.Wait();
                                     var result = await client.Files.UploadSessionStartAsync(body: memSream);
                                     sessionId = result.SessionId;
+                                    await Logger.sendLog(string.Format("{0} | {1} | {2}", "", "Servicio de windows ejecutandose ", "Scanda.Service.DBProtector.StartUpload"), "T");
+
                                     await status.uploadStatusFile(status.upload);
 
                                 }
@@ -649,31 +686,29 @@ namespace Scanda.AppTray
                         }
                     }
                 }
-
-
                 return true;
             }
             catch (OutOfMemoryException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.uploadZipFile"), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "ScandaConector.uploadZipFile"), "E");
                 Console.WriteLine("Se acabo la memoria");
                 return false;
             }
             catch (FileNotFoundException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.uploadZipFile"), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "ScandaConector.uploadZipFile"), "E");
                 Console.WriteLine("No existe el archivo");
                 return false;
             }
             catch (AggregateException ex) //Excepciones al vuelo
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.uploadZipFile"), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "ScandaConector.uploadZipFile"), "E");
                 Console.WriteLine("Tarea Cancelada");
                 return false;
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.uploadZipFile"), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "ScandaConector.uploadZipFile"), "E");
                 Console.WriteLine(ex);
                 return false;
             }
@@ -699,61 +734,48 @@ namespace Scanda.AppTray
                 FileMetadata metadata = x.Response;
                 archivo = File.Create(metadata.Name);
 
-                //
-
-                Stream stream = await x.GetContentAsStreamAsync();
-                stream.CopyTo(archivo);
-                archivo.Close();
-
-                /*
                 var y = await x.GetContentAsStreamAsync();
 
                 Stream stream = y;
                 stream.CopyTo(archivo);
-                
 
-                var y = await x.GetContentAsByteArrayAsync();
-                File.WriteAllBytes(metadata.Name, y);
-                */
-
+                archivo.Close();
 
                 return metadata.Name;
             }
             catch (OutOfMemoryException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.downloadZipFile"), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}",  ex.Message, ex.StackTrace, "Scanda.ClassLibrary.ScandaConector.downloadZipFile"), "E");
                 Console.WriteLine("Se acabo la memoria");
                 return null;
             }
             catch (FileNotFoundException ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.downloadZipFile"), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.ClassLibrary.ScandaConector.downloadZipFile"), "E");
                 Console.WriteLine("No existe el archivo");
                 return null;
             }
             catch (AggregateException ex) //Excepciones al vuelo
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.downloadZipFile"), "E");
+                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.ClassLibrary.ScandaConector.downloadZipFile"), "E");
                 Console.WriteLine("Tarea Cancelada");
                 return null;
             }
             catch (Exception ex)
             {
-                await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.downloadZipFile"), "E");
-                Console.WriteLine("Exepcion general ");
                 Console.WriteLine(ex);
                 return null;
             }
             finally
             {
-                if (archivo != null)
+                if (archivo!=null)
                 {
                     archivo.Close();
                     archivo.Dispose();
                 }
             }
         }
-        public static async Task<int> getUsedSpace(string userID, int s = 1)
+        public static async Task<long> getUsedSpace(string userID, int s = 1)
         {
             //obtengo todos los archivos 
             ListFolderResult res = await listFiles(userID, true);
@@ -762,8 +784,10 @@ namespace Scanda.AppTray
 
             long tam = (long)archivos.Select((x) => { return x.Size; }).Aggregate((x, y) => { return x + y; });
 
-            return (int)Math.Ceiling((double)tam / (double)B_TO_MB);
+            return tam / B_TO_MB;
         }
+
+     
         private static string cifrar(string origen, string usrId)
         {
             FileInfo info = new FileInfo(origen);
@@ -776,7 +800,7 @@ namespace Scanda.AppTray
                 zip.AddFile(origen, ".");
                 zip.Name = info.Name + ".zip";
                 if (File.Exists("C:\\DBProtector\\" + info.Name + ".zip"))
-                    File.Delete("C:\\DBProtector\\" + info.Name + ".zip");
+                    File.Delete("C:\\DBPotector\\" + info.Name + ".zip");
 
                 zip.Save("C:\\DBProtector\\" + info.Name + ".zip");
 
@@ -792,9 +816,8 @@ namespace Scanda.AppTray
                 using (ZipFile zip = ZipFile.Read(origen))
                 {
                     string pass = SHA256string(usrId);
-                    string file = origen.Replace(".zip", "");
-                    if (File.Exists(file))
-                    {
+                    string file = origen.Replace(".zip","");
+                    if (File.Exists(file)) {
                         File.Delete(file);
                     }
                     ZipEntry entry = zip.First();
@@ -849,14 +872,14 @@ namespace Scanda.AppTray
                         }
                         else
                         {
-                            int res = r.StorageLimit - r.UsedStorage;
-                            if (res > 0)
+                            int res = Math.Abs(r.StorageLimit - r.UsedStorage);
+                            if (tam < res)
                             {
                                 tamvalido = true;
                             }
                             else
                             {
-                                await Logger.sendLog(string.Format("{0} | {1} | {2}", " Sin espacio", "Se agoto el espacio, este cliente cuenta con " + r.StorageLimit + " MB disponibles en la nube", "Scadna.AppTray.ScandaConector.isValidSize"), "E");
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", " Sin espacio", "Se agoto el espacio ya este cliente tiene " + r.StorageLimit + " en la nube", "Scadna.AppTray.ScandaConector.isValidSize"), "E");
                                 tamvalido = false;
                             }
                         }
@@ -886,7 +909,6 @@ namespace Scanda.AppTray
                 return false;
             }
         }
-
         private static bool isValidExt(string ext, List<string> extensions)
         {
             if (extensions == null)
