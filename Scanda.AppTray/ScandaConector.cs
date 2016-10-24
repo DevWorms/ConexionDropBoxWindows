@@ -26,7 +26,7 @@ namespace Scanda.AppTray
         //static string APITOKEN = "f-taP7WG2wAAAAAAAAAATT2oK8oc3cov6Bfk5dQlxjFubRX7cWBoJS5PyErF8HmQ";
 
         static int B_TO_MB = 1024 * 1024;
-        static int CHUNK_SIZE = 5 * B_TO_MB;
+        static int CHUNK_SIZE = 1 * B_TO_MB;
 
         static string STATUSFILE = "status.json";
         //static string BACKEDFOLDER = "Backed";
