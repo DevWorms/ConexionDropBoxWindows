@@ -83,9 +83,10 @@ namespace Scanda.AppTray.Models
                 switch(download.status)
                 {
                     case 1:
-                        requestUrl = string.Format("FileTransaction_SET?User={0}&Password={1}&StartDate={2}&ActualChunk={3}&TotalChunk={4}&Status={5}&FileName={6}&TransactionType=2", this.username, this.password, unixTimestamp, 2, 2, status, download.file);
+                        requestUrl = string.Format("FileTransaction_SET?User={0}&Password={1}&StartDate={2}&ActualChunk={3}&TotalChunk={4}&Status={5}&FileName={6}&TransactionType=2", this.username, this.password, unixTimestamp, 0, 0, status, download.file);
                         break;
                     case 3:
+                    case 2:
                         requestUrl = string.Format("FileTransaction_UPDATE?User={0}&Password={1}&ActualChunk={2}&Status={3}&FileName={4}&TransactionType=2", this.username, this.password,download.chunk, status, download.file);
                         break;
                 }

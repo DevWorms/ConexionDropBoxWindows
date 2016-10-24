@@ -38,7 +38,7 @@ namespace Scanda.AppTray
 
                 using (var client = new HttpClient())
                 {
-                    var service_url = string.Format("Log_SET?Message={0}&MessageType={2}&Code=1&AppVersion=1.11.W&IdCustomer={1}", Message, string.IsNullOrEmpty(config.id_customer) ? "-1":config.id_customer, Type);
+                    var service_url = string.Format("Log_SET?Message={0}&MessageType={2}&Code=1&AppVersion=1.12.W&IdCustomer={1}", Message, string.IsNullOrEmpty(config.id_customer) ? "-1":config.id_customer, Type);
                     client.BaseAddress = new Uri(url);
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

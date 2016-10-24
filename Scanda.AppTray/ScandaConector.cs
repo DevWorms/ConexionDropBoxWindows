@@ -477,7 +477,7 @@ namespace Scanda.AppTray
 
                 FileInfo info = new FileInfo(destino + "/" + archivo);
 
-                status.download.chunk = info.Length+"";
+                status.download.chunk = info.Length/1024d+"";
                 status.download.status = 3;
                 status.download.path = destino + "/" + archivo;
                 await status.downloadStatusFile(status.download);
