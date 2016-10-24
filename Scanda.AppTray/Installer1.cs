@@ -38,19 +38,18 @@ namespace Scanda.AppTray
 
         public override void Uninstall(IDictionary savedState)
         {
-            Process application = null;
+
             foreach (var process in Process.GetProcesses())
             {
-                if (!process.ProcessName.ToLower().Contains("dbprotector")) continue;
-                application = process;
-                break;
+                if (process.ProcessName.ToLower().Contains("dbprotector"))
+                {
+                    process.Kill();
+                }
             }
 
-            if (application != null && application.Responding)
-            {
-                application.Kill();
-                base.Uninstall(savedState);
-            }
+            base.Uninstall(savedState);
+            
+            
         }
     }
 }
