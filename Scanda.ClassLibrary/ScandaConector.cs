@@ -733,13 +733,21 @@ namespace Scanda.ClassLibrary
 
                 FileMetadata metadata = x.Response;
                 archivo = File.Create(metadata.Name);
-
-                var y = await x.GetContentAsStreamAsync();
-
-                Stream stream = y;
-                stream.CopyTo(archivo);
-
                 archivo.Close();
+                //
+
+                Stream stream = await x.GetContentAsStreamAsync();
+                //
+                //stream.CopyTo(archivo);
+                byte[] buff = new byte[CHUNK_SIZE];
+                int read;
+                while (0 < (read = stream.Read(buff, 0, CHUNK_SIZE)))
+                {
+                    using (var appedS = new FileStream(metadata.Name, FileMode.Append))
+                    {
+                        appedS.Write(buff, 0, read);
+                    }
+                }
 
                 return metadata.Name;
             }

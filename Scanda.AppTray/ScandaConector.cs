@@ -697,13 +697,22 @@ namespace Scanda.AppTray
 
                 FileMetadata metadata = x.Response;
                 archivo = File.Create(metadata.Name);
-
+                archivo.Close();
                 //
 
                 Stream stream = await x.GetContentAsStreamAsync();
-                stream.CopyTo(archivo);
-                archivo.Close();
-
+                //
+                //stream.CopyTo(archivo);
+                byte[] buff= new byte[CHUNK_SIZE];
+                int read;
+                while(0 < (read=stream.Read(buff, 0, CHUNK_SIZE) ) )
+                {
+                    using (var appedS = new FileStream(metadata.Name, FileMode.Append))
+                    {
+                        appedS.Write(buff, 0, read);
+                    }
+                }
+                
                 /*
                 var y = await x.GetContentAsStreamAsync();
 
