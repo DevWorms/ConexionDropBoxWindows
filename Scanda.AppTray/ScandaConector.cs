@@ -627,8 +627,7 @@ namespace Scanda.AppTray
                                     {
                                         //var x =  client.Files.UploadSessionAppendAsync(cursor, memSream);
                                         //x.Wait();
-                                        //var x = await client.Files.UploadSessionAppendAsync(cursor, memSream);
-                                        await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
+                                        await client.Files.UploadSessionAppendAsync(cursor, memSream);
                                         await status.uploadStatusFile(status.upload);
                                         // x.Wait();
                                         //await client.Files.UploadSessionAppendV2Async(new UploadSessionAppendArg(cursor), memSream);
