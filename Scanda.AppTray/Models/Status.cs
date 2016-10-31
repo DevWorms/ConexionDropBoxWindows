@@ -77,7 +77,7 @@ namespace Scanda.AppTray.Models
                 client.BaseAddress = new Uri(this.base_url);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                string status = upload.status == 3 ? "Finalizado" : "EnProgreso";
+                string status = download.status == 3 ? "Finalizado" : "EnProgreso";
                 string requestUrl = "";
 
                 switch(download.status)
@@ -87,7 +87,7 @@ namespace Scanda.AppTray.Models
                         break;
                     case 3:
                     case 2:
-                        requestUrl = string.Format("FileTransaction_UPDATE?User={0}&Password={1}&ActualChunk={2}&Status={3}&FileName={4}&TransactionType=2", this.username, this.password,download.chunk, status, download.file);
+                        requestUrl = string.Format("FileTransaction_UPDATE?User={0}&Password={1}&ActualChunk={2}&Status={3}&FileName={4}&TransactionType=2", this.username, this.password, Math.Ceiling(double.Parse(download.chunk)), status, download.file);
                         break;
                 }
 
