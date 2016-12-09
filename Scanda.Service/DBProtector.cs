@@ -79,7 +79,8 @@ namespace Scanda.Service
 
         public async Task StartUpload()
         {
-            
+            await Logger.sendLog(string.Format("{0} | {1} | {2}", "Servicio esta corriendo", "programado por tiempo de configuracion ", " "), "T");
+
             if (!string.IsNullOrEmpty(config.id_customer) && !string.IsNullOrEmpty(config.path)  )
             {
                 if (config.type_storage == "3" && string.IsNullOrEmpty(config.hist_path))

@@ -115,12 +115,15 @@ namespace Scanda.Service
 
         private async void TimerHandler(object sender, ElapsedEventArgs e)
         {
+        
             await this.dbProtector.StartUpload();
         }
         
 
         protected override void OnStart(string[] args)
         {
+            Logger.writeErrors("Servicio iniciado");
+
 
             if (config != null && !string.IsNullOrEmpty(config.time))
             {
@@ -130,7 +133,9 @@ namespace Scanda.Service
                     if (xTime != 0)
                     {
                         int timestamp = xTime * 3600 * 1000; // horas * 60 * 1000
-                                             // Create a timer with a ten second interval.
+                                                             // Create a timer with a ten second interval.
+                        
+
                         aTimer = new System.Timers.Timer(timestamp);
 
                         // Hook up the Elapsed event for the timer.
@@ -145,6 +150,7 @@ namespace Scanda.Service
                 catch(Exception ex)
                 {
 
+                    Logger.writeErrors(ex.Message);
                 }
             }
            

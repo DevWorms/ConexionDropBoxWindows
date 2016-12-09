@@ -203,7 +203,7 @@ namespace Scanda.AppTray
                     {
                         string item = response[key];
                         var strs = item.Split(' ');
-                        items.Add(new Historico() { RFC = key, Fecha = strs[0] + " " + strs[1] + " " + strs[2] });
+                        items.Add(new Historico() { RFC = key, Fecha = strs[0] + " " + strs[1]  });
                     }
                    
                 }

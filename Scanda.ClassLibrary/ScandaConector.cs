@@ -186,16 +186,18 @@ namespace Scanda.ClassLibrary
                         try
                         {
                             await client.Files.DeleteAsync(fm.PathDisplay);
-                            var espacio_archivo_borrar = (long)fm.Size;
+
                             var espacio_usado = await ScandaConector.getUsedSpace(config.id_customer) * B_TO_MB;
-                            var espacio_nuevo = Math.Abs(espacio_archivo_borrar - espacio_usado);
+
+                            double espacio = (double)espacio_usado / (double)1024 / (double)1024;
+
                             string url = ConfigurationManager.AppSettings["api_url"];
                             using (var client = new HttpClient())
                             {
                                 client.BaseAddress = new Uri(url);
                                 client.DefaultRequestHeaders.Accept.Clear();
                                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                                HttpResponseMessage response = await client.GetAsync(string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, espacio_nuevo));
+                                HttpResponseMessage response = await client.GetAsync(string.Format("CustomerStorage_SET?UsedStorage={2}&User={0}&Password={1}", config.user, config.password, espacio));
                                 if (response.IsSuccessStatusCode)
                                 {
 
@@ -207,8 +209,13 @@ namespace Scanda.ClassLibrary
                         catch (BadInputException ex)
                         {
 
-                            await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.AppTray.ScandaConector.deleteHistory "), "E");
+                            await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.ClassLibrary.ScandaConector.deleteHistory "), "E");
                             Console.WriteLine("Error de Token");
+                            Console.WriteLine(ex.Message);
+                        }
+                        catch (Exception ex)
+                        {
+                            await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.ClassLibrary.ScandaConector.deleteHistory "), "E");
                             Console.WriteLine(ex.Message);
                         }
                     }
@@ -793,10 +800,11 @@ namespace Scanda.ClassLibrary
 
             long tam = (long)archivos.Select((x) => { return x.Size; }).Aggregate((x, y) => { return x + y; });
 
-            return tam / B_TO_MB;
+            return (long)(Math.Ceiling((double)tam / (double)B_TO_MB));
+
         }
 
-     
+
         private static string cifrar(string origen, string usrId)
         {
             FileInfo info = new FileInfo(origen);
@@ -881,20 +889,23 @@ namespace Scanda.ClassLibrary
                         }
                         else
                         {
-                            int res = Math.Abs(r.StorageLimit - r.UsedStorage);
-                            if (tam < res)
+                            long espacioUsuadoFuturo = await obtenerEspacioUsado(config.id_customer, Convert.ToInt32(config.cloud_historical), config);
+                            long archivoEnMegasParaSubir = (long)Math.Ceiling(tam / B_TO_MB);
+                            long res = (long)r.StorageLimit - (archivoEnMegasParaSubir + espacioUsuadoFuturo);
+                            if (res > 0)
                             {
                                 tamvalido = true;
                             }
                             else
                             {
-                                await Logger.sendLog(string.Format("{0} | {1} | {2}", " Sin espacio", "Se agoto el espacio ya este cliente tiene " + r.StorageLimit + " en la nube", "Scadna.AppTray.ScandaConector.isValidSize"), "E");
+                                await Logger.sendLog(string.Format("{0} | {1} | {2}", " Sin espacio", "Se agoto el espacio, este cliente cuenta con " + r.StorageLimit + " MB disponibles en la nube", "Scadna.AppTray.ScandaConector.isValidSize"), "E");
                                 tamvalido = false;
                             }
                         }
 
                     }
                 }
+
                 return tamvalido;
 
             }
@@ -905,6 +916,54 @@ namespace Scanda.ClassLibrary
             }
 
         }
+
+        //si cantidad -1 no hay limite
+        public static async Task<long> obtenerEspacioUsado(string userID, int cant, Config config)
+        {
+            if (cant == -1)
+                return 0;
+            long tamanoALiberar = 0; // Este es el tamaño que dejara disponible un archivo cuando sea eliminado en la nube en la etapa final
+                                     //obtengo todos los archivos 
+            ListFolderResult res = await listFiles(userID, true);
+            List<Metadata> todo = res.Entries as List<Metadata>;
+            List<FileMetadata> archivos = todo.Where(x => x.IsFile).Select(y => y.AsFile).ToList();
+            archivos.Sort((a, b) => a.ServerModified.CompareTo(b.ServerModified)); //Ordenamos , mas viejos primero
+
+            int dif = archivos.Count - cant; //Cuantos debo de eliminar
+            if (dif < 0)
+                return 0; //quiere decir que no hay archivos por borrar
+            dif += 1; //se suma uno porque se tiene que considerar el archivo que se pretende subir 
+            foreach (FileMetadata fm in archivos.Take(dif))
+            {
+                //Necesitamos crear un cliente
+                try
+                {
+
+                    var espacio_archivo_borrar = (long)fm.Size;
+
+                    tamanoALiberar += espacio_archivo_borrar;
+
+                }
+                catch (BadInputException ex)
+                {
+                    await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.ClassLibrary.obtenerEspacioUsado "), "E");
+                    Console.WriteLine("Error de Token");
+                    Console.WriteLine(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    await Logger.sendLog(string.Format("{0} | {1} | {2}", ex.Message, ex.StackTrace, "Scanda.ClassLibrary.obtenerEspacioUsado "), "E");
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            var espacio_usado = await ScandaConector.getUsedSpace(config.id_customer);
+
+            long espacioFuturoFinal = Math.Abs(tamanoALiberar / B_TO_MB - espacio_usado);
+            return espacioFuturoFinal;
+
+        }
+
         private static bool isValidFileName(string fileName)
         {
             if (String.IsNullOrEmpty(fileName))
